@@ -1,0 +1,15 @@
+{
+  "name": "PLUGIN_NAME",
+  "version": "1.0.0",
+  "description": "Brief description of what this plugin does",
+  "author": {
+    "name": "jaykim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "keyword1",
+    "keyword2"
+  ]
+}

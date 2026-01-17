@@ -3,8 +3,9 @@
  * npx installer for claude-ai-engineering
  *
  * Usage:
- *   npx github:jaykim/claude-ai-engineering                  # Install all
- *   npx github:jaykim/claude-ai-engineering learning-summary # Install specific skill
+ *   npx github:jaykim/claude-ai-engineering                    # Install all plugins
+ *   npx github:jaykim/claude-ai-engineering learning-summary   # Install specific plugin
+ *   npx github:jaykim/claude-ai-engineering --list             # List available plugins
  */
 
 const fs = require('fs');
@@ -16,7 +17,7 @@ const SOURCE_DIR = path.join(__dirname, '..');
 
 // Parse arguments
 const args = process.argv.slice(2);
-const specificItem = args[0];
+const specificPlugin = args[0];
 
 console.log('📦 Claude AI Engineering Toolkit Installer\n');
 
@@ -27,9 +28,11 @@ if (!fs.existsSync(CLAUDE_DIR)) {
 
 const skillsDir = path.join(CLAUDE_DIR, 'skills');
 const agentsDir = path.join(CLAUDE_DIR, 'agents');
+const commandsDir = path.join(CLAUDE_DIR, 'commands');
 
 if (!fs.existsSync(skillsDir)) fs.mkdirSync(skillsDir, { recursive: true });
 if (!fs.existsSync(agentsDir)) fs.mkdirSync(agentsDir, { recursive: true });
+if (!fs.existsSync(commandsDir)) fs.mkdirSync(commandsDir, { recursive: true });
 
 /**
  * Copy directory recursively
@@ -54,125 +57,171 @@ function copyDir(src, dest) {
 }
 
 /**
- * Install a specific skill
+ * Install a specific plugin
  */
-function installSkill(name) {
-  const src = path.join(SOURCE_DIR, 'skills', name);
-  const dest = path.join(skillsDir, name);
+function installPlugin(name) {
+  const pluginPath = path.join(SOURCE_DIR, 'plugins', name);
 
-  if (!fs.existsSync(src)) {
-    console.error(`❌ Error: Skill "${name}" not found`);
+  if (!fs.existsSync(pluginPath)) {
+    console.error(`❌ Error: Plugin "${name}" not found`);
     return false;
   }
 
-  // Remove existing
-  if (fs.existsSync(dest)) {
-    fs.rmSync(dest, { recursive: true, force: true });
-  }
+  let itemsInstalled = 0;
 
-  copyDir(src, dest);
-  console.log(`✓ Installed skill: ${name}`);
-  return true;
-}
-
-/**
- * Install a specific agent
- */
-function installAgent(name) {
-  const src = path.join(SOURCE_DIR, 'agents', name);
-  const dest = path.join(agentsDir, name);
-
-  if (!fs.existsSync(src)) {
-    console.error(`❌ Error: Agent "${name}" not found`);
-    return false;
-  }
-
-  // Remove existing
-  if (fs.existsSync(dest)) {
-    fs.rmSync(dest, { recursive: true, force: true });
-  }
-
-  copyDir(src, dest);
-  console.log(`✓ Installed agent: ${name}`);
-  return true;
-}
-
-/**
- * Install all skills and agents
- */
-function installAll() {
-  let count = 0;
-
-  // Install all skills
-  const skillsSource = path.join(SOURCE_DIR, 'skills');
-  if (fs.existsSync(skillsSource)) {
-    const skills = fs.readdirSync(skillsSource, { withFileTypes: true })
+  // Install skills from this plugin
+  const skillsPath = path.join(pluginPath, 'skills');
+  if (fs.existsSync(skillsPath)) {
+    const skills = fs.readdirSync(skillsPath, { withFileTypes: true })
       .filter(entry => entry.isDirectory())
       .map(entry => entry.name);
 
     for (const skill of skills) {
-      if (installSkill(skill)) count++;
+      const src = path.join(skillsPath, skill);
+      const dest = path.join(skillsDir, skill);
+
+      // Remove existing
+      if (fs.existsSync(dest)) {
+        fs.rmSync(dest, { recursive: true, force: true });
+      }
+
+      copyDir(src, dest);
+      console.log(`  ✓ Installed skill: ${skill}`);
+      itemsInstalled++;
     }
   }
 
-  // Install all agents
-  const agentsSource = path.join(SOURCE_DIR, 'agents');
-  if (fs.existsSync(agentsSource)) {
-    const agents = fs.readdirSync(agentsSource, { withFileTypes: true })
+  // Install agents from this plugin
+  const agentsPath = path.join(pluginPath, 'agents');
+  if (fs.existsSync(agentsPath)) {
+    const agents = fs.readdirSync(agentsPath)
+      .filter(file => file.endsWith('.md'));
+
+    for (const agent of agents) {
+      const src = path.join(agentsPath, agent);
+      const dest = path.join(agentsDir, agent);
+
+      // Remove existing
+      if (fs.existsSync(dest)) {
+        fs.rmSync(dest, { force: true });
+      }
+
+      fs.copyFileSync(src, dest);
+      console.log(`  ✓ Installed agent: ${agent}`);
+      itemsInstalled++;
+    }
+  }
+
+  // Install commands from this plugin
+  const commandsPath = path.join(pluginPath, 'commands');
+  if (fs.existsSync(commandsPath)) {
+    const commands = fs.readdirSync(commandsPath, { withFileTypes: true })
       .filter(entry => entry.isDirectory())
       .map(entry => entry.name);
 
-    for (const agent of agents) {
-      if (installAgent(agent)) count++;
+    for (const command of commands) {
+      const src = path.join(commandsPath, command);
+      const dest = path.join(commandsDir, command);
+
+      // Remove existing
+      if (fs.existsSync(dest)) {
+        fs.rmSync(dest, { recursive: true, force: true });
+      }
+
+      copyDir(src, dest);
+      console.log(`  ✓ Installed command: ${command}`);
+      itemsInstalled++;
     }
   }
 
-  return count;
+  return itemsInstalled > 0;
 }
 
 /**
- * List available items
+ * Install all plugins
  */
-function listAvailable() {
-  console.log('📋 Available Skills:');
-  const skillsSource = path.join(SOURCE_DIR, 'skills');
-  if (fs.existsSync(skillsSource)) {
-    const skills = fs.readdirSync(skillsSource, { withFileTypes: true })
-      .filter(entry => entry.isDirectory())
-      .map(entry => entry.name);
-    skills.forEach(skill => console.log(`   - ${skill}`));
+function installAll() {
+  const pluginsPath = path.join(SOURCE_DIR, 'plugins');
+
+  if (!fs.existsSync(pluginsPath)) {
+    console.error('❌ Error: No plugins directory found');
+    return 0;
   }
 
-  console.log('\n📋 Available Agents:');
-  const agentsSource = path.join(SOURCE_DIR, 'agents');
-  if (fs.existsSync(agentsSource)) {
-    const agents = fs.readdirSync(agentsSource, { withFileTypes: true })
-      .filter(entry => entry.isDirectory())
-      .map(entry => entry.name);
-    agents.forEach(agent => console.log(`   - ${agent}`));
+  const plugins = fs.readdirSync(pluginsPath, { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .map(entry => entry.name);
+
+  let totalInstalled = 0;
+
+  for (const plugin of plugins) {
+    console.log(`📦 Plugin: ${plugin}`);
+    const count = installPlugin(plugin);
+    if (count) {
+      totalInstalled++;
+      console.log('');
+    }
   }
+
+  return totalInstalled;
+}
+
+/**
+ * List available plugins
+ */
+function listAvailable() {
+  const pluginsPath = path.join(SOURCE_DIR, 'plugins');
+
+  if (!fs.existsSync(pluginsPath)) {
+    console.error('❌ Error: No plugins directory found');
+    return;
+  }
+
+  const plugins = fs.readdirSync(pluginsPath, { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .map(entry => entry.name);
+
+  console.log('📋 Available Plugins:\n');
+
+  for (const plugin of plugins) {
+    const pluginJsonPath = path.join(pluginsPath, plugin, '.claude-plugin', 'plugin.json');
+
+    if (fs.existsSync(pluginJsonPath)) {
+      const pluginInfo = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
+      console.log(`   ${plugin}`);
+      console.log(`      ${pluginInfo.description || 'No description'}`);
+      console.log('');
+    } else {
+      console.log(`   ${plugin}`);
+      console.log('');
+    }
+  }
+
+  console.log('Usage:');
+  console.log('   npx github:jaykim/claude-ai-engineering <plugin-name>');
 }
 
 // Main execution
-if (!specificItem || specificItem === '--all') {
+if (!specificPlugin || specificPlugin === '--all') {
   // Install all
   const count = installAll();
-  console.log(`\n✅ Successfully installed ${count} items to ${CLAUDE_DIR}`);
-} else if (specificItem === '--list') {
+  console.log(`✅ Successfully installed ${count} plugins to ${CLAUDE_DIR}`);
+} else if (specificPlugin === '--list') {
   // List available
   listAvailable();
 } else {
-  // Try to install specific item (check skills first, then agents)
-  if (installSkill(specificItem)) {
-    console.log(`\n✅ Successfully installed skill: ${specificItem}`);
-  } else if (installAgent(specificItem)) {
-    console.log(`\n✅ Successfully installed agent: ${specificItem}`);
+  // Install specific plugin
+  console.log(`📦 Plugin: ${specificPlugin}`);
+  const success = installPlugin(specificPlugin);
+
+  if (success) {
+    console.log(`\n✅ Successfully installed plugin: ${specificPlugin}`);
   } else {
-    console.error(`\n❌ Item "${specificItem}" not found`);
-    console.log('\nRun with --list to see available items:');
+    console.error(`\n❌ Plugin "${specificPlugin}" not found`);
+    console.log('\nRun with --list to see available plugins:');
     console.log('  npx github:jaykim/claude-ai-engineering --list');
     process.exit(1);
   }
 }
 
-console.log('\n💡 Installation complete! Your skills/agents are ready to use.');
+console.log('\n💡 Installation complete! Your plugins are ready to use.');

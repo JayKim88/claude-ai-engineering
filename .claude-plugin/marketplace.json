@@ -2,14 +2,19 @@
   "name": "claude-ai-engineering",
   "owner": {
     "name": "Jay Kim",
-    "url": "https://github.com/jaykim"
+    "url": "https://github.com/JayKim88"
   },
-  "description": "AI Engineering toolkit with Claude Code skills, agents, and experiments",
+  "description": "AI Engineering toolkit with Claude Code plugins for learning, project analysis, and multi-agent workflows",
   "plugins": [
     {
       "name": "learning-summary",
       "description": "Capture and document key learnings from conversations with structured markdown output",
-      "source": "./skills/learning-summary"
+      "source": "./plugins/learning-summary"
+    },
+    {
+      "name": "project-insight",
+      "description": "Comprehensive project analysis using multi-agent insights pipeline",
+      "source": "./plugins/project-insight"
     }
   ]
 }
