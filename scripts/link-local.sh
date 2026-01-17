@@ -1,6 +1,6 @@
 #!/bin/bash
 # link-local.sh
-# Link all skills and agents to Claude Code for local development
+# Link all skills, agents, and commands to Claude Code for local development
 #
 # Usage:
 #   ./scripts/link-local.sh
@@ -10,12 +10,13 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLAUDE_DIR="$HOME/.claude"
 
-echo "🔗 Linking skills and agents to Claude Code..."
+echo "🔗 Linking skills, agents, and commands to Claude Code..."
 echo ""
 
 # Ensure Claude directories exist
 mkdir -p "$CLAUDE_DIR/skills"
 mkdir -p "$CLAUDE_DIR/agents"
+mkdir -p "$CLAUDE_DIR/commands"
 
 # Link skills
 if [ -d "$REPO_ROOT/skills" ]; then
@@ -36,16 +37,16 @@ if [ -d "$REPO_ROOT/skills" ]; then
   done
 fi
 
-# Link agents
+# Link agents (individual .md files)
 if [ -d "$REPO_ROOT/agents" ]; then
-  for agent in "$REPO_ROOT/agents"/*; do
-    if [ -d "$agent" ]; then
+  for agent in "$REPO_ROOT/agents"/*.md; do
+    if [ -f "$agent" ]; then
       agent_name=$(basename "$agent")
       target="$CLAUDE_DIR/agents/$agent_name"
 
-      # Remove existing link/directory
-      if [ -L "$target" ] || [ -d "$target" ]; then
-        rm -rf "$target"
+      # Remove existing link/file
+      if [ -L "$target" ] || [ -f "$target" ]; then
+        rm -f "$target"
       fi
 
       # Create symlink
@@ -55,12 +56,32 @@ if [ -d "$REPO_ROOT/agents" ]; then
   done
 fi
 
+# Link commands (directory structure)
+if [ -d "$REPO_ROOT/commands" ]; then
+  for command in "$REPO_ROOT/commands"/*; do
+    if [ -d "$command" ]; then
+      command_name=$(basename "$command")
+      target="$CLAUDE_DIR/commands/$command_name"
+
+      # Remove existing link/directory
+      if [ -L "$target" ] || [ -d "$target" ]; then
+        rm -rf "$target"
+      fi
+
+      # Create symlink
+      ln -s "$command" "$target"
+      echo "✓ Linked command: $command_name"
+    fi
+  done
+fi
+
 echo ""
-echo "✅ All skills and agents linked successfully!"
+echo "✅ All skills, agents, and commands linked successfully!"
 echo ""
 echo "📝 Linked locations:"
-echo "   Skills: $CLAUDE_DIR/skills/"
-echo "   Agents: $CLAUDE_DIR/agents/"
+echo "   Skills:   $CLAUDE_DIR/skills/"
+echo "   Agents:   $CLAUDE_DIR/agents/"
+echo "   Commands: $CLAUDE_DIR/commands/"
 echo ""
 echo "💡 Now you can:"
 echo "   - Edit files in: $REPO_ROOT"
