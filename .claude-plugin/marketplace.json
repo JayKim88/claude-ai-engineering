@@ -15,6 +15,11 @@
       "name": "project-insight",
       "description": "Comprehensive project analysis using multi-agent insights pipeline",
       "source": "./plugins/project-insight"
+    },
+    {
+      "name": "ai-digest",
+      "description": "Digest AI/tech articles and content into structured learning documents",
+      "source": "./plugins/ai-digest"
     }
   ]
 }

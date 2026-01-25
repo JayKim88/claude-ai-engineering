@@ -57,6 +57,27 @@ Comprehensive project analysis using a multi-agent pipeline to evaluate code qua
 
 **[View Plugin →](./plugins/project-insight/README.md)**
 
+### 3. ai-digest
+
+Digest AI/tech articles and content into structured learning documents for quick reference and practical application.
+
+**Features:**
+- URL-based article fetching and analysis
+- Direct content analysis (paste text)
+- Focused extraction (specify what to extract)
+- AI-optimized bilingual template (Korean/English)
+- Git integration (auto-commit/push support)
+- Shared configuration with learning-summary
+
+**Usage:**
+```
+/ai-digest https://anthropic.com/news/...
+"digest this article [URL]"
+"analyze this AI news"
+```
+
+**[View Plugin →](./plugins/ai-digest/README.md)**
+
 ## Installation
 
 ### For Users: Install via npx
@@ -68,6 +89,7 @@ npx github:JayKim88/claude-ai-engineering
 # Install specific plugin
 npx github:JayKim88/claude-ai-engineering learning-summary
 npx github:JayKim88/claude-ai-engineering project-insight
+npx github:JayKim88/claude-ai-engineering ai-digest
 
 # List available plugins
 npx github:JayKim88/claude-ai-engineering --list
