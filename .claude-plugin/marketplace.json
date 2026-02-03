@@ -20,6 +20,11 @@
       "name": "ai-digest",
       "description": "Digest AI/tech articles and content into structured learning documents",
       "source": "./plugins/ai-digest"
+    },
+    {
+      "name": "spec-interview",
+      "description": "AI-driven requirements gathering through in-depth interviews to create comprehensive specifications",
+      "source": "./plugins/spec-interview"
     }
   ]
 }

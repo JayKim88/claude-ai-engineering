@@ -1,0 +1,17 @@
+{
+  "name": "spec-interview",
+  "version": "1.0.0",
+  "description": "AI-driven requirements gathering through in-depth interviews. Ask deep questions to create comprehensive specifications.",
+  "author": {
+    "name": "jaykim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "requirements",
+    "interview",
+    "specification",
+    "planning"
+  ]
+}
