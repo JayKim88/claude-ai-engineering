@@ -1,0 +1,165 @@
+# Market Pulse - Data Source Configuration
+# Symbols and sources for financial market data fetching
+
+# --- US Market ---
+us_indices:
+  "^GSPC": "S&P 500"
+  "^IXIC": "NASDAQ Composite"
+  "^DJI": "Dow Jones Industrial"
+  "^RUT": "Russell 2000"
+
+us_sector_etfs:
+  - symbol: "XLK"
+    name: "Technology"
+    weight: 10
+  - symbol: "XLF"
+    name: "Financials"
+    weight: 8
+  - symbol: "XLV"
+    name: "Healthcare"
+    weight: 8
+  - symbol: "XLE"
+    name: "Energy"
+    weight: 7
+  - symbol: "XLI"
+    name: "Industrials"
+    weight: 7
+  - symbol: "XLY"
+    name: "Consumer Discretionary"
+    weight: 7
+  - symbol: "XLP"
+    name: "Consumer Staples"
+    weight: 6
+  - symbol: "XLU"
+    name: "Utilities"
+    weight: 5
+  - symbol: "XLRE"
+    name: "Real Estate"
+    weight: 5
+  - symbol: "XLB"
+    name: "Materials"
+    weight: 5
+  - symbol: "XLC"
+    name: "Communication Services"
+    weight: 7
+
+# --- Korean Market ---
+kr_default_stocks:
+  - ticker: "005930"
+    name: "삼성전자"
+  - ticker: "000660"
+    name: "SK하이닉스"
+  - ticker: "373220"
+    name: "LG에너지솔루션"
+  - ticker: "207940"
+    name: "삼성바이오로직스"
+  - ticker: "005380"
+    name: "현대자동차"
+  - ticker: "006400"
+    name: "삼성SDI"
+  - ticker: "035420"
+    name: "NAVER"
+  - ticker: "035720"
+    name: "카카오"
+  - ticker: "051910"
+    name: "LG화학"
+  - ticker: "068270"
+    name: "셀트리온"
+
+# --- Global Macro ---
+treasury_yields:
+  "^FVX": "5-Year"
+  "^TNX": "10-Year"
+  "^TYX": "30-Year"
+
+commodities:
+  "GC=F": "Gold"
+  "CL=F": "Crude Oil (WTI)"
+  "NG=F": "Natural Gas"
+
+currencies:
+  "DX-Y.NYB": "US Dollar Index"
+  "KRW=X": "USD/KRW"
+  "EURUSD=X": "EUR/USD"
+  "JPY=X": "USD/JPY"
+
+volatility:
+  "^VIX": "CBOE Volatility Index"
+
+# --- Crypto ---
+crypto_symbols:
+  - symbol: "BTC-USD"
+    name: "Bitcoin"
+  - symbol: "ETH-USD"
+    name: "Ethereum"
+  - symbol: "SOL-USD"
+    name: "Solana"
+  - symbol: "BNB-USD"
+    name: "BNB"
+  - symbol: "XRP-USD"
+    name: "XRP"
+  - symbol: "ADA-USD"
+    name: "Cardano"
+
+# --- News RSS Feeds ---
+news_feeds:
+  us:
+    - name: "CNBC Markets"
+      url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258"
+      weight: 8
+    - name: "MarketWatch"
+      url: "http://feeds.marketwatch.com/marketwatch/topstories"
+      weight: 7
+  kr:
+    - name: "한국경제"
+      url: "https://www.hankyung.com/feed/economy"
+      weight: 8
+    - name: "매일경제"
+      url: "https://www.mk.co.kr/rss/30000001/"
+      weight: 8
+  crypto:
+    - name: "CoinDesk"
+      url: "https://www.coindesk.com/arc/outboundfeeds/rss/"
+      weight: 7
+
+# --- Scoring (for news relevance) ---
+scoring:
+  keyword_boost:
+    high_priority:  # +5
+      - "FOMC"
+      - "금리"
+      - "interest rate"
+      - "earnings"
+      - "실적"
+      - "IPO"
+      - "recession"
+      - "inflation"
+    medium_priority:  # +3
+      - "GDP"
+      - "CPI"
+      - "unemployment"
+      - "기관"
+      - "외국인"
+      - "semiconductor"
+      - "반도체"
+      - "AI"
+    low_priority:  # +1
+      - "market"
+      - "stock"
+      - "주식"
+      - "투자"
+  recency_boost:
+    last_6h: 10
+    last_24h: 5
+    last_48h: 2
+
+# --- Market Hours ---
+market_hours:
+  us:
+    open: "09:30"
+    close: "16:00"
+    timezone: "US/Eastern"
+  kr:
+    open: "09:00"
+    close: "15:30"
+    timezone: "Asia/Seoul"

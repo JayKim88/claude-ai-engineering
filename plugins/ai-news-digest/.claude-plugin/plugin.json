@@ -1,0 +1,18 @@
+{
+  "name": "ai-news-digest",
+  "version": "1.0.0",
+  "description": "Aggregates latest AI news from multiple sources (blogs, papers, communities) and generates Top 5 digest on-demand",
+  "author": {
+    "name": "jaykim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "ai-news",
+    "rss",
+    "aggregator",
+    "digest",
+    "news"
+  ]
+}

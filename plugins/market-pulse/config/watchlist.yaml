@@ -1,0 +1,40 @@
+# Market Pulse - Personal Watchlist
+# Edit this file to track your own stocks and crypto
+
+us_stocks:
+  - symbol: "AAPL"
+    name: "Apple"
+    notes: "Core holding"
+    # alert_above: 250
+    # alert_below: 180
+  - symbol: "NVDA"
+    name: "NVIDIA"
+    notes: "AI infrastructure"
+  - symbol: "MSFT"
+    name: "Microsoft"
+    notes: "Cloud + AI"
+  - symbol: "GOOGL"
+    name: "Alphabet"
+  - symbol: "TSLA"
+    name: "Tesla"
+  - symbol: "AMZN"
+    name: "Amazon"
+
+kr_stocks:
+  - ticker: "005930"
+    name: "삼성전자"
+    notes: "반도체 핵심"
+  - ticker: "000660"
+    name: "SK하이닉스"
+    notes: "HBM 수혜"
+  - ticker: "035420"
+    name: "NAVER"
+    notes: "AI 검색"
+
+crypto:
+  - symbol: "BTC-USD"
+    name: "Bitcoin"
+  - symbol: "ETH-USD"
+    name: "Ethereum"
+  - symbol: "SOL-USD"
+    name: "Solana"

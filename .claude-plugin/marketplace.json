@@ -25,6 +25,16 @@
       "name": "spec-interview",
       "description": "AI-driven requirements gathering through in-depth interviews to create comprehensive specifications",
       "source": "./plugins/spec-interview"
+    },
+    {
+      "name": "ai-news-digest",
+      "description": "Aggregates latest AI news from multiple RSS sources and generates curated Top 5 digest on-demand",
+      "source": "./plugins/ai-news-digest"
+    },
+    {
+      "name": "market-pulse",
+      "description": "Financial market analysis dashboard with US stocks, Korean stocks, global macro, and crypto insights",
+      "source": "./plugins/market-pulse"
     }
   ]
 }
