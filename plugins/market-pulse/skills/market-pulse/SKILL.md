@@ -12,86 +12,62 @@ Fetches real-time financial market data (US stocks, Korean stocks, global macro,
 
 ## Execution Algorithm
 
-### Step 1: Acknowledge Trigger
+### Step 1: Acknowledge and Start
 
-Briefly confirm in Korean:
+Briefly confirm in Korean and start immediately with default scope (overview):
 
-"시장 분석을 시작하겠습니다. 먼저 분석 범위를 선택해주세요."
+"시장 분석을 시작합니다. 데이터를 수집하고 있습니다..."
 
----
+**Default scope: `overview`** (미국, 한국, 글로벌 매크로, 크립토 전체 요약)
 
-### Step 2: Ask Analysis Scope
-
-Use AskUserQuestion to let the user choose the analysis scope.
-
-```
-AskUserQuestion:
-  questions:
-    - question: "어떤 시장 분석을 원하시나요?"
-      header: "분석 범위"
-      multiSelect: false
-      options:
-        - label: "전체 시장 개요 (Overview)"
-          description: "미국, 한국, 글로벌 매크로, 크립토 전체 요약 (Recommended)"
-        - label: "미국 시장 (US Market)"
-          description: "S&P 500, 섹터 ETF, VIX 상세 분석"
-        - label: "한국 시장 (Korean Market)"
-          description: "KOSPI/KOSDAQ, 외국인/기관, 주요 종목 상세 분석"
-        - label: "글로벌 매크로 + 크립토"
-          description: "금리, 원자재, 환율, 암호화폐 분석"
-        - label: "내 워치리스트 (My Watchlist)"
-          description: "개인 관심 종목 집중 분석"
-        - label: "딥 다이브 (Deep Dive)"
-          description: "전체 시장 + 워치리스트 + 뉴스 (가장 상세)"
-```
-
-**Map selection to --scope argument:**
-- "전체 시장 개요" → `--scope overview`
+**Note:** User can request specific scope by saying "미국 시장만", "한국 시장만", etc. In that case, use the appropriate scope:
 - "미국 시장" → `--scope us`
 - "한국 시장" → `--scope kr`
-- "글로벌 매크로 + 크립토" → `--scope crypto`
-- "내 워치리스트" → `--scope watchlist`
+- "글로벌 매크로" or "크립토" → `--scope crypto`
+- "워치리스트" → `--scope watchlist`
 - "딥 다이브" → `--scope deep`
 
 ---
 
-### Step 3: Check Dependencies & Fetch Data
+### Step 2: Check Dependencies & Fetch Data
 
-**3-1. Check Python dependencies:**
+**2-1. Check Python dependencies (silent auto-install):**
 
 ```bash
 python3 -c "import yfinance, pykrx, yaml" 2>/dev/null || \
   pip3 install yfinance pykrx pyyaml feedparser --quiet
 ```
 
-**3-2. Locate and run the fetch script:**
+**2-2. Locate and run the fetch script:**
 
 Find the plugin directory. Check these paths in order:
 1. `~/.claude/skills/market-pulse/../../config/fetch_market.py` (installed via symlink)
 2. `plugins/market-pulse/config/fetch_market.py` (local development)
 
 ```bash
-python3 {path_to_fetch_market.py} --scope {scope} --output json
+# Save output to temp file for later use
+TEMP_JSON=/tmp/market-pulse-data-$(date +%s).json
+python3 {path_to_fetch_market.py} --scope {scope} --output json > $TEMP_JSON
 ```
 
-**3-3. Error handling:**
+**2-3. Error handling:**
 - If script not found: inform user of the path issue and suggest reinstalling
 - If script fails: show error and suggest checking internet connection
 - If partial data: proceed with available data, note missing sections
 
 ---
 
-### Step 4: Branch by Scope
+### Step 3: Branch by Scope
 
-**For `overview` or `deep` scope** → Go to Step 5 (Multi-Agent Pipeline)
+**For `overview` or `deep` scope** → Go to Step 4 (Multi-Agent Pipeline)
 
-**For single-market scope (`us`, `kr`, `crypto`)** → Go to Step 6-Single
+**For single-market scope (`us`, `kr`, `crypto`)** → Go to Step 5-Single
 
-**For `watchlist` scope** → Go to Step 6-Watchlist
+**For `watchlist` scope** → Go to Step 5-Watchlist
 
 ---
 
-### Step 5: Multi-Agent Analysis (overview / deep)
+### Step 4: Multi-Agent Analysis (overview / deep)
 
 **Phase 1: Parallel Analysis**
 
@@ -133,11 +109,33 @@ Task(
 )
 ```
 
-Go to Step 7.
+**Phase 3: Save Analysis to JSON**
+
+After synthesis completes, add analysis results to the JSON file:
+
+```bash
+# Read original JSON
+ORIGINAL_JSON=$(cat $TEMP_JSON)
+
+# Create new JSON with analysis added
+python3 -c "
+import json, sys
+data = json.loads('''$ORIGINAL_JSON''')
+data['analysis'] = {
+    'us_market': '''(us-market-analyzer output text)''',
+    'kr_market': '''(kr-market-analyzer output text)''',
+    'crypto_macro': '''(crypto-macro-analyzer output text)''',
+    'synthesis': '''(market-synthesizer output text)'''
+}
+print(json.dumps(data, indent=2, ensure_ascii=False))
+" > $TEMP_JSON
+```
+
+Go to Step 6.
 
 ---
 
-### Step 6-Single: Single Market Analysis
+### Step 5-Single: Single Market Analysis
 
 For `us`, `kr`, or `crypto` scope:
 - Only launch the relevant single agent
@@ -159,11 +157,11 @@ For `crypto`:
 Task(subagent_type="crypto-macro-analyzer", model="sonnet", ...)
 ```
 
-Go to Step 7.
+Go to Step 6.
 
 ---
 
-### Step 6-Watchlist: Watchlist Display
+### Step 5-Watchlist: Watchlist Display
 
 For `watchlist` scope, no agents are needed. Display watchlist data directly in a table format:
 
@@ -186,36 +184,65 @@ For `watchlist` scope, no agents are needed. Display watchlist data directly in 
 | {name} | ${price} | {change_pct}% |
 ```
 
-Go to Step 7.
+Go to Step 6.
 
 ---
 
-### Step 7: Display Dashboard
+### Step 6: Generate HTML Dashboard and Auto-Open
 
-Present the analysis directly in the terminal. **DO NOT save to a file automatically.**
+**6-1. Display Terminal Summary**
 
-After displaying the dashboard or analysis, output this follow-up message:
+Present a brief summary of the analysis in the terminal (key takeaways only, 5-10 lines).
 
-"추가 분석이 필요하시면 말씀해주세요:"
-"1. 특정 종목 딥다이브 (종목명이나 티커 입력)"
-"2. 대시보드를 파일로 저장"
-"3. 워치리스트 확인"
-"4. 없음 (마무리)"
+**6-2. Generate Interactive HTML Dashboard**
+
+Automatically generate HTML dashboard with visualizations (auto-named with timestamp):
+
+```bash
+# Locate generate_html.py (same directory as fetch_market.py)
+# Output path will be auto-generated: /tmp/market-pulse-YYYYMMDD-HHMMSS.html
+HTML_OUTPUT=$(python3 {path_to_generate_html.py} --input $TEMP_JSON)
+```
+
+**6-3. Auto-Open in Browser**
+
+Automatically open the HTML dashboard:
+
+```bash
+# macOS
+open "$HTML_OUTPUT"
+
+# Linux
+xdg-open "$HTML_OUTPUT" 2>/dev/null || sensible-browser "$HTML_OUTPUT"
+
+# Windows
+start "$HTML_OUTPUT"
+```
+
+**6-4. Confirm to User**
+
+Output in Korean:
+
+"✅ 대시보드가 생성되었습니다!
+📊 HTML 파일: $HTML_OUTPUT
+🌐 브라우저에서 자동으로 열렸습니다.
+
+대시보드에는 다음 정보가 포함되어 있습니다:
+- 대화형 차트 (Chart.js)
+- 상세 데이터 테이블
+- 정확한 데이터 출처 링크
+
+추가로 필요하신 게 있으시면 말씀해주세요!"
 
 ---
 
-### Step 8: Handle Follow-up
+### Step 7: Optional Follow-up
 
-**Parse user response:**
+If user requests additional analysis:
 
-- If specific stock/ticker requested: Use WebSearch to find latest news, or fetch specific stock data and provide brief analysis
-- If save requested:
-  - Read `~/.claude/skills/learning-summary/config.yaml`
-  - If `learning_repo` configured: save to `{learning_repo}/digests/market-pulse-YYYY-MM-DD.md`
-  - Otherwise: save to `./market-pulse-YYYY-MM-DD.md`
-  - Confirm: "대시보드를 저장했습니다: {file_path}"
-- If watchlist requested: Run fetch with `--scope watchlist` and display
-- If "없음" or done: "마무리합니다. 다음에 시장 분석이 필요하면 말씀해주세요!"
+- **특정 종목 분석**: Use WebSearch to find latest news and provide brief analysis
+- **워치리스트 확인**: Run fetch with `--scope watchlist` and display
+- **마무리**: "감사합니다. 다음에 시장 분석이 필요하면 말씀해주세요!"
 
 ---
 

@@ -585,6 +585,47 @@ class MarketDataFetcher:
             "scope": scope,
             "market_status": self.get_market_status(),
             "data": {},
+            "sources": {
+                "us_market": {
+                    "provider": "Yahoo Finance",
+                    "library": "yfinance",
+                    "url": "https://finance.yahoo.com",
+                    "api_docs": "https://pypi.org/project/yfinance/",
+                    "data_types": ["indices", "sectors", "volatility"]
+                },
+                "kr_market": {
+                    "provider": "한국거래소 (Korea Exchange)",
+                    "library": "pykrx",
+                    "url": "http://data.krx.co.kr",
+                    "api_docs": "https://github.com/sharebook-kr/pykrx",
+                    "data_types": ["indices", "stocks", "trading_flows"]
+                },
+                "treasury": {
+                    "provider": "Yahoo Finance",
+                    "library": "yfinance",
+                    "url": "https://finance.yahoo.com/bonds",
+                    "data_types": ["treasury_yields"]
+                },
+                "commodities": {
+                    "provider": "Yahoo Finance",
+                    "library": "yfinance",
+                    "url": "https://finance.yahoo.com/commodities",
+                    "data_types": ["gold", "oil", "natural_gas"]
+                },
+                "currencies": {
+                    "provider": "Yahoo Finance",
+                    "library": "yfinance",
+                    "url": "https://finance.yahoo.com/currencies",
+                    "data_types": ["fx_rates", "dollar_index"]
+                },
+                "crypto": {
+                    "provider": "Yahoo Finance",
+                    "library": "yfinance",
+                    "url": "https://finance.yahoo.com/cryptocurrencies",
+                    "data_types": ["crypto_prices"]
+                },
+                "disclaimer": "All data is provided as-is from free public sources. Real-time data may be delayed 15-20 minutes."
+            }
         }
 
         if scope in ("overview", "deep", "us"):
