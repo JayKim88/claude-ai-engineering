@@ -1,0 +1,21 @@
+{
+  "name": "future-architect",
+  "version": "1.0.0",
+  "description": "Organize thoughts and create actionable plans through adaptive conversational interviews with Mermaid diagrams and capacity-aware TODOs",
+  "author": {
+    "name": "jaykim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "planning",
+    "goal-setting",
+    "mermaid-diagrams",
+    "task-management",
+    "thought-organization",
+    "priorities"
+  ],
+  "skills": ["future-architect"],
+  "agents": [],
+  "commands": []
+}

@@ -1,0 +1,42 @@
+# Future Architect Configuration (v1.0)
+
+# 저장 경로 (기본값: ~/Documents/plans)
+output_dir: "./tempo/future-architect-outputs/plans"
+
+# 저장 후 자동으로 파일 열기 (macOS: open, Linux: xdg-open)
+auto_open: true
+
+# Mermaid 다이어그램 기본 방향
+# TD: Top-Down (기본), LR: Left-Right, RL: Right-Left
+diagram_direction: "TD"
+
+# TODO 우선순위 시스템
+# 3-tier: Critical/Important/Beneficial (기본)
+# 4-tier: Critical/High/Medium/Low
+priority_system: "3-tier"
+
+# 파일명 포맷
+# {date}: YYYY-MM-DD
+# {goal}: 목표 키워드 (공백은 하이픈으로 변환)
+# 예시: 2026-02-07-커리어-전환-계획.md
+filename_format: "{date}-{goal}.md"
+
+# --- v1.0 옵션 ---
+
+# 인터뷰 모드
+# adaptive: 유저 맥락 분석 후 적응형 질문 생성 (기본, 권장)
+# standard: 고정 템플릿 질문 (v2.0 동작)
+interview_mode: "adaptive"
+
+# Advisor-Mode 심층 질문 활성화
+# true: 가정 도전, 모순 탐색, 대안 제시 등 심층 질문 포함 (기본)
+# false: 심층 질문 비활성화 (빠른 진행 우선)
+advisor_probing: true
+
+# 용량 인식 TODO 시스템 활성화
+# true: 주간 가용시간 확인 후 현실성 검증 (기본)
+# false: 시간 예산 확인 없이 TODO 생성
+capacity_planning: true
+
+# 기본 주간 가용시간 (시간 단위, 세션별 오버라이드 가능)
+default_weekly_hours: 20

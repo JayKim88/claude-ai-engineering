@@ -35,6 +35,11 @@
       "name": "market-pulse",
       "description": "Financial market analysis dashboard with US stocks, Korean stocks, global macro, and crypto insights",
       "source": "./plugins/market-pulse"
+    },
+    {
+      "name": "future-architect",
+      "description": "Organize thoughts and create actionable plans with Mermaid diagrams and prioritized TODOs",
+      "source": "./plugins/future-architect"
     }
   ]
 }
