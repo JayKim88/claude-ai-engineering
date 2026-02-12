@@ -7,17 +7,23 @@ Fetches financial market data from free sources (yfinance, pykrx, RSS)
 import json
 import yaml
 import sys
+import os
 import argparse
 import re
 from datetime import datetime, timedelta, date
 from typing import List, Dict, Any, Optional
 from pathlib import Path
+import pandas as pd
+
+# Import MarketHistoryDB for historical data storage
+sys.path.append(str(Path(__file__).parent.parent / "data"))
+from market_history import MarketHistoryDB
 
 
 class MarketDataFetcher:
     """Fetches market data from multiple free sources."""
 
-    def __init__(self, config_path: str = None, watchlist_path: str = None):
+    def __init__(self, config_path: str = None, watchlist_path: str = None, use_db: bool = True):
         if config_path is None:
             config_path = Path(__file__).parent / "sources.yaml"
         with open(config_path, 'r') as f:
@@ -29,6 +35,11 @@ class MarketDataFetcher:
         if Path(watchlist_path).exists():
             with open(watchlist_path, 'r') as f:
                 self.watchlist = yaml.safe_load(f) or {}
+
+        # Initialize MarketHistoryDB for 60-day data storage
+        self.use_db = use_db
+        self.db = MarketHistoryDB() if use_db else None
+        print(f"📊 MarketHistoryDB {'enabled' if use_db else 'disabled'}", file=sys.stderr)
 
     # ──────────────────────────────────────────────
     # Market Status
@@ -68,17 +79,38 @@ class MarketDataFetcher:
     # ──────────────────────────────────────────────
 
     def fetch_us_indices(self) -> Dict[str, Any]:
-        """Fetch major US indices."""
+        """Fetch major US indices with 60-day historical data storage."""
         import yfinance as yf
 
         result = {}
         for symbol, name in self.config["us_indices"].items():
             try:
                 ticker = yf.Ticker(symbol)
-                hist = ticker.history(period="5d")
+
+                # Fetch 60 days for historical analysis (changed from 5d)
+                hist = ticker.history(period="60d")
                 if hist.empty:
                     result[symbol] = {"name": name, "error": "No data"}
                     continue
+
+                # Save to database if enabled
+                if self.use_db and self.db:
+                    for date_idx, row in hist.iterrows():
+                        date_str = date_idx.strftime('%Y-%m-%d')
+                        ohlcv = {
+                            'open': float(row['Open']),
+                            'high': float(row['High']),
+                            'low': float(row['Low']),
+                            'close': float(row['Close']),
+                            'volume': int(row['Volume']),
+                            'adj_close': float(row['Close'])
+                        }
+                        self.db.save_daily_prices(symbol, date_str, ohlcv)
+
+                    # Calculate and save multi-period returns
+                    self.db.calculate_and_save_returns(symbol)
+
+                # Return current values (maintain backward compatibility)
                 current = hist["Close"].iloc[-1]
                 prev = hist["Close"].iloc[-2] if len(hist) >= 2 else current
                 change = current - prev
@@ -95,7 +127,7 @@ class MarketDataFetcher:
         return result
 
     def fetch_us_sectors(self) -> List[Dict[str, Any]]:
-        """Fetch sector ETF performance with 1d/1w/1m returns."""
+        """Fetch sector ETF performance with 60-day historical data storage."""
         import yfinance as yf
 
         results = []
@@ -103,7 +135,8 @@ class MarketDataFetcher:
         names = {s["symbol"]: s["name"] for s in self.config["us_sector_etfs"]}
 
         try:
-            data = yf.download(symbols, period="1mo", progress=False, group_by="ticker")
+            # Changed from 1mo to 2mo for 60-day data
+            data = yf.download(symbols, period="2mo", progress=False, group_by="ticker")
         except Exception as e:
             print(f"Error downloading sector ETFs: {e}", file=sys.stderr)
             return results
@@ -112,10 +145,30 @@ class MarketDataFetcher:
             sym = etf["symbol"]
             try:
                 if len(symbols) == 1:
-                    close = data["Close"]
+                    hist_df = data
                 else:
-                    close = data[sym]["Close"]
-                close = close.dropna()
+                    hist_df = data[sym]
+
+                # Save to database if enabled
+                if self.use_db and self.db:
+                    for date_idx in hist_df.index:
+                        if pd.notna(hist_df.loc[date_idx, "Close"]):
+                            date_str = date_idx.strftime('%Y-%m-%d')
+                            ohlcv = {
+                                'open': float(hist_df.loc[date_idx, "Open"]),
+                                'high': float(hist_df.loc[date_idx, "High"]),
+                                'low': float(hist_df.loc[date_idx, "Low"]),
+                                'close': float(hist_df.loc[date_idx, "Close"]),
+                                'volume': int(hist_df.loc[date_idx, "Volume"]),
+                                'adj_close': float(hist_df.loc[date_idx, "Close"])
+                            }
+                            self.db.save_daily_prices(sym, date_str, ohlcv)
+
+                    # Calculate and save multi-period returns
+                    self.db.calculate_and_save_returns(sym)
+
+                # Calculate returns for display (maintain backward compatibility)
+                close = hist_df["Close"].dropna()
                 if close.empty:
                     continue
                 current = close.iloc[-1]
@@ -575,6 +628,36 @@ class MarketDataFetcher:
         return result
 
     # ──────────────────────────────────────────────
+    # Historical Data from DB
+    # ──────────────────────────────────────────────
+
+    def get_historical_trends(self, symbols: List[str], days: int = 60) -> Dict[str, Any]:
+        """
+        Get historical price trends from database for charting.
+
+        Args:
+            symbols: List of ticker symbols
+            days: Number of days to retrieve (default: 60)
+
+        Returns:
+            Dictionary with dates and prices for each symbol
+        """
+        if not self.use_db or not self.db:
+            return {}
+
+        result = {}
+        for symbol in symbols:
+            df = self.db.get_historical_prices(symbol, days=days)
+            if not df.empty:
+                result[symbol] = {
+                    'dates': [d.strftime('%Y-%m-%d') for d in df['date']],
+                    'prices': [float(p) for p in df['close']],
+                    'count': len(df)
+                }
+
+        return result
+
+    # ──────────────────────────────────────────────
     # Orchestrator
     # ──────────────────────────────────────────────
 
@@ -651,6 +734,22 @@ class MarketDataFetcher:
 
         if scope in ("watchlist", "deep"):
             result["data"]["watchlist"] = self.fetch_watchlist()
+
+        # Add 60-day historical trends for charting
+        if self.use_db and self.db and scope in ("overview", "deep", "us", "kr"):
+            trend_symbols = []
+
+            # US indices
+            if "us_indices" in result["data"]:
+                trend_symbols.extend(list(result["data"]["us_indices"].keys()))
+
+            # KR indices (KOSPI/KOSDAQ)
+            if "kr_indices" in result["data"]:
+                # Add specific symbols if needed
+                pass
+
+            if trend_symbols:
+                result["data"]["historical_trends"] = self.get_historical_trends(trend_symbols, days=60)
 
         return result
 
@@ -736,6 +835,8 @@ def _check_alerts(price: float, config: Dict) -> List[str]:
     return alerts
 
 
+
+
 def main():
     parser = argparse.ArgumentParser(description="Fetch financial market data")
     parser.add_argument(
@@ -749,10 +850,49 @@ def main():
         "--output", type=str, default="json",
         choices=["json", "text"], help="Output format",
     )
+    parser.add_argument(
+        "--with-analysis", action="store_true",
+        help="Automatically generate AI insights from data (data-driven heuristics)",
+    )
 
     args = parser.parse_args()
     fetcher = MarketDataFetcher(args.config, args.watchlist)
     data = fetcher.fetch_all(scope=args.scope)
+
+    # Auto-generate insights if requested
+    if args.with_analysis:
+        try:
+            import subprocess
+            import tempfile
+
+            # Save data to temp file
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False, default=str)
+                temp_file = f.name
+
+            # Run insights generator
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            insights_script = os.path.join(script_dir, 'generate_insights.py')
+
+            result = subprocess.run(
+                [sys.executable, insights_script, temp_file],
+                capture_output=True,
+                text=True
+            )
+
+            if result.returncode == 0:
+                # Read updated data with insights
+                with open(temp_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                print(f"✅ AI insights generated automatically", file=sys.stderr)
+            else:
+                print(f"⚠️  Failed to generate insights: {result.stderr}", file=sys.stderr)
+
+            # Clean up temp file
+            os.unlink(temp_file)
+
+        except Exception as e:
+            print(f"⚠️  Error generating insights: {e}", file=sys.stderr)
 
     if args.output == "json":
         print(json.dumps(data, indent=2, ensure_ascii=False, default=str))

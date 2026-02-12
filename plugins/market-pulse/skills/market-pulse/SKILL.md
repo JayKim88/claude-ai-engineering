@@ -1,7 +1,7 @@
 ---
 name: market-pulse
-description: Financial market analysis dashboard. Use when user says "market overview", "market pulse", "stock market", "시장 분석", "주식 시장", "시장 현황", "증시 분석", "시장 브리핑", or wants to check financial markets, stocks, crypto.
-version: 1.0.0
+description: Financial market analysis dashboard with value investing tools. Use when user says "market overview", "market pulse", "stock market", "시장 분석", "주식 시장", "시장 현황", "증시 분석", "시장 브리핑", "가치투자", "안전마진", "PEG 스크리닝", "기업 분석", or wants to check financial markets, stocks, crypto, or analyze stocks using Graham/Lynch/Buffett strategies.
+version: 2.0.0
 ---
 
 # Market Pulse
@@ -47,8 +47,15 @@ Find the plugin directory. Check these paths in order:
 ```bash
 # Save output to temp file for later use
 TEMP_JSON=/tmp/market-pulse-data-$(date +%s).json
-python3 {path_to_fetch_market.py} --scope {scope} --output json > $TEMP_JSON
+
+# Option 1: With automatic insights (Recommended)
+python3 {path_to_fetch_market.py} --scope {scope} --output json --with-analysis > $TEMP_JSON
+
+# Option 2: Without insights (will need manual Phase 3)
+# python3 {path_to_fetch_market.py} --scope {scope} --output json > $TEMP_JSON
 ```
+
+**Note**: `--with-analysis` flag automatically generates data-driven insights, eliminating the need for manual Phase 3. The insights are based on heuristics and will be displayed in the HTML dashboard.
 
 **2-3. Error handling:**
 - If script not found: inform user of the path issue and suggest reinstalling
@@ -64,6 +71,8 @@ python3 {path_to_fetch_market.py} --scope {scope} --output json > $TEMP_JSON
 **For single-market scope (`us`, `kr`, `crypto`)** → Go to Step 5-Single
 
 **For `watchlist` scope** → Go to Step 5-Watchlist
+
+**For value investing analysis (`value`, `안전마진`, `garp`, `deep-dive`)** → Go to Step 5-Value
 
 ---
 
@@ -111,25 +120,111 @@ Task(
 
 **Phase 3: Save Analysis to JSON**
 
-After synthesis completes, add analysis results to the JSON file:
+**CRITICAL**: After Phase 2 synthesis completes, you MUST add all agent analysis results to the JSON file before proceeding to Step 6. This ensures the HTML dashboard includes AI insights, not just raw data.
 
-```bash
-# Read original JSON
-ORIGINAL_JSON=$(cat $TEMP_JSON)
+**Instructions**:
+1. Save each agent's output to temporary files during Phase 1 & 2
+2. Read the agent outputs and add them to the JSON using Python
+3. Verify the JSON contains the 'analysis' section
 
-# Create new JSON with analysis added
-python3 -c "
-import json, sys
-data = json.loads('''$ORIGINAL_JSON''')
-data['analysis'] = {
-    'us_market': '''(us-market-analyzer output text)''',
-    'kr_market': '''(kr-market-analyzer output text)''',
-    'crypto_macro': '''(crypto-macro-analyzer output text)''',
-    'synthesis': '''(market-synthesizer output text)'''
-}
-print(json.dumps(data, indent=2, ensure_ascii=False))
-" > $TEMP_JSON
+**Method 1: Save to temp files (Recommended)**
+
+During Phase 1, save each agent output:
+```python
+# After us-market-analyzer completes
+us_analysis = """[paste the full output from us-market-analyzer agent]"""
+with open('/tmp/us_analysis.txt', 'w', encoding='utf-8') as f:
+    f.write(us_analysis)
+
+# After kr-market-analyzer completes
+kr_analysis = """[paste the full output from kr-market-analyzer agent]"""
+with open('/tmp/kr_analysis.txt', 'w', encoding='utf-8') as f:
+    f.write(kr_analysis)
+
+# After crypto-macro-analyzer completes
+crypto_analysis = """[paste the full output from crypto-macro-analyzer agent]"""
+with open('/tmp/crypto_analysis.txt', 'w', encoding='utf-8') as f:
+    f.write(crypto_analysis)
 ```
+
+After Phase 2, save synthesis:
+```python
+synthesis = """[paste the full output from market-synthesizer agent]"""
+with open('/tmp/synthesis.txt', 'w', encoding='utf-8') as f:
+    f.write(synthesis)
+```
+
+Then add all analysis to JSON:
+```python
+import json
+
+# Read JSON
+with open(TEMP_JSON, 'r', encoding='utf-8') as f:
+    data = json.load(f)
+
+# Read analysis files
+with open('/tmp/us_analysis.txt', 'r', encoding='utf-8') as f:
+    us_market = f.read()
+with open('/tmp/kr_analysis.txt', 'r', encoding='utf-8') as f:
+    kr_market = f.read()
+with open('/tmp/crypto_analysis.txt', 'r', encoding='utf-8') as f:
+    crypto_macro = f.read()
+with open('/tmp/synthesis.txt', 'r', encoding='utf-8') as f:
+    synthesis = f.read()
+
+# Add analysis section
+data['analysis'] = {
+    'us_market': us_market,
+    'kr_market': kr_market,
+    'crypto_macro': crypto_macro,
+    'synthesis': synthesis
+}
+
+# Save updated JSON
+with open(TEMP_JSON, 'w', encoding='utf-8') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("✅ Analysis added to JSON")
+```
+
+**Method 2: Direct inline (Alternative)**
+
+If you prefer, you can directly paste the agent outputs into a Python script:
+```bash
+python3 << 'EOF'
+import json
+
+# Read original JSON
+with open("$TEMP_JSON", 'r', encoding='utf-8') as f:
+    data = json.load(f)
+
+# Add analysis (paste actual agent outputs here)
+data['analysis'] = {
+    'us_market': """[paste us-market-analyzer output]""",
+    'kr_market': """[paste kr-market-analyzer output]""",
+    'crypto_macro': """[paste crypto-macro-analyzer output]""",
+    'synthesis': """[paste market-synthesizer output]"""
+}
+
+# Save
+with open("$TEMP_JSON", 'w', encoding='utf-8') as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+
+print("✅ Analysis saved")
+EOF
+```
+
+**Verification**:
+```bash
+# Verify analysis was added
+grep -c '"analysis"' $TEMP_JSON
+# Should output: 1
+
+# Preview synthesis
+python3 -c "import json; data=json.load(open('$TEMP_JSON')); print(data['analysis']['synthesis'][:200])"
+```
+
+**IMPORTANT**: Do NOT skip Phase 3! If you skip it, the HTML dashboard will only show data tables without any AI insights or investment recommendations.
 
 Go to Step 6.
 
@@ -188,6 +283,84 @@ Go to Step 6.
 
 ---
 
+### Step 5-Value: Value Investing Analysis (Phase 2.5)
+
+**NEW in v2.0**: Analyze stocks using investment masters' strategies (Graham, Lynch, Buffett, Munger, Asness, Dalio, Fisher).
+
+**Trigger phrases:**
+- "가치투자 분석", "안전마진 분석", "저평가 종목"
+- "PEG 스크리닝", "GARP 종목", "린치 분석"
+- "기업 심층 분석", "[TICKER] 분석해줘"
+
+**Analysis Types:**
+
+**1. Safety Margin Analysis (안전마진 - Graham/Buffett)**
+```bash
+python3 {path_to}/analysis/value_investing_analyzer.py \
+  --tickers "AAPL,MSFT,GOOGL,NVDA,META,TSLA,AMZN" \
+  --analysis safety_margin
+```
+
+Output: 저평가 종목 (안전마진 20%+) with intrinsic value, current price, safety margin %, recommendation.
+
+**2. GARP Screening (Growth At Reasonable Price - Lynch)**
+```bash
+python3 {path_to}/analysis/value_investing_analyzer.py \
+  --tickers "AAPL,MSFT,GOOGL,NVDA,META" \
+  --analysis garp
+```
+
+Output: GARP 종목 (PEG < 1.0, growth >= 10%) with category, PEG ratio, growth rate, ROE, recommendation.
+
+**3. Company Deep Dive (8-Perspective Analysis)**
+```bash
+python3 {path_to}/analysis/company_deep_dive.py
+```
+
+Then provide single ticker when prompted. Generates comprehensive report with:
+- Graham: Safety margin & intrinsic value
+- Buffett: Economic moat strength
+- Lynch: GARP category & PEG
+- Munger: Risk analysis (inversion thinking)
+- Asness: Factor scores (Value, Quality, Momentum)
+- Dalio: Economic cycle positioning
+- Fisher: Qualitative analysis (Scuttlebutt)
+- Overall: Comprehensive score, risk-reward ratio, final recommendation
+
+**4. All-in-One Analysis**
+```bash
+python3 {path_to}/analysis/value_investing_analyzer.py \
+  --tickers "AAPL,MSFT,GOOGL" \
+  --analysis all \
+  --output /tmp/value-analysis-{timestamp}.json
+```
+
+**Display Format:**
+
+Present results in markdown tables:
+
+**안전마진 Top 10 (Safety Margin)**
+| 종목 | 회사명 | 현재가 | 내재가치 | 안전마진 | 추천 |
+|------|--------|--------|----------|----------|------|
+| MSFT | Microsoft | $404.37 | $2,045.76 | 80.2% | 강력 매수 |
+| NVDA | NVIDIA | $190.05 | $574.70 | 66.9% | 강력 매수 |
+
+**GARP 종목 (PEG < 1.0)**
+| 종목 | 카테고리 | PEG | 성장률 | ROE | 추천 |
+|------|----------|-----|--------|-----|------|
+| MSFT | 고성장주 | 0.36 | 59.8% | 34.4% | 강력 매수 |
+| NVDA | 고성장주 | 0.37 | 66.7% | 107.4% | 강력 매수 |
+
+**Notes:**
+- Safety margin analysis uses Graham formula: IV = EPS × (8.5 + 2g)
+- GARP screening combines value (PEG < 1.0) + growth (earnings growth >= 10%)
+- Deep dive provides 8 different investment perspectives for comprehensive due diligence
+- All analysis uses yfinance data (15-20 min delayed)
+
+Go to Step 6.
+
+---
+
 ### Step 6: Generate HTML Dashboard and Auto-Open
 
 **6-1. Display Terminal Summary**
@@ -196,6 +369,17 @@ Present a brief summary of the analysis in the terminal (key takeaways only, 5-1
 
 **6-2. Generate Interactive HTML Dashboard**
 
+**Before generating HTML, verify JSON contains AI analysis**:
+```bash
+# Check if analysis section exists
+if grep -q '"analysis"' "$TEMP_JSON"; then
+    echo "✅ Analysis found in JSON"
+else
+    echo "⚠️  WARNING: JSON missing 'analysis' section - HTML will show data only, no insights!"
+    echo "Did you complete Step 4 Phase 3? The dashboard needs AI analysis for investment insights."
+fi
+```
+
 Automatically generate HTML dashboard with visualizations (auto-named with timestamp):
 
 ```bash
@@ -203,6 +387,10 @@ Automatically generate HTML dashboard with visualizations (auto-named with times
 # Output path will be auto-generated: /tmp/market-pulse-YYYYMMDD-HHMMSS.html
 HTML_OUTPUT=$(python3 {path_to_generate_html.py} --input $TEMP_JSON)
 ```
+
+**What the HTML includes**:
+- **If analysis exists**: Full AI insights section with key takeaways, investment strategies, cross-market analysis
+- **If analysis missing**: Data tables and charts only (no investment recommendations)
 
 **6-3. Auto-Open in Browser**
 
@@ -248,7 +436,7 @@ If user requests additional analysis:
 
 ## Trigger Phrases
 
-**English:**
+**Market Overview (English):**
 - "market overview"
 - "market pulse"
 - "stock market analysis"
@@ -256,13 +444,23 @@ If user requests additional analysis:
 - "check the markets"
 - "financial dashboard"
 
-**Korean:**
+**Market Overview (Korean):**
 - "시장 분석"
 - "주식 시장"
 - "시장 현황"
 - "오늘 시장 어때"
 - "증시 분석"
 - "시장 브리핑"
+
+**Value Investing Analysis (NEW in v2.0):**
+- "가치투자 분석"
+- "안전마진 분석" / "safety margin"
+- "저평가 종목" / "undervalued stocks"
+- "PEG 스크리닝" / "GARP screening"
+- "린치 분석" / "Lynch analysis"
+- "[TICKER] 기업 분석" / "analyze [TICKER]"
+- "[TICKER] 내재가치" / "intrinsic value of [TICKER]"
+- "심층 분석" / "deep dive"
 
 ---
 
@@ -370,4 +568,41 @@ User: "market deep dive"
 → Fetch all data + watchlist + news (45s)
 → Full multi-agent pipeline
 → Extended dashboard with watchlist and news sections
+```
+
+### Example 4: Value Investing Analysis (NEW v2.0)
+
+```
+User: "안전마진 분석해줘" or "저평가 종목 찾아줘"
+→ Ask for tickers: "어떤 종목들을 분석하시겠습니까? (쉼표로 구분)"
+User: "AAPL, MSFT, GOOGL, NVDA, META"
+→ Run: value_investing_analyzer.py --tickers "AAPL,MSFT,GOOGL,NVDA,META" --analysis safety_margin
+→ Display table with safety margins (80.2% MSFT, 66.9% NVDA, 59.4% GOOGL)
+→ "MSFT, NVDA, GOOGL이 20% 이상 저평가되어 있습니다."
+```
+
+```
+User: "AAPL 기업 분석해줘"
+→ Run: company_deep_dive.py (single ticker analysis)
+→ Display comprehensive 8-perspective report
+   - Graham: 22.8% safety margin (HOLD)
+   - Buffett: Wide moat (100/100)
+   - Lynch: Fast Grower, PEG 1.62 (expensive)
+   - Munger: Low risk (15/100), high survivability (85/100)
+   - Asness: Weak factor scores (27.5/100)
+   - Overall: 69.3/100, "조건부 매수", 1-3 year horizon
+→ "추가로 다른 종목을 분석하시겠습니까?"
+```
+
+```
+User: "PEG 스크리닝해줘" or "GARP 종목 찾아줘"
+→ Ask for tickers
+User: "테크 대장주들"
+→ Interpret: AAPL, MSFT, GOOGL, NVDA, META, AMZN, TSLA
+→ Run: value_investing_analyzer.py --tickers "..." --analysis garp
+→ Display GARP stocks (PEG < 1.0):
+   - MSFT: PEG 0.36, 성장률 59.8%
+   - NVDA: PEG 0.37, 성장률 66.7%
+   - GOOGL: PEG 0.75, 성장률 31.1%
+→ "3개 GARP 종목 발견 (Growth At Reasonable Price)"
 ```

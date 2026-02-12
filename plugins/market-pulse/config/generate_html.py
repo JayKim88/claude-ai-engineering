@@ -147,6 +147,7 @@ def generate_html(data: Dict[str, Any], output_path: str = None) -> str:
             padding: 20px;
             border: 2px solid #2c2c2c;
             border-radius: 0;
+            overflow-x: auto;
         }}
 
         .card-title {{
@@ -176,6 +177,8 @@ def generate_html(data: Dict[str, Any], output_path: str = None) -> str:
             font-size: 0.9em;
             margin: 16px 0;
             background: white;
+            table-layout: fixed;
+            word-wrap: break-word;
         }}
 
         th {{
@@ -194,6 +197,8 @@ def generate_html(data: Dict[str, Any], output_path: str = None) -> str:
             padding: 10px 12px;
             border: 1px solid #d4cfc3;
             background: #faf8f3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }}
 
         tr:nth-child(even) td {{
@@ -548,6 +553,39 @@ def _generate_us_section(data: Dict) -> str:
     sectors_labels = [s['name'] for s in sectors]
     sectors_1d = [s['change_1d'] for s in sectors]
 
+    # Check if historical trends data exists
+    historical_trends = data.get('data', {}).get('historical_trends', {})
+    trend_chart_html = ""
+
+    if historical_trends:
+        trend_chart_html = f"""
+        <div class="card" style="grid-column: 1 / -1; margin-top: 20px;">
+            <div class="card-title">📊 60-Day Trend Analysis</div>
+            <div style="display: flex; flex-direction: column; gap: 24px; margin-top: 16px;">
+                <div style="width: 100%;">
+                    <div style="font-weight: bold; margin-bottom: 8px; color: #2563eb; font-size: 1.1em;">S&P 500</div>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="sp500Chart"></canvas>
+                    </div>
+                </div>
+
+                <div style="width: 100%;">
+                    <div style="font-weight: bold; margin-bottom: 8px; color: #10b981; font-size: 1.1em;">NASDAQ</div>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="nasdaqChart"></canvas>
+                    </div>
+                </div>
+
+                <div style="width: 100%;">
+                    <div style="font-weight: bold; margin-bottom: 8px; color: #8b5cf6; font-size: 1.1em;">Dow Jones</div>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="dowChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """
+
     return f"""
     <h2 style="font-size: 2em; margin-bottom: 20px; color: #1f2937;">🇺🇸 US Market</h2>
 
@@ -582,6 +620,8 @@ def _generate_us_section(data: Dict) -> str:
                 <canvas id="sectorChart"></canvas>
             </div>
         </div>
+
+        {trend_chart_html}
     </div>
     """
 
@@ -835,84 +875,212 @@ def _generate_sources_section(data: Dict) -> str:
 def _generate_charts_js(data: Dict) -> str:
     """Generate Chart.js initialization scripts - Newspaper style (minimal color)."""
     sectors = data.get('data', {}).get('us_sectors', [])
+    historical_trends = data.get('data', {}).get('historical_trends', {})
 
-    if not sectors:
-        return ""
+    charts_js = ""
 
-    labels = [s['name'] for s in sectors]
-    values = [s['change_1d'] for s in sectors]
-    # Newspaper style: black for positive, gray for negative
-    colors = ['#2c2c2c' if v > 0 else '#999999' if v < 0 else '#cccccc' for v in values]
-    border_colors = ['#000000' if v > 0 else '#666666' if v < 0 else '#999999' for v in values]
+    # Sector Chart
+    if sectors:
+        labels = [s['name'] for s in sectors]
+        values = [s['change_1d'] for s in sectors]
+        # Newspaper style: black for positive, gray for negative
+        colors = ['#2c2c2c' if v > 0 else '#999999' if v < 0 else '#cccccc' for v in values]
+        border_colors = ['#000000' if v > 0 else '#666666' if v < 0 else '#999999' for v in values]
 
-    return f"""
-    <script>
-        // Sector Performance Chart - Newspaper Style
-        const sectorCtx = document.getElementById('sectorChart');
-        if (sectorCtx) {{
-            new Chart(sectorCtx, {{
-                type: 'bar',
-                data: {{
-                    labels: {json.dumps(labels)},
-                    datasets: [{{
-                        label: '1-Day Performance (%)',
-                        data: {json.dumps(values)},
-                        backgroundColor: {json.dumps(colors)},
-                        borderColor: {json.dumps(border_colors)},
-                        borderWidth: 2
-                    }}]
-                }},
-                options: {{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {{
-                        legend: {{
-                            display: false
-                        }},
-                        tooltip: {{
-                            backgroundColor: '#2c2c2c',
-                            titleColor: '#faf8f3',
-                            bodyColor: '#faf8f3',
-                            borderColor: '#000',
-                            borderWidth: 1
-                        }}
+        charts_js += f"""
+        <script>
+            // Sector Performance Chart - Newspaper Style
+            const sectorCtx = document.getElementById('sectorChart');
+            if (sectorCtx) {{
+                new Chart(sectorCtx, {{
+                    type: 'bar',
+                    data: {{
+                        labels: {json.dumps(labels)},
+                        datasets: [{{
+                            label: '1-Day Performance (%)',
+                            data: {json.dumps(values)},
+                            backgroundColor: {json.dumps(colors)},
+                            borderColor: {json.dumps(border_colors)},
+                            borderWidth: 2
+                        }}]
                     }},
-                    scales: {{
-                        y: {{
-                            beginAtZero: true,
-                            grid: {{
-                                color: '#d4cfc3',
-                                lineWidth: 1
-                            }},
-                            ticks: {{
-                                color: '#2c2c2c',
-                                font: {{
-                                    family: 'Georgia, serif',
-                                    size: 11
-                                }},
-                                callback: function(value) {{
-                                    return value + '%';
-                                }}
-                            }}
-                        }},
-                        x: {{
-                            grid: {{
+                    options: {{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {{
+                            legend: {{
                                 display: false
                             }},
-                            ticks: {{
-                                color: '#2c2c2c',
-                                font: {{
-                                    family: 'Georgia, serif',
-                                    size: 10
+                            tooltip: {{
+                                backgroundColor: '#2c2c2c',
+                                titleColor: '#faf8f3',
+                                bodyColor: '#faf8f3',
+                                borderColor: '#000',
+                                borderWidth: 1
+                            }}
+                        }},
+                        scales: {{
+                            y: {{
+                                beginAtZero: true,
+                                grid: {{
+                                    color: '#d4cfc3',
+                                    lineWidth: 1
+                                }},
+                                ticks: {{
+                                    color: '#2c2c2c',
+                                    font: {{
+                                        family: 'Georgia, serif',
+                                        size: 11
+                                    }},
+                                    callback: function(value) {{
+                                        return value + '%';
+                                    }}
+                                }}
+                            }},
+                            x: {{
+                                grid: {{
+                                    display: false
+                                }},
+                                ticks: {{
+                                    color: '#2c2c2c',
+                                    font: {{
+                                        family: 'Georgia, serif',
+                                        size: 10
+                                    }}
                                 }}
                             }}
                         }}
                     }}
+                }});
+            }}
+        </script>
+        """
+
+    # 60-Day Trend Charts (3 Separate Charts with Single Y-Axis)
+    if historical_trends:
+        # Get US indices data with distinct colors
+        indices_config = [
+            {
+                'symbol': '^GSPC',
+                'name': 'S&P 500',
+                'color': '#2563eb',
+                'canvasId': 'sp500Chart'
+            },
+            {
+                'symbol': '^IXIC',
+                'name': 'NASDAQ',
+                'color': '#10b981',
+                'canvasId': 'nasdaqChart'
+            },
+            {
+                'symbol': '^DJI',
+                'name': 'Dow Jones',
+                'color': '#8b5cf6',
+                'canvasId': 'dowChart'
+            }
+        ]
+
+        for config in indices_config:
+            symbol = config['symbol']
+            if symbol in historical_trends:
+                trend_data = historical_trends[symbol]
+                dates = trend_data['dates']
+                prices = trend_data['prices']
+
+                if prices and len(prices) > 0:
+                    first_price = prices[0]
+                    charts_js += f"""
+            <script>
+                // {config['name']} Chart
+                const {config['canvasId']}Ctx = document.getElementById('{config['canvasId']}');
+                if ({config['canvasId']}Ctx) {{
+                    new Chart({config['canvasId']}Ctx, {{
+                        type: 'line',
+                        data: {{
+                            labels: {json.dumps(dates)},
+                            datasets: [{{
+                                label: '{config['name']}',
+                                data: {json.dumps(prices)},
+                                borderColor: '{config['color']}',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2,
+                                tension: 0.1,
+                                pointRadius: 0,
+                                pointHoverRadius: 5,
+                                fill: false
+                            }}]
+                        }},
+                        options: {{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {{
+                                mode: 'index',
+                                intersect: false
+                            }},
+                            plugins: {{
+                                legend: {{
+                                    display: false
+                                }},
+                                tooltip: {{
+                                    backgroundColor: '#2c2c2c',
+                                    titleColor: '#faf8f3',
+                                    bodyColor: '#faf8f3',
+                                    borderColor: '#000',
+                                    borderWidth: 1,
+                                    padding: 12,
+                                    displayColors: false,
+                                    callbacks: {{
+                                        label: function(context) {{
+                                            const value = context.parsed.y;
+                                            const firstValue = {first_price};
+                                            const change = value - firstValue;
+                                            const changePct = ((change / firstValue) * 100).toFixed(2);
+                                            return '$' + value.toFixed(2) + ' (' + (change >= 0 ? '+' : '') + changePct + '%)';
+                                        }}
+                                    }}
+                                }}
+                            }},
+                            scales: {{
+                                y: {{
+                                    grid: {{
+                                        color: '#e5e7eb',
+                                        lineWidth: 1
+                                    }},
+                                    ticks: {{
+                                        color: '{config['color']}',
+                                        font: {{
+                                            family: 'Georgia, serif',
+                                            size: 10,
+                                            weight: 'bold'
+                                        }},
+                                        callback: function(value) {{
+                                            return '$' + value.toLocaleString();
+                                        }}
+                                    }}
+                                }},
+                                x: {{
+                                    grid: {{
+                                        display: false
+                                    }},
+                                    ticks: {{
+                                        color: '#2c2c2c',
+                                        font: {{
+                                            family: 'Georgia, serif',
+                                            size: 9
+                                        }},
+                                        maxTicksLimit: 8,
+                                        maxRotation: 0,
+                                        minRotation: 0
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }});
                 }}
-            }});
-        }}
-    </script>
-    """
+            </script>
+            """
+
+    return charts_js
 
 
 def main():
