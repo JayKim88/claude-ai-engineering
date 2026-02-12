@@ -1,0 +1,22 @@
+{
+  "name": "portfolio-analyzer-fused",
+  "version": "1.0.0",
+  "description": "AI-powered portfolio management with multi-agent analysis, stock scoring, and intelligent advisory - fusion of Pragmatist and Architect approaches",
+  "author": {
+    "name": "Jay Kim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "portfolio",
+    "stocks",
+    "investment",
+    "analysis",
+    "risk",
+    "ai-advisor",
+    "finance",
+    "multi-agent",
+    "scorecard",
+    "competitive-agents-fusion"
+  ]
+}

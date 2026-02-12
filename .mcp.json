@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "stock-data": {
+      "command": "python3",
+      "args": [
+        "/Users/jaykim/Documents/Projects/claude-ai-engineering/plugins/market-pulse/mcp/stock_mcp_server.py"
+      ],
+      "description": "Stock market data provider (yfinance-based). Provides fundamental metrics, valuation, profitability, growth rates, financial health, and dividend information for US stocks."
+    }
+  }
+}

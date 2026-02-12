@@ -1,0 +1,17 @@
+{
+  "name": "competitive-agents",
+  "version": "1.0.0",
+  "description": "Dual-agent competitive generation with cross-review, improvement rounds, and judge evaluation",
+  "author": {
+    "name": "Jay Kim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "multi-agent",
+    "competitive",
+    "plugin-generation",
+    "cross-review",
+    "quality"
+  ]
+}

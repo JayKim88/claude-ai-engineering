@@ -1,0 +1,95 @@
+# Scoring Configuration
+# Customize how stocks are scored (financial + valuation + momentum)
+
+# Component weights (must sum to 1.0)
+weights:
+  financial_health: 0.40    # Profitability, growth, stability
+  valuation: 0.35           # P/E, PEG, P/B ratios
+  momentum: 0.25            # Price trends, moving averages
+
+# Financial Health Scoring Rules
+financial_health:
+  roe:  # Return on Equity
+    excellent: 0.20   # > 20%: +1.5 points
+    good: 0.15        # > 15%: +1.0 points
+    fair: 0.10        # > 10%: +0.5 points
+    poor: 0.0         # < 0%: -1.5 points
+
+  profit_margin:
+    excellent: 0.20   # > 20%: +1.5 points
+    good: 0.10        # > 10%: +1.0 points
+    fair: 0.05        # > 5%: +0.5 points
+    poor: 0.0         # < 0%: -1.5 points
+
+  debt_to_equity:
+    excellent: 0.5    # < 0.5: +1.0 points
+    good: 1.0         # < 1.0: +0.5 points
+    poor: 2.0         # > 2.0: -1.0 points
+
+  revenue_growth:
+    excellent: 0.20   # > 20%: +1.0 points
+    good: 0.10        # > 10%: +0.5 points
+    poor: -0.05       # < -5%: -1.0 points
+
+# Valuation Scoring Rules
+valuation:
+  pe_ratio:
+    sweet_spot_min: 10     # 10-20: +1.5 points (sweet spot)
+    sweet_spot_max: 20
+    fair_max: 30           # 20-30: +0.5 points
+    undervalued: 10        # < 10: +1.0 points (potentially undervalued)
+    expensive: 40          # > 40: -1.5 points
+
+  peg_ratio:
+    excellent: 1.0    # < 1.0: +2.0 points (growth at reasonable price)
+    good: 1.5         # < 1.5: +1.0 points
+    poor: 2.0         # > 2.0: -1.0 points
+
+  pb_ratio:
+    undervalued: 1.0  # < 1.0: +1.0 points
+    fair: 3.0         # < 3.0: +0.5 points
+    expensive: 5.0    # > 5.0: -1.0 points
+
+# Momentum Scoring Rules
+momentum:
+  moving_averages:
+    above_50d: 1.0    # Above 50-day MA: +1.0 points
+    below_50d: -0.5   # Below 50-day MA: -0.5 points
+    above_200d: 1.0   # Above 200-day MA: +1.0 points
+    below_200d: -0.5  # Below 200-day MA: -0.5 points
+
+  three_month_return:
+    excellent: 0.20   # > 20%: +1.5 points
+    good: 0.10        # > 10%: +1.0 points
+    fair: 0.0         # > 0%: +0.5 points
+    poor: -0.20       # < -20%: -1.5 points
+    bad: -0.10        # < -10%: -1.0 points
+
+  position_52w:
+    near_high: 0.8    # > 80% of 52w range: +1.0 points
+    near_low: 0.2     # < 20% of 52w range: -1.0 points
+
+# Grade Thresholds
+grades:
+  A_plus: 9.0       # 90-100: Excellent opportunity
+  A: 8.0            # 80-89: Strong buy candidate
+  B_plus: 7.0       # 70-79: Good investment
+  B: 6.0            # 60-69: Fair, consider carefully
+  C: 5.0            # 50-59: Neutral, watch
+  D: 0.0            # 0-49: Avoid or sell
+
+# Sector-Specific Adjustments (optional)
+sector_adjustments:
+  enabled: false
+  Technology:
+    valuation_weight: 0.30   # Tech stocks often have higher P/E
+    momentum_weight: 0.30
+  Utilities:
+    financial_health_weight: 0.50  # Value stability
+    momentum_weight: 0.15
+
+# Advanced Settings
+advanced:
+  min_data_points: 3        # Minimum data points needed for scoring
+  default_score: 5.0        # Default score when insufficient data
+  normalize_scores: true    # Normalize component scores to 0-10 range

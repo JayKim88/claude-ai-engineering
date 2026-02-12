@@ -33,13 +33,23 @@
     },
     {
       "name": "market-pulse",
-      "description": "Financial market analysis dashboard with US stocks, Korean stocks, global macro, and crypto insights",
+      "description": "Financial market analysis dashboard with value investing tools (v2.0). US/Korean/Crypto markets + Graham/Lynch/Buffett analysis + safety margin calculation + GARP screening + investment firm-style reports",
       "source": "./plugins/market-pulse"
     },
     {
       "name": "future-architect",
       "description": "Organize thoughts and create actionable plans with Mermaid diagrams and prioritized TODOs",
       "source": "./plugins/future-architect"
+    },
+    {
+      "name": "competitive-agents",
+      "description": "Dual-agent competitive generation with cross-review, improvement rounds, and judge evaluation for plugin creation",
+      "source": "./plugins/competitive-agents"
+    },
+    {
+      "name": "portfolio-analyzer-fused",
+      "description": "AI-powered portfolio management with multi-agent analysis. Stock scoring, risk analytics, opportunity finding, and conversational advisor (Competitive-Agents Fusion)",
+      "source": "./plugins/portfolio-analyzer-fused"
     }
   ]
 }
