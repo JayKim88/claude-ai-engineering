@@ -1,0 +1,189 @@
+# Factor Definitions for factor-lab
+# Based on Fama-French 5-Factor Model
+
+factors:
+  value:
+    name: "Value Factor"
+    description: "Undervalued stocks revert to mean"
+    metrics:
+      - name: "pe_ratio"
+        weight: 0.4
+        direction: "lower_is_better"
+        description: "Price-to-Earnings Ratio"
+      - name: "pb_ratio"
+        weight: 0.4
+        direction: "lower_is_better"
+        description: "Price-to-Book Ratio"
+      - name: "ev_ebitda"
+        weight: 0.2
+        direction: "lower_is_better"
+        description: "Enterprise Value to EBITDA"
+
+  quality:
+    name: "Quality Factor"
+    description: "High-quality companies sustain profits"
+    metrics:
+      - name: "roe"
+        weight: 0.4
+        direction: "higher_is_better"
+        threshold: 0.15
+        description: "Return on Equity (> 15%)"
+      - name: "debt_to_equity"
+        weight: 0.3
+        direction: "lower_is_better"
+        threshold: 0.5
+        description: "Debt-to-Equity Ratio (< 0.5)"
+      - name: "operating_margin"
+        weight: 0.2
+        direction: "higher_is_better"
+        description: "Operating Profit Margin"
+      - name: "earnings_stability"
+        weight: 0.1
+        direction: "lower_is_better"
+        description: "5-year earnings standard deviation"
+
+  momentum:
+    name: "Momentum Factor"
+    description: "Trends persist (behavioral)"
+    metrics:
+      - name: "12m_return"
+        weight: 0.6
+        direction: "higher_is_better"
+        lookback_days: 252
+        skip_days: 21
+        description: "12-month return (skip recent 1 month)"
+      - name: "6m_return"
+        weight: 0.3
+        direction: "higher_is_better"
+        lookback_days: 126
+        description: "6-month return"
+      - name: "relative_strength"
+        weight: 0.1
+        direction: "higher_is_better"
+        description: "Relative strength vs sector"
+
+  low_volatility:
+    name: "Low Volatility Factor"
+    description: "Low-risk stocks outperform high-risk"
+    metrics:
+      - name: "beta"
+        weight: 0.5
+        direction: "lower_is_better"
+        threshold: 0.8
+        description: "Beta vs market (< 0.8)"
+      - name: "60d_volatility"
+        weight: 0.4
+        direction: "lower_is_better"
+        description: "60-day standard deviation"
+      - name: "max_drawdown"
+        weight: 0.1
+        direction: "lower_is_better"
+        description: "Maximum drawdown (1 year)"
+
+  size:
+    name: "Size Factor"
+    description: "Small caps outperform large caps"
+    metrics:
+      - name: "market_cap"
+        weight: 1.0
+        direction: "lower_is_better"
+        threshold: 2000000000
+        description: "Market Capitalization (prefer < $2B)"
+
+# Default Composite Weights
+default_weights:
+  conservative:
+    value: 0.4
+    quality: 0.5
+    momentum: 0.1
+    low_volatility: 0.0
+    size: 0.0
+
+  balanced:
+    value: 0.3
+    quality: 0.4
+    momentum: 0.3
+    low_volatility: 0.0
+    size: 0.0
+
+  aggressive:
+    value: 0.2
+    quality: 0.3
+    momentum: 0.5
+    low_volatility: 0.0
+    size: 0.0
+
+# Sector Benchmarks (for relative valuation)
+sector_benchmarks:
+  Technology:
+    pe_ratio: 30.0
+    pb_ratio: 7.0
+  Healthcare:
+    pe_ratio: 25.0
+    pb_ratio: 5.0
+  "Financial Services":
+    pe_ratio: 15.0
+    pb_ratio: 1.5
+  "Consumer Cyclical":
+    pe_ratio: 20.0
+    pb_ratio: 4.0
+  "Consumer Defensive":
+    pe_ratio: 22.0
+    pb_ratio: 5.0
+  Energy:
+    pe_ratio: 15.0
+    pb_ratio: 2.0
+  Industrials:
+    pe_ratio: 20.0
+    pb_ratio: 3.0
+  "Communication Services":
+    pe_ratio: 18.0
+    pb_ratio: 3.0
+  Utilities:
+    pe_ratio: 18.0
+    pb_ratio: 2.0
+  "Real Estate":
+    pe_ratio: 20.0
+    pb_ratio: 2.0
+  "Basic Materials":
+    pe_ratio: 15.0
+    pb_ratio: 2.0
+
+# Universe Definitions
+universes:
+  SP500:
+    name: "S&P 500"
+    min_market_cap: 10000000000  # $10B
+    min_volume: 1000000          # $1M daily volume
+    data_source: "yfinance"
+
+  NASDAQ100:
+    name: "NASDAQ 100"
+    min_market_cap: 5000000000   # $5B
+    min_volume: 1000000
+    data_source: "yfinance"
+
+  KOSPI200:
+    name: "KOSPI 200"
+    min_market_cap: 500000000000  # ₩500B
+    min_volume: 5000000000        # ₩5B daily volume
+    data_source: "pykrx"
+
+  KOSDAQ150:
+    name: "KOSDAQ 150"
+    min_market_cap: 100000000000  # ₩100B
+    min_volume: 2000000000
+    data_source: "pykrx"
+
+# Scoring Parameters
+scoring:
+  scale: 100  # 0-100 scoring
+  normalization: "percentile"  # percentile, z-score, min-max
+
+  grade_thresholds:
+    "A+": 90
+    "A": 80
+    "B+": 70
+    "B": 60
+    "C": 50
+    "D": 0

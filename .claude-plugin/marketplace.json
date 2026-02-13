@@ -50,6 +50,11 @@
       "name": "portfolio-analyzer-fused",
       "description": "AI-powered portfolio management with multi-agent analysis. Stock scoring, risk analytics, opportunity finding, and conversational advisor (Competitive-Agents Fusion)",
       "source": "./plugins/portfolio-analyzer-fused"
+    },
+    {
+      "name": "spec-validator",
+      "description": "Validates implementation code against specification documents using YAML-based checklists and 4-dimension scoring (Competitive-Agents Winner - Agent Beta)",
+      "source": "./plugins/spec-validator"
     }
   ]
 }

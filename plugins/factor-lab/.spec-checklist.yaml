@@ -1,0 +1,276 @@
+# .spec-checklist.yaml
+# Generated from SPEC.md and PROGRESS.md
+# factor-lab implementation tracking
+
+metadata:
+  spec_file: plugins/factor-lab/SPEC.md
+  project_name: factor-lab - Quantitative Factor Investing Platform
+  last_validated: "2026-02-13T18:30:00+09:00"
+  generated_at: "2026-02-13"
+  phase: "Phase 1 Week 2 Complete, Week 3 In Progress"
+
+functional_requirements:
+  - id: FR-1
+    title: "Data Infrastructure"
+    priority: high
+    status: completed
+    test_status: completed
+    implementation_notes: "data_manager.py (474 lines). SQLite DB with 3 tables, multi-universe support (SP500, NASDAQ100, KOSPI200, KOSDAQ150), yfinance + pykrx integration, 30-day cache, S&P 500 scraping with SSL fix."
+    blockers: []
+    files: ["quant/data_manager.py", "data/market_data_cache.db"]
+
+  - id: FR-2
+    title: "Factor Calculator"
+    priority: high
+    status: completed
+    test_status: completed
+    implementation_notes: "factor_calculator.py (499 lines). 5 factors (Value, Quality, Momentum, Low Vol, Size), composite scoring (0-100), grade assignment (A+ to D). All normalization bugs fixed."
+    blockers: []
+    files: ["quant/factor_calculator.py"]
+
+  - id: FR-3
+    title: "Factor Screener CLI"
+    priority: high
+    status: completed
+    test_status: completed
+    implementation_notes: "factor_screener.py (333 lines). CLI with argparse, multi-factor weighting, progress indicators, CSV/JSON export, terminal display, sector breakdown. Tested with 503 S&P 500 stocks (98% success)."
+    blockers: []
+    files: ["quant/factor_screener.py"]
+
+  - id: FR-4
+    title: "Backtest Engine"
+    priority: high
+    status: completed
+    test_status: completed
+    implementation_notes: "backtest_engine.py (530+ lines). Historical simulation, monthly/quarterly rebalancing, transaction costs (0.1% commission, 0.05% slippage), performance metrics (return, CAGR, Sharpe, drawdown), equity curve CSV + PNG visualization."
+    blockers: []
+    files: ["quant/backtest_engine.py"]
+
+  - id: FR-5
+    title: "Strategy Library"
+    priority: high
+    status: completed
+    test_status: completed
+    implementation_notes: "4 strategies implemented: Buy-and-Hold (base.py, 120 lines), Momentum (momentum.py, 200 lines), Value (value_factor.py, 140 lines), Quality (quality.py, 135 lines). All validated with 2020-2024 backtests."
+    blockers: []
+    files: ["strategies/base.py", "strategies/momentum.py", "strategies/value_factor.py", "strategies/quality.py"]
+
+  - id: FR-6
+    title: "Cache Pre-population Script"
+    priority: medium
+    status: completed
+    test_status: completed
+    implementation_notes: "populate_cache.py (200 lines). Bulk download with rate limiting (1.5s delay), progress tracking, CLI interface. Achieved 100% success (503/503 stocks) in ~12 minutes."
+    blockers: []
+    files: ["scripts/populate_cache.py"]
+
+  - id: FR-7
+    title: "Documentation"
+    priority: medium
+    status: in_progress
+    test_status: not_started
+    implementation_notes: "README.md (323 lines) completed with Quick Start, features, architecture, workflow Mermaid diagram, 5 factors explanation. QUANT_INVESTING_GUIDE.md (60+ pages) pending."
+    blockers: []
+    files: ["README.md", "PROGRESS.md", "SETUP_GUIDE.md"]
+
+  - id: FR-8
+    title: "Integration Testing"
+    priority: low
+    status: not_started
+    test_status: not_started
+    implementation_notes: ""
+    blockers: []
+    files: []
+
+  - id: FR-9
+    title: "Unit Tests"
+    priority: low
+    status: not_started
+    test_status: not_started
+    implementation_notes: ""
+    blockers: []
+    files: []
+
+non_functional_requirements:
+  - id: NFR-1
+    title: "Performance"
+    status: completed
+    test_status: completed
+    implementation_notes: "Achieved: Screening 503 stocks in ~5 min (cached), Backtesting 10 years in <1 min (cached), Cache hit rate 95%+."
+    metrics:
+      screening_time: "5 minutes (cached)"
+      backtest_time: "< 1 minute (cached)"
+      cache_hit_rate: "95%+"
+
+  - id: NFR-2
+    title: "Accuracy"
+    status: completed
+    test_status: completed
+    implementation_notes: "Sector-relative scoring, realistic transaction costs (0.1% + 0.05%), reproducible results validated. AAPL score 55.9/100 (realistic, not inflated)."
+    metrics:
+      scoring: "Sector-relative normalization"
+      transaction_costs: "0.1% commission + 0.05% slippage"
+      reproducibility: "100% (same params = same results)"
+
+  - id: NFR-3
+    title: "Reliability"
+    status: completed
+    test_status: completed
+    implementation_notes: "98% success rate for S&P 500 (503 stocks), graceful error handling, 30-day cache expiration working."
+    metrics:
+      success_rate: "98%+ (S&P 500)"
+      error_handling: "Continue on failures"
+      cache_validity: "30 days"
+
+  - id: NFR-4
+    title: "Usability"
+    status: completed
+    test_status: completed
+    implementation_notes: "Standard argparse CLI with --help, CSV/JSON/PNG outputs, real-time progress indicators. All CLI commands tested and working."
+    metrics:
+      cli_standard: "argparse with --help"
+      output_formats: "CSV, JSON, PNG"
+      progress_tracking: "Every 50 stocks"
+
+cli_commands:
+  - id: CLI-1
+    name: "Factor Screener"
+    command: "python3 quant/factor_screener.py"
+    status: completed
+    test_status: completed
+    notes: "Tested with SP500, multiple factor combinations, top-n filtering. Working correctly."
+
+  - id: CLI-2
+    name: "Backtest Engine"
+    command: "python3 quant/backtest_engine.py"
+    status: completed
+    test_status: completed
+    notes: "Tested with 4 strategies (2020-2024). Momentum +86.81%, Value +51.47%, Quality +52.15%."
+
+  - id: CLI-3
+    name: "Cache Population"
+    command: "python3 scripts/populate_cache.py"
+    status: completed
+    test_status: completed
+    notes: "100% success (503/503 stocks), ~12 minutes execution time."
+
+  - id: CLI-4
+    name: "Debug Scoring"
+    command: "python3 quant/debug_scoring.py"
+    status: completed
+    test_status: completed
+    notes: "161 lines. Used for debugging factor scores during development. Working correctly."
+
+edge_cases:
+  - id: EC-1
+    description: "API Rate Limiting"
+    status: completed
+    test_status: completed
+    notes: "Resolved with cache pre-population script (1.5s delays). 100% success rate achieved."
+
+  - id: EC-2
+    description: "Missing Stock Data"
+    status: completed
+    test_status: completed
+    notes: "Continue on failures, log errors. 98% success rate for S&P 500 (10 errors out of 503)."
+
+  - id: EC-3
+    description: "Timezone-Aware Datetimes"
+    status: completed
+    test_status: completed
+    notes: "Fixed with pd.Timestamp and tz_localize(). No more TypeError in momentum strategy."
+
+  - id: EC-4
+    description: "Insufficient Historical Data"
+    status: completed
+    test_status: completed
+    notes: "Skip momentum calculation for new IPOs, use neutral score (50.0). Extended fetch to 450 days to ensure 252 trading days."
+
+  - id: EC-5
+    description: "Extreme Valuation Metrics"
+    status: completed
+    test_status: completed
+    notes: "Proper normalization with distance_ratio for outliers. Negative P/E and P/B > 50 handled correctly."
+
+  - id: EC-6
+    description: "S&P 500 Fetching Failure"
+    status: completed
+    test_status: completed
+    notes: "Fixed with ssl._create_unverified_context() + User-Agent header. Successfully fetches 503 tickers."
+
+bug_fixes:
+  - id: BUG-1
+    title: "Value Score Normalization"
+    status: resolved
+    date: "2026-02-13"
+    notes: "Overvalued stocks showing 100.0 → Fixed with proper distance_ratio"
+
+  - id: BUG-2
+    title: "Momentum Score Calculation"
+    status: resolved
+    date: "2026-02-13"
+    notes: "All stocks neutral 50.0 → Extended fetch to 450 days"
+
+  - id: BUG-3
+    title: "Column Name Mismatch"
+    status: resolved
+    date: "2026-02-13"
+    notes: "KeyError 'Close' → Added column capitalization"
+
+  - id: BUG-4
+    title: "S&P 500 Fetching"
+    status: resolved
+    date: "2026-02-13"
+    notes: "SSL + 403 error → ssl context + User-Agent"
+
+  - id: BUG-5
+    title: "Timezone Comparison"
+    status: resolved
+    date: "2026-02-13"
+    notes: "TypeError → tz_localize()"
+
+  - id: BUG-6
+    title: "API Rate Limiting"
+    status: resolved
+    date: "2026-02-13"
+    notes: "Rate limiting errors → Pre-population script"
+
+validation_history:
+  - timestamp: "2026-02-13T18:30:00+09:00"
+    score: 91.89
+    grade: "A - Ready to Ship"
+    delta: 91.89
+    completeness: 37.89
+    quality: 21.0
+    adherence: 20.0
+    transparency: 13.0
+    notes: "First validation. Excellent baseline! Production-ready with only minor documentation (FR-7) and unit testing (FR-9) gaps. All core features completed with real-world validation (2020-2024 backtests). All bugs resolved."
+
+# Implementation Statistics
+stats:
+  total_code_lines: 6500+
+  total_doc_lines: 4000+
+  modules: 11
+  strategies: 4
+  factors: 5
+  universes: 4
+  test_coverage: "Limited (no unit tests yet)"
+  phase_completion: "Phase 1 Week 2: 100%, Week 3: 40%"
+
+# Performance Benchmarks
+benchmarks:
+  momentum_2020_2024:
+    total_return: "+86.81%"
+    annual_return: "+16.91%"
+    sharpe_ratio: 3.54
+    max_drawdown: "-25.20%"
+  value_2020_2024:
+    total_return: "+51.47%"
+    annual_return: "+10.94%"
+    sharpe_ratio: 2.56
+    max_drawdown: "-27.22%"
+  quality_2020_2024:
+    total_return: "+52.15%"
+    annual_return: "+11.06%"
+    sharpe_ratio: 2.53
+    max_drawdown: "-28.56%"

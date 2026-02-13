@@ -1,0 +1,59 @@
+{
+  "name": "factor-lab",
+  "version": "1.0.0",
+  "description": "Quantitative stock screening and backtesting platform with multi-factor analysis",
+  "author": "Jay Kim",
+  "license": "MIT",
+  "keywords": [
+    "quantitative-investing",
+    "factor-investing",
+    "backtesting",
+    "stock-screening",
+    "momentum",
+    "value-factor",
+    "quality-factor",
+    "low-volatility",
+    "algorithmic-trading",
+    "systematic-trading"
+  ],
+  "category": "finance",
+  "triggers": [
+    "quant screen",
+    "factor screen",
+    "backtest",
+    "퀀트 스크리닝",
+    "백테스트",
+    "팩터 분석"
+  ],
+  "skills": [
+    {
+      "name": "backtest",
+      "path": "skills/backtest",
+      "description": "Backtest quantitative strategies with historical data"
+    },
+    {
+      "name": "screen",
+      "path": "skills/screen",
+      "description": "Screen stocks using multi-factor scoring"
+    }
+  ],
+  "dependencies": {
+    "python": ">=3.8",
+    "packages": [
+      "numpy>=1.24",
+      "pandas>=2.0",
+      "scipy>=1.10",
+      "yfinance>=0.2.28",
+      "pykrx>=1.0.45",
+      "PyYAML>=6.0"
+    ],
+    "optional": [
+      "matplotlib>=3.7",
+      "pandas-ta>=0.3.14"
+    ]
+  },
+  "documentation": {
+    "guide": "docs/QUANT_INVESTING_GUIDE.md",
+    "readme": "README.md"
+  }
+}
