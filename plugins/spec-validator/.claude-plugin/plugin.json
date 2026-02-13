@@ -1,0 +1,21 @@
+{
+  "name": "spec-validator",
+  "version": "1.0.0",
+  "description": "Validate implementation progress against specification documents. Generates 100-point scored validation reports with actionable feedback and tracks improvement over time.",
+  "author": {
+    "name": "jaykim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "specification",
+    "validation",
+    "verification",
+    "quality-assurance",
+    "spec-driven",
+    "tracking",
+    "checklist",
+    "implementation"
+  ]
+}

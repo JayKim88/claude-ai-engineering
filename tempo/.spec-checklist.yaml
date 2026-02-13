@@ -1,0 +1,162 @@
+# .spec-checklist.yaml
+# Auto-generated from test-spec.md
+# Update status as you implement features
+
+metadata:
+  spec_file: tempo/test-spec.md
+  project_name: Test Project - User Authentication System
+  last_validated: "2026-02-13T17:45:00+09:00"
+  generated_at: "2026-02-13"
+
+functional_requirements:
+  - id: FR-1
+    title: "User Registration"
+    priority: high
+    status: completed
+    test_status: completed
+    implementation_notes: "Implemented with bcrypt hashing, email validation, password strength check"
+    blockers: []
+
+  - id: FR-2
+    title: "Email Verification"
+    priority: high
+    status: completed
+    test_status: in_progress
+    implementation_notes: "Email sending works, tokens generated correctly. Tests being written."
+    blockers: []
+
+  - id: FR-3
+    title: "User Login"
+    priority: high
+    status: in_progress
+    test_status: not_started
+    implementation_notes: "JWT generation implemented, need to add refresh token logic"
+    blockers: ["Need to decide on refresh token strategy"]
+
+  - id: FR-4
+    title: "Password Reset"
+    priority: medium
+    status: not_started
+    test_status: not_started
+    implementation_notes: ""
+    blockers: []
+
+  - id: FR-5
+    title: "Profile Management"
+    priority: low
+    status: not_started
+    test_status: not_started
+    implementation_notes: ""
+    blockers: []
+
+non_functional_requirements:
+  - id: NFR-1
+    title: "Security"
+    status: not_started
+    test_status: not_started
+    implementation_notes: ""
+
+  - id: NFR-2
+    title: "Performance"
+    status: not_started
+    test_status: not_started
+    implementation_notes: ""
+
+  - id: NFR-3
+    title: "Scalability"
+    status: not_started
+    test_status: not_started
+    implementation_notes: ""
+
+data_models:
+  - name: User
+    status: completed
+    fields_implemented: ["id", "email", "password_hash", "name", "email_verified", "created_at", "updated_at"]
+    validation_implemented: true
+    notes: "All fields implemented. Missing: bio, avatar_url (low priority)"
+
+  - name: VerificationToken
+    status: completed
+    fields_implemented: ["token", "user_id", "token_type", "expires_at", "used_at"]
+    validation_implemented: true
+    notes: "Fully implemented with TTL index on expires_at"
+
+api_endpoints:
+  - method: POST
+    path: /api/auth/register
+    status: completed
+    test_status: completed
+    notes: "Creates new user account. Returns 201 with user object."
+
+  - method: POST
+    path: /api/auth/verify-email
+    status: completed
+    test_status: in_progress
+    notes: "Verifies email with token. Integration tests needed."
+
+  - method: POST
+    path: /api/auth/login
+    status: in_progress
+    test_status: not_started
+    notes: "Basic auth works, need to add rate limiting"
+
+  - method: POST
+    path: /api/auth/forgot-password
+    status: not_started
+    test_status: not_started
+    notes: "Initiates password reset"
+
+  - method: GET
+    path: /api/users/profile
+    status: not_started
+    test_status: not_started
+    notes: "Returns current user profile"
+
+  - method: PUT
+    path: /api/users/profile
+    status: not_started
+    test_status: not_started
+    notes: "Updates user profile"
+
+edge_cases:
+  - id: EC-1
+    description: "Duplicate Email Registration"
+    status: completed
+    test_status: completed
+    notes: "Returns 400 with 'Email already registered' message"
+
+  - id: EC-2
+    description: "Expired Verification Token"
+    status: completed
+    test_status: completed
+    notes: "Returns 400 with 'Token expired' and resend option"
+
+  - id: EC-3
+    description: "Too Many Failed Logins"
+    status: not_started
+    test_status: not_started
+    notes: "Lock account for 15 minutes after 5 failed attempts"
+
+  - id: EC-4
+    description: "Invalid JWT Token"
+    status: not_started
+    test_status: not_started
+    notes: "Return 401 error"
+
+validation_history:
+  - timestamp: "2026-02-13T17:45:00+09:00"
+    score: 57.65
+    grade: "F - Major Gaps"
+    delta: 57.65
+    completeness: 18.0
+    quality: 6.9
+    adherence: 19.75
+    transparency: 13.0
+    notes: "First validation. Baseline established. Strong adherence and transparency, but critical gaps in testing and NFR implementation."
+
+# Usage Notes:
+# - Update 'status' as you implement: not_started -> in_progress -> completed -> blocked
+# - Update 'test_status' for testing progress
+# - Add implementation_notes for context
+# - Document blockers when status is 'blocked'
+# - Run 'validate spec' to check progress and generate reports

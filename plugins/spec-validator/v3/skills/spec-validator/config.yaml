@@ -1,0 +1,276 @@
+# Spec Validator Configuration
+# This file controls scoring weights, validation rules, and parsing patterns
+
+# === DIMENSION WEIGHTS (Total: 100 points) ===
+dimensions:
+  implementation_completeness:
+    total_weight: 40
+    breakdown:
+      functional_requirements: 20  # FRs are most critical
+      non_functional_requirements: 10  # NFRs are important but secondary
+      data_models: 5  # Models support FRs
+      api_endpoints: 5  # APIs expose functionality
+
+  implementation_quality:
+    total_weight: 25
+    breakdown:
+      test_coverage: 15  # Testing is crucial for quality
+      edge_case_coverage: 7  # Edge cases prevent bugs
+      implementation_notes: 3  # Documentation aids maintenance
+
+  spec_adherence:
+    total_weight: 20
+    breakdown:
+      synchronization: 12  # Checklist must match spec
+      priority_accuracy: 5  # Priorities must be correct
+      structure_compliance: 3  # Valid YAML structure required
+
+  progress_transparency:
+    total_weight: 15
+    breakdown:
+      status_hygiene: 5  # Clear status values
+      blocker_documentation: 4  # Blockers need explanations
+      implementation_notes: 3  # Meaningful notes
+      validation_history: 3  # Track progress over time
+
+# === PRIORITY WEIGHTS (for FR scoring) ===
+# FRs are weighted by priority to emphasize critical features
+priority_weights:
+  high: 3  # High-priority FRs worth 3x
+  medium: 2  # Medium-priority FRs worth 2x
+  low: 1  # Low-priority FRs worth 1x
+  default: 2  # If priority not specified, assume medium
+
+# === GRADE THRESHOLDS ===
+grades:
+  A:
+    min_score: 90
+    max_score: 100
+    label: "Ready to ship"
+    description: "High confidence in completeness and quality"
+  B:
+    min_score: 80
+    max_score: 89
+    label: "Nearly complete"
+    description: "Minor gaps, generally ready for release"
+  C:
+    min_score: 70
+    max_score: 79
+    label: "Good progress"
+    description: "Significant work done, but notable gaps remain"
+  D:
+    min_score: 60
+    max_score: 69
+    label: "Needs work"
+    description: "More incomplete than complete"
+  F:
+    min_score: 0
+    max_score: 59
+    label: "Significant gaps"
+    description: "Major requirements missing or incomplete"
+
+# === ISSUE SEVERITY THRESHOLDS ===
+issue_severity:
+  critical:
+    - missing_high_priority_fr
+    - orphaned_checklist_items  # In checklist but not in spec
+    - invalid_yaml_structure
+    - synchronization_error  # 10%+ items out of sync
+    - missing_required_section
+
+  important:
+    - missing_medium_priority_fr
+    - untested_completed_items  # Marked complete but tests not done
+    - missing_nfr
+    - priority_mismatch  # Spec says high, checklist says low
+    - blocked_without_reason
+
+  minor:
+    - missing_low_priority_fr
+    - incomplete_implementation_notes
+    - missing_validation_history
+    - unclear_status_values
+
+# === VALIDATION MODES ===
+validation_modes:
+  full:
+    duration_estimate: "30 seconds"
+    dimensions: ["completeness", "quality", "adherence", "transparency"]
+    total_points: 100
+    description: "Complete validation across all 4 dimensions"
+
+  quick:
+    duration_estimate: "10 seconds"
+    dimensions: ["completeness", "adherence"]
+    total_points: 60  # Will be rescaled to 100
+    description: "Fast check of implementation progress and sync"
+
+  requirements_only:
+    duration_estimate: "15 seconds"
+    dimensions: ["completeness"]
+    total_points: 40  # Will be rescaled to 100
+    description: "FR/NFR progress tracking only"
+
+# === SPEC PARSING PATTERNS ===
+parsing:
+  functional_requirements:
+    # Patterns to match FR-1, FR-2, etc.
+    patterns:
+      - regex: '##\s+FR-(\d+)[:：]\s*(.+)'
+        capture_groups:
+          id: 1
+          title: 2
+      - regex: '\*\*FR-(\d+)\*\*[:：]\s*(.+)'
+        capture_groups:
+          id: 1
+          title: 2
+      - regex: '^FR-(\d+)[:：]\s*(.+)'
+        capture_groups:
+          id: 1
+          title: 2
+
+    # Priority detection patterns
+    priority_patterns:
+      high:
+        - 'Priority:\s*High'
+        - 'priority:\s*high'
+        - '\(High\)'
+        - '\[HIGH\]'
+      medium:
+        - 'Priority:\s*Medium'
+        - 'priority:\s*medium'
+        - '\(Medium\)'
+        - '\[MEDIUM\]'
+      low:
+        - 'Priority:\s*Low'
+        - 'priority:\s*low'
+        - '\(Low\)'
+        - '\[LOW\]'
+
+  non_functional_requirements:
+    patterns:
+      - regex: '##\s+NFR-(\d+)[:：]\s*(.+)'
+        capture_groups:
+          id: 1
+          title: 2
+      - regex: '\*\*NFR-(\d+)\*\*[:：]\s*(.+)'
+        capture_groups:
+          id: 1
+          title: 2
+
+  data_models:
+    # Look for model definitions in Technical Design section
+    section_markers:
+      - '## Technical Design'
+      - '## Data Models'
+      - '### Data Models'
+    patterns:
+      - regex: '###\s+(\w+)\s+Model'
+        capture_groups:
+          name: 1
+      - regex: '####\s+(\w+)'
+        capture_groups:
+          name: 1
+
+  api_endpoints:
+    patterns:
+      - regex: '(GET|POST|PUT|DELETE|PATCH)\s+(/[/\w\-{}:]+)'
+        capture_groups:
+          method: 1
+          path: 2
+      - regex: '`(GET|POST|PUT|DELETE|PATCH)\s+([^`]+)`'
+        capture_groups:
+          method: 1
+          path: 2
+
+  edge_cases:
+    section_markers:
+      - '## Edge Cases'
+      - '### Edge Cases'
+      - '## Error Handling'
+    patterns:
+      - regex: '^\d+\.\s+(.+)'  # Numbered list
+        capture_groups:
+          description: 1
+      - regex: '^[-*]\s+(.+)'  # Bullet list
+        capture_groups:
+          description: 1
+
+# === CHECKLIST VALIDATION RULES ===
+checklist:
+  required_sections:
+    - functional_requirements
+    - non_functional_requirements
+    - metadata
+
+  valid_statuses:
+    - completed
+    - in_progress
+    - not_started
+    - blocked
+
+  valid_test_statuses:
+    - completed
+    - in_progress
+    - not_started
+
+  required_fields_per_item:
+    - id
+    - status
+
+  optional_fields_per_item:
+    - test_status
+    - implementation_notes
+    - blockers
+    - completed_date
+
+# === REPORT SETTINGS ===
+report:
+  output_format: "markdown"
+  default_filename_pattern: "validation-report-{timestamp}.md"
+  timestamp_format: "%Y%m%d-%H%M%S"
+
+  include_sections:
+    - executive_summary
+    - dimension_scores_table
+    - requirements_status_table
+    - issues_by_severity
+    - next_steps_checklist
+    - validation_history
+    - configuration_summary
+
+  issues_display:
+    max_critical_issues: 50  # Show all critical issues
+    max_important_issues: 20  # Limit important issues to keep report readable
+    max_minor_issues: 10  # Limit minor issues
+
+# === VALIDATION HISTORY SETTINGS ===
+history:
+  max_entries: 50  # Keep last 50 validations
+  show_trend: true  # Calculate and display score trends
+  trend_window: 5  # Use last 5 validations for trend calculation
+
+  trend_indicators:
+    improving: "↗"
+    stable: "→"
+    declining: "↘"
+    insufficient_data: "-"
+
+# === DEFAULT PATHS ===
+paths:
+  checklist_filename: ".spec-checklist.yaml"
+  report_output_directory: "."  # Same directory as spec
+  template_directory: "templates"
+
+# === FEATURE FLAGS ===
+features:
+  enable_code_validation: false  # Future: Validate actual code against checklist
+  enable_auto_fix: false  # Future: Auto-fix minor sync issues
+  enable_git_integration: false  # Future: Track validation with git commits
+  strict_mode: false  # If true, exit on first error instead of continuing
+
+# === PERFORMANCE SETTINGS ===
+performance:
+  max_spec_size_mb: 10  # Skip files larger than 10MB
+  max_checklist_items: 1000  # Warn if checklist has more than 1000 items
+  parsing_timeout_seconds: 30  # Timeout for spec parsing

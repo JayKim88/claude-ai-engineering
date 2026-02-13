@@ -1,0 +1,20 @@
+{
+  "name": "spec-validator",
+  "version": "1.0.0",
+  "description": "Validates implementation code against specification documents using YAML-based checklists and 4-dimension scoring system",
+  "author": {
+    "name": "Jay Kim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "specification",
+    "validation",
+    "testing",
+    "quality-assurance",
+    "checklist",
+    "requirements",
+    "spec-driven-development",
+    "implementation-verification"
+  ]
+}
