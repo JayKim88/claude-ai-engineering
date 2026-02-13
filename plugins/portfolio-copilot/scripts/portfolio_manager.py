@@ -377,7 +377,7 @@ def main():
     """Command-line interface for portfolio management."""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Investment Analyzer - Portfolio Management')
+    parser = argparse.ArgumentParser(description='Portfolio Copilot - Portfolio Management')
     subparsers = parser.add_subparsers(dest='command', help='Commands')
 
     # Create portfolio

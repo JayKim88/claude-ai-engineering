@@ -114,7 +114,7 @@ def calculate_portfolio_metrics(portfolio_id: int):
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Investment Analyzer - Portfolio Dashboard</title>
+    <title>Portfolio Copilot - Portfolio Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Financial Times inspired styling */

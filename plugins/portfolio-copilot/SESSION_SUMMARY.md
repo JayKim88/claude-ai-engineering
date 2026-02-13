@@ -1,4 +1,4 @@
-# Investment Analyzer - Session Summary
+# Portfolio Copilot - Session Summary
 
 **Date**: 2026-02-12
 **Duration**: ~4 hours
@@ -396,7 +396,7 @@ Independent modules made Week 3 integration seamless:
 
 ## 🏁 Conclusion
 
-**Investment Analyzer** is a **fully functional tool** for portfolio management, stock analysis, and visual dashboards.
+**Portfolio Copilot** is a **fully functional tool** for portfolio management, stock analysis, and visual dashboards.
 
 **What Works Well**:
 - Portfolio tracking with real-time P&L ✅
@@ -684,7 +684,7 @@ python3 dashboard_generator.py
 
 ## 🏁 Final Validation Summary
 
-**Investment Analyzer v1.0** has been **fully tested and validated** as of 2026-02-12.
+**Portfolio Copilot v1.0** has been **fully tested and validated** as of 2026-02-12.
 
 **Test Coverage**:
 - ✅ 5/5 core features tested
@@ -704,3 +704,29 @@ python3 dashboard_generator.py
 
 **Session 2 Complete!** 🎉
 **Total Development Time**: ~8 hours (Week 1-3: 7h, Testing: 1h)
+
+---
+
+## 🚀 Session 3: Rebranding & Future Vision (2026-02-13)
+
+### Activity: Strategic Repositioning
+**Focus**: Rename to "Portfolio Copilot" and document future development direction
+
+### Naming Decision
+**From**: "Investment Analyzer" (too passive, analysis-only)
+**To**: "Portfolio Copilot" (AI partner, active assistance)
+
+**Rationale**:
+- "Copilot" conveys AI partnership, not just a tool
+- Aligns with Phase 3 conversational AI advisor vision
+- Follows industry trend (GitHub Copilot, MS 365 Copilot)
+- Natural fit for "관리해주는" (actively manages) role
+
+### Future Development Vision
+See README.md for complete Phase 2-3 roadmap.
+
+**Key Milestones**:
+- Phase 2: Diversification warnings, rebalancing, opportunity finder
+- Phase 3: AI conversational advisor, risk analytics, performance tracking
+
+**Session Complete**: Rebranding done, ready for Phase 2 development

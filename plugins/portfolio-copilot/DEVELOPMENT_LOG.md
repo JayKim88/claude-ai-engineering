@@ -1,4 +1,4 @@
-# Investment Analyzer - Development Log
+# Portfolio Copilot - Development Log
 
 Detailed chronological log of all development activities.
 

@@ -1,4 +1,4 @@
-# Investment Analyzer - 아키텍처 & 프로세스 문서
+# Portfolio Copilot - 아키텍처 & 프로세스 문서
 
 **작성일**: 2026-02-12
 **버전**: 0.4.0

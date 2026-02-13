@@ -1,4 +1,4 @@
-# Investment Analyzer - Next Steps
+# Portfolio Copilot - Next Steps
 
 **Current Status**: Week 1 Complete ✅
 **Next Phase**: Week 2 - Company Scorecard Engine

@@ -1,15 +1,79 @@
-# Investment Analyzer
+# Portfolio Copilot
 
 AI-powered portfolio management and stock analysis tool for intelligent investment decisions.
 
 ## Overview
 
-**Investment Analyzer** is a comprehensive Claude Code plugin that combines:
+**Portfolio Copilot** is a comprehensive Claude Code plugin that combines:
 - **Portfolio Management**: Track holdings, transactions, P&L, and performance
 - **Stock Analysis**: AI-powered company scorecards (financial, valuation, momentum)
 - **Investment Opportunities**: Discover undervalued stocks and rebalancing suggestions
 - **Risk Management**: Correlation analysis, beta, volatility, VaR metrics
 - **AI Advisor**: Multi-round conversational portfolio reviews
+
+## 🚀 Evolution Path
+
+### Current Capabilities (Phase 1) ✅
+**Observer Mode**: Track & Score
+- Portfolio management with real-time P&L
+- 3D stock scoring (Financial, Valuation, Momentum)
+- HTML dashboards with Chart.js
+- Dual mode: Pre-investment screening + Post-investment tracking
+
+### Future Vision (Phase 2-3) 🔮
+
+#### Phase 2: Analyzer Mode (Weeks 4-7)
+**Theme**: From Tracking to Insights
+
+**New Capabilities**:
+- Diversification warnings ("Tech 100% concentration detected!")
+- Correlation analysis and heatmaps
+- Rebalancing suggestions with target allocation
+- Investment opportunity finder (undervalued stocks)
+
+**New Skills**:
+- `/copilot insights` - Portfolio health check
+- `/copilot rebalance` - Get rebalancing recommendations
+- `/copilot opportunities` - Find new investment ideas
+
+#### Phase 3: Advisor Mode (Weeks 8-10)
+**Theme**: From Insights to Advice
+
+**New Capabilities**:
+- AI conversational advisor (multi-round consultations)
+- Performance tracking (TWR, benchmark comparison)
+- Risk analytics (beta, Sharpe ratio, VaR)
+- Scenario analysis (market crash, rate hikes)
+
+**New Skills**:
+- `/copilot risk` - Comprehensive risk assessment
+- `/copilot performance` - Performance attribution
+- `/copilot chat` - Start AI consultation session
+
+### The "Copilot" Journey
+
+**Phase 1** (Current) ✅:
+```
+User: "Copilot, score my portfolio"
+Copilot: [Returns scores and dashboard]
+```
+
+**Phase 2** (Weeks 4-7) 🔍:
+```
+User: "Copilot, what's wrong with my portfolio?"
+Copilot: "Tech 100% concentrated, MSFT score dropped to 3.9"
+Copilot: "Consider adding Healthcare/Finance, target Tech 60%"
+```
+
+**Phase 3** (Weeks 8-10) 🤖:
+```
+User: "Copilot, should I sell NVDA given the -76% loss?"
+Copilot: [Analyzes score, recovery probability, tax implications]
+Copilot: "Consider tax-loss harvesting, reinvest in JNJ (8.2 score)"
+Copilot: "Your portfolio beta is 1.4, reducing NVDA lowers risk to 1.2"
+```
+
+**Goal**: Make portfolio management effortless with AI guidance 🚀
 
 ## Key Features
 
@@ -106,10 +170,17 @@ MIT
 
 ## Development Status
 
-- **Version**: 0.4.0 (Week 3 - Portfolio Integration Complete) ✅
-- **Last Updated**: 2026-02-12 18:30 KST
-- **Current Phase**: Week 3 Complete (100% - All features delivered)
-- **Next Milestone**: Phase 2 - Portfolio Intelligence & Correlation Analysis
+- **Version**: 1.0.0 (Phase 1 Complete - Rebranded to Portfolio Copilot) ✅
+- **Last Updated**: 2026-02-13
+- **Current Phase**: Phase 1 Complete (Observer Mode)
+- **Next Milestone**: Phase 2 - Analyzer Mode (Insights & Recommendations)
+
+### Roadmap Progress
+```
+Phase 1: Observer  ████████████████████ 100% ✅
+Phase 2: Analyzer  ░░░░░░░░░░░░░░░░░░░░   0% ⏳
+Phase 3: Advisor   ░░░░░░░░░░░░░░░░░░░░   0% ⏳
+```
 
 ## 🎯 Two Ways to Use This Tool
 

@@ -1,5 +1,5 @@
 """
-Database models and schema for Investment Analyzer.
+Database models and schema for Portfolio Copilot.
 
 Uses SQLAlchemy ORM for portfolio management, transaction tracking,
 performance monitoring, and data caching.
@@ -155,7 +155,7 @@ class DataCache(Base):
 
 # Database connection and session management
 class Database:
-    """Database manager for Investment Analyzer."""
+    """Database manager for Portfolio Copilot."""
 
     def __init__(self, db_path=None):
         if db_path is None:
@@ -190,7 +190,7 @@ def get_database(db_path=None):
 
 if __name__ == "__main__":
     # Test database creation
-    print("Creating Investment Analyzer database...")
+    print("Creating Portfolio Copilot database...")
     db = get_database()
     print(f"✅ Database created successfully!")
     print(f"📊 Tables: {Base.metadata.tables.keys()}")

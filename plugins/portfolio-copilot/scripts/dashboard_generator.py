@@ -211,7 +211,7 @@ class PortfolioDashboardGenerator:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Investment Analyzer - Portfolio Dashboard</title>
+    <title>Portfolio Copilot - Portfolio Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
         * {{
@@ -445,7 +445,7 @@ class PortfolioDashboardGenerator:
         </div>
 
         <div class="footer">
-            Investment Analyzer Dashboard | <a href="https://github.com/anthropics/claude-code" target="_blank">Built with Claude Code</a>
+            Portfolio Copilot Dashboard | <a href="https://github.com/anthropics/claude-code" target="_blank">Built with Claude Code</a>
         </div>
     </div>
 

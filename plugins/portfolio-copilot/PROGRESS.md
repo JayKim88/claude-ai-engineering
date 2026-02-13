@@ -1,4 +1,4 @@
-# Investment Analyzer - Development Progress
+# Portfolio Copilot - Development Progress
 
 **Last Updated**: 2026-02-12
 **Current Phase**: Week 2 Complete (Company Scorecard)
@@ -840,7 +840,7 @@ What it is NOT:
 
 **Status**: FULLY VALIDATED ✅
 
-**Verdict**: Investment Analyzer is **production-ready** for personal use with full awareness of limitations.
+**Verdict**: Portfolio Copilot is **production-ready** for personal use with full awareness of limitations.
 
 **Strengths**:
 - 100% functional success rate
