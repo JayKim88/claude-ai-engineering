@@ -154,7 +154,18 @@ class DataSourceManager:
                 'industry': info.get('industry'),
                 'eps': info.get('trailingEps'),
                 'revenue': info.get('totalRevenue'),
+                # Financial metrics (Sprint 4 fix)
+                'roe': info.get('returnOnEquity'),
+                'roa': info.get('returnOnAssets'),
+                'operating_margin': info.get('operatingMargins'),
+                'net_margin': info.get('profitMargins'),
                 'profit_margin': info.get('profitMargins'),
+                'gross_margin': info.get('grossMargins'),
+                'ebitda_margin': info.get('ebitdaMargins'),
+                'revenue_growth': info.get('revenueGrowth'),
+                'earnings_growth': info.get('earningsGrowth'),
+                'current_ratio': info.get('currentRatio'),
+                'quick_ratio': info.get('quickRatio'),
                 'debt_to_equity': info.get('debtToEquity'),
                 '52_week_high': info.get('fiftyTwoWeekHigh'),
                 '52_week_low': info.get('fiftyTwoWeekLow'),
@@ -300,10 +311,35 @@ class DataSourceManager:
         }
 
 
-# Convenience function
+# Convenience functions
 def get_data_source_manager(mcp_available=False) -> DataSourceManager:
     """Get a DataSourceManager instance."""
     return DataSourceManager(mcp_available=mcp_available)
+
+
+def get_stock_data(ticker: str, market: str = None) -> Dict:
+    """
+    Simple convenience function to get stock data.
+
+    Args:
+        ticker: Stock ticker symbol
+        market: Market hint ('US' or 'KR'), auto-detected if not provided
+
+    Returns:
+        Dictionary with stock info including 'current_price', 'pe_ratio', 'sector', etc.
+    """
+    dsm = get_data_source_manager()
+    info = dsm.get_stock_info(ticker)
+
+    if 'error' in info:
+        return {}
+
+    # Normalize field names for backward compatibility
+    result = info.copy()
+    if 'price' in result and 'current_price' not in result:
+        result['current_price'] = result['price']
+
+    return result
 
 
 if __name__ == "__main__":

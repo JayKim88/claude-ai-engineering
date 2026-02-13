@@ -80,7 +80,10 @@ class Transaction(Base):
     """Transaction history for holdings (buy, sell, dividend, split)."""
 
     __tablename__ = "transactions"
-    __table_args__ = (CheckConstraint("type IN ('BUY', 'SELL', 'DIVIDEND', 'SPLIT')", name="check_type"),)
+    __table_args__ = (
+        CheckConstraint("type IN ('BUY', 'SELL', 'DIVIDEND', 'SPLIT')", name="check_type"),
+        CheckConstraint("holding_period IN ('short_term', 'long_term', NULL)", name="check_holding_period"),
+    )
 
     id = Column(Integer, primary_key=True)
     holding_id = Column(Integer, ForeignKey("holdings.id"), nullable=False)
@@ -92,6 +95,12 @@ class Transaction(Base):
     exchange_rate = Column(Float)  # For KRW→USD conversion
     notes = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Tax-related fields (Sprint 1)
+    tax_lot_id = Column(Integer)  # Tax lot identifier for FIFO/LIFO tracking
+    holding_period = Column(String)  # 'short_term' (<1 year) or 'long_term' (>=1 year)
+    realized_gain_loss = Column(Float)  # Realized gain/loss for SELL transactions
+    tax_year = Column(Integer)  # Tax year for this transaction
 
     # Relationships
     holding = relationship("Holding", back_populates="transactions")
@@ -151,6 +160,30 @@ class DataCache(Base):
 
     def __repr__(self):
         return f"<DataCache(key='{self.key}', source='{self.source}', expires={self.expires_at})>"
+
+
+class DividendCalendar(Base):
+    """Dividend payment schedule and history tracking (Sprint 1)."""
+
+    __tablename__ = "dividend_calendar"
+    __table_args__ = (
+        CheckConstraint("frequency IN ('quarterly', 'monthly', 'annual', 'semi-annual', 'irregular')", name="check_frequency"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    ticker = Column(String, nullable=False, index=True)
+    ex_date = Column(Date)  # Ex-dividend date
+    payment_date = Column(Date)  # Actual payment date
+    record_date = Column(Date)  # Record date
+    amount = Column(Float, nullable=False)  # Dividend amount per share
+    frequency = Column(String)  # Payment frequency
+    currency = Column(String, default="USD")  # USD or KRW
+    qualified = Column(Integer, default=1)  # 1=qualified dividend, 0=non-qualified (for US tax)
+    notes = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<DividendCalendar(ticker='{self.ticker}', ex_date={self.ex_date}, amount=${self.amount})>"
 
 
 # Database connection and session management

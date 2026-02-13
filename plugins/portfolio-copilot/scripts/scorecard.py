@@ -71,12 +71,17 @@ class CompanyScorecardGenerator:
             ticker, historical
         )
 
-        # Calculate total weighted score
+        # Calculate total weighted score (Sprint 4 fix: cap all scores at 10)
+        financial_score = min(max(financial_score, 0), 10)
+        valuation_score = min(max(valuation_score, 0), 10)
+        momentum_score = min(max(momentum_score, 0), 10)
+
         total_score = (
             financial_score * 0.40 +
             valuation_score * 0.30 +
             momentum_score * 0.30
         )
+        total_score = min(max(total_score, 0), 10)
 
         return {
             'ticker': ticker,
@@ -448,7 +453,7 @@ class CompanyScorecardGenerator:
         poor: float
     ) -> float:
         """
-        Normalize a value to 0-10 scale
+        Normalize a value to 0-10 scale (Sprint 4 fix: cap at 10)
 
         Args:
             value: Input value to normalize
@@ -470,8 +475,9 @@ class CompanyScorecardGenerator:
             ratio = (value - poor) / (acceptable - poor)
             return 2.5 + (ratio * 2.5)
         else:
-            # Below poor: scale down to 0
-            return max(0, 2.5 * (value / poor))
+            # Below poor: scale down to 0 (capped at 10)
+            score = 2.5 * (value / poor) if poor != 0 else 0
+            return min(max(0, score), 10.0)
 
     def _get_grade(self, score: float) -> str:
         """Convert numerical score to letter grade"""
