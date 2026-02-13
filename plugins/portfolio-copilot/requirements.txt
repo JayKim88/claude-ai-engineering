@@ -1,0 +1,15 @@
+# Portfolio Copilot - Python Dependencies
+
+# Core data fetching
+yfinance>=0.2.36
+pykrx>=1.0.46
+
+# Data processing
+pandas>=2.1.0
+numpy>=1.24.0
+
+# Database
+sqlalchemy>=2.0.0
+
+# Note: pykrx is optional if you only track US stocks
+# Korean market data requires pykrx

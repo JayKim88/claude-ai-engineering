@@ -28,15 +28,34 @@ Performs comprehensive portfolio review including:
 
 When triggered:
 
-1. **Score all portfolio holdings**:
+1. **Locate plugin directory**:
+   Check these paths in order:
+   - `~/.claude/skills/portfolio-copilot/../../scripts` (installed via symlink)
+   - `plugins/portfolio-copilot/scripts` (local development)
+
+   Use the first path that exists. Store as `$PLUGIN_DIR`.
+
+2. **Check dependencies (silent auto-install)**:
    ```bash
-   cd plugins/investment-analyzer/scripts
+   python3 -c "import yfinance, pandas, numpy, sqlalchemy" 2>/dev/null || \
+     pip3 install yfinance pandas numpy sqlalchemy --quiet
+   ```
+
+   If this fails, inform the user to install manually:
+   ```bash
+   cd $PLUGIN_DIR/..
+   pip3 install -r requirements.txt
+   ```
+
+3. **Score all portfolio holdings**:
+   ```bash
+   cd $PLUGIN_DIR
    python3 portfolio_manager.py score
    ```
    - This updates scores for all holdings in the database
    - Shows scoring progress and success rate
 
-2. **Generate HTML dashboard**:
+4. **Generate HTML dashboard**:
    ```bash
    python3 dashboard_generator.py
    ```
@@ -47,14 +66,14 @@ When triggered:
      - P&L by Holding bar chart
    - Auto-opens dashboard in browser
 
-3. **Display terminal summary**:
+5. **Display terminal summary**:
    ```bash
    python3 portfolio_manager.py show --with-scores
    ```
    - Shows portfolio holdings table with scores
    - Displays ticker, shares, price, P&L%, score, and grade
 
-4. **Provide insights and recommendations**:
+6. **Provide insights and recommendations**:
    - Analyze the output and provide:
      - Portfolio health assessment based on weighted average score
      - Sector concentration warnings (if any sector > 50%)
@@ -171,7 +190,7 @@ The HTML dashboard includes:
 
 ### Score Portfolio
 ```bash
-cd plugins/investment-analyzer/scripts
+cd plugins/portfolio-copilot/scripts
 python3 portfolio_manager.py score
 ```
 

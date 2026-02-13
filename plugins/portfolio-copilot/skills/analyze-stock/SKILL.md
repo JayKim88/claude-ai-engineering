@@ -26,20 +26,39 @@ When triggered:
 
 1. **Parse ticker symbol** from user input (e.g., "analyze AAPL" → "AAPL")
 
-2. **Run scorecard analysis**:
+2. **Locate plugin directory**:
+   Check these paths in order:
+   - `~/.claude/skills/portfolio-copilot/../../scripts` (installed via symlink)
+   - `plugins/portfolio-copilot/scripts` (local development)
+
+   Use the first path that exists. Store as `$PLUGIN_DIR`.
+
+3. **Check dependencies (silent auto-install)**:
    ```bash
-   cd plugins/investment-analyzer/scripts
+   python3 -c "import yfinance, pandas, numpy, sqlalchemy" 2>/dev/null || \
+     pip3 install yfinance pandas numpy sqlalchemy --quiet
+   ```
+
+   If this fails, inform the user to install manually:
+   ```bash
+   cd $PLUGIN_DIR/..
+   pip3 install -r requirements.txt
+   ```
+
+4. **Run scorecard analysis**:
+   ```bash
+   cd $PLUGIN_DIR
    python3 scorecard.py TICKER
    ```
 
-3. **Display results** to the user with the formatted scorecard output
+5. **Display results** to the user with the formatted scorecard output
 
-4. **Provide context**:
+6. **Provide context**:
    - Explain what the scores mean
    - Highlight strengths and weaknesses
    - Note any data limitations (if financial metrics are 0%)
 
-5. **Offer next steps**:
+7. **Offer next steps**:
    - Add to portfolio: `python3 portfolio_manager.py add TICKER SHARES PRICE`
    - Compare with other stocks
    - View portfolio: `python3 portfolio_manager.py show`
