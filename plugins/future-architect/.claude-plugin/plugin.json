@@ -16,6 +16,6 @@
     "priorities"
   ],
   "skills": ["future-architect"],
-  "agents": [],
+  "agents": ["future-architect"],
   "commands": []
 }
