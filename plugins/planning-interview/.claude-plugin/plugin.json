@@ -1,0 +1,32 @@
+{
+  "name": "planning-interview",
+  "version": "1.0.0",
+  "description": "AI-powered product planning interview plugin that transforms vague ideas into comprehensive PRDs through adaptive, context-aware questioning. Supports Solo Builder (Lean Canvas), Startup Founder (Product Brief), and Product Manager (Full PRD) workflows.",
+  "author": "Fused Implementation (Alpha Pragmatist + Beta Architect)",
+  "license": "MIT",
+  "keywords": [
+    "planning",
+    "interview",
+    "prd",
+    "product",
+    "requirements",
+    "lean-canvas",
+    "product-brief",
+    "business-planning",
+    "startup",
+    "pm-tools"
+  ],
+  "required_tools": [
+    "AskUserQuestion",
+    "Write"
+  ],
+  "dependencies": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/claude-plugins"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/claude-plugins/issues"
+  },
+  "homepage": "https://github.com/your-org/claude-plugins/tree/main/planning-interview"
+}
