@@ -1,0 +1,43 @@
+# Rich Guide - Trusted Financial Information Sources
+# Priority 1: Verified (신뢰 검증됨)
+verified:
+  - domain: hankyung.com
+    name: 한국경제
+    type: newspaper
+  - domain: sedaily.com
+    name: 서울경제
+    type: newspaper
+  - domain: finance.naver.com
+    name: 네이버증권
+    type: portal
+  - domain: fss.or.kr
+    name: 금융감독원
+    type: government
+  - domain: kfb.or.kr
+    name: 은행연합회
+    type: association
+  - domain: fpsb.or.kr
+    name: 한국FP협회
+    type: association
+  - domain: kofia.or.kr
+    name: 금융투자협회
+    type: association
+
+# Priority 2: Unverified (미검증 - use with label)
+unverified:
+  - domain: blog.naver.com
+    name: 네이버블로그
+    type: blog
+  - domain: youtube.com
+    name: 유튜브
+    type: video
+  - domain: cafe.naver.com
+    name: 네이버카페
+    type: community
+
+# Search keywords by goal
+search_templates:
+  investment: "{goal} 투자 방법 2026 site:hankyung.com OR site:sedaily.com"
+  tax_benefit: "ISA 연금저축 세제혜택 2026"
+  beginner: "재테크 초보 시작 방법 {risk_level} 리스크"
+  side_hustle: "부업 추천 직장인 2026 월 수익"

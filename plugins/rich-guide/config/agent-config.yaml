@@ -1,0 +1,114 @@
+# Rich Guide - Agent Configuration
+# 모든 에이전트의 동작 파라미터를 조정하는 중앙 설정
+#
+# 수정 방법: 이 파일을 직접 편집합니다
+# 설치 후 경로: ~/.claude/skills/rich-guide/config/agent-config.yaml
+
+# ===== 모델 설정 =====
+# 핵심 전략 생성 에이전트는 Opus 사용 (변경 비권장)
+# 분석 에이전트는 Sonnet, 정보 수집은 Haiku (비용 최적화)
+models:
+  wealth_strategist: "claude-opus-4-6"                    # 창의적 전략 생성 (CRITICAL)
+  action_plan_generator: "claude-opus-4-6"                # 상세 실행 계획 (CRITICAL)
+  financial_diagnostician: "claude-sonnet-4-5-20250929"   # 재무 분석
+  market_context_analyzer: "claude-sonnet-4-5-20250929"   # 시장 분석
+  risk_reward_evaluator: "claude-sonnet-4-5-20250929"     # 리스크 평가
+  info_curator: "claude-haiku-4-5"                        # 정보 수집 (속도 우선)
+
+# ===== 타임아웃 설정 (초) =====
+timeouts:
+  # Opus 모델 에이전트 (복잡한 생성 작업)
+  wealth_strategist: 120      # 전략 3-5개 생성
+  action_plan_generator: 120  # 12주 상세 계획
+
+  # Sonnet 모델 에이전트 (분석 작업)
+  financial_diagnostician: 60
+  market_context_analyzer: 60
+  risk_reward_evaluator: 60
+
+  # Haiku 모델 에이전트 (정보 수집, 웹서치 포함)
+  info_curator: 90
+
+  # 재시도 대기 시간
+  retry_delay_seconds: 5
+
+# ===== 재시도 설정 =====
+retry:
+  max_attempts: 2             # 실패 시 최대 재시도 횟수
+  fallback_on_fail: true      # 모든 재시도 실패 시 기본값 사용
+
+# ===== 인터뷰 기본값 =====
+# 사용자가 "잘 모르겠어요" 선택 시 적용되는 기본값
+interview:
+  defaults:
+    monthly_income: 300           # 만원 (한국 직장인 중위값)
+    monthly_expense: 180          # 만원
+    savings: 500                  # 만원
+    investment_assets: 0          # 만원
+    debt: 0                       # 만원
+    risk_tolerance: "medium"      # low | medium | high
+
+  # 기존 데이터 재활용 임계값
+  cache_hours: 24                 # 24시간 이내 → "기존 데이터 사용" 제안
+  refresh_days: 30                # 30일 이상 → "갱신 권장" 메시지
+
+# ===== 전략 생성 설정 =====
+strategy:
+  min_count: 3                    # 최소 전략 수
+  max_count: 5                    # 최대 전략 수
+  enforce_diversity: true         # 리스크/시간/분야 다양성 강제
+
+  # 리스크 성향별 권장 전략 구성
+  allocation_by_risk:
+    low:
+      low_risk: 2
+      medium_risk: 1
+      high_risk: 0
+    medium:
+      low_risk: 1
+      medium_risk: 2
+      high_risk: 0
+      side_hustle: 1
+    high:
+      low_risk: 0
+      medium_risk: 1
+      high_risk: 2
+      side_hustle: 1
+
+# ===== 정보 수집 설정 =====
+curation:
+  max_articles: 10                # 최대 수집 기사 수
+  max_verified: 7                 # 화이트리스트 기사 최대 수
+  max_unverified: 3               # 미검증 기사 최대 수
+  max_article_age_days: 90        # 90일 이상 기사 제외
+  search_year: 2026               # 검색 키워드에 연도 포함
+
+# ===== 파일 경로 설정 =====
+paths:
+  db: "~/.claude/skills/rich-guide/data/profiles.db"
+  roadmaps: "~/.claude/skills/rich-guide/roadmaps"
+  logs: "~/.claude/skills/rich-guide/logs"
+  tmp: "/tmp"                     # 에이전트 간 JSON 임시 파일
+
+  # 외부 플러그인 연동 경로 (선택)
+  # 절대 경로가 아닌 홈 기준 상대 경로 사용
+  portfolio_copilot_db: "~/.claude/plugins/portfolio-copilot/data/portfolio.db"
+  market_pulse_analysis: "~/.claude/plugins/market-pulse/analysis"
+
+# ===== 보안 설정 =====
+security:
+  db_file_permissions: "600"      # 소유자만 읽기/쓰기
+  db_dir_permissions: "700"       # 소유자만 접근
+  log_financial_amounts: false    # 금액 정보 로그 기록 금지
+
+# ===== 출력 설정 =====
+output:
+  language: "ko"                  # 출력 언어 (ko / en)
+  include_disclaimer: true        # 면책 조항 항상 포함
+  include_sources: true           # 출처 항상 명시
+  include_expert_referral: true   # 전문가 상담 링크 항상 포함
+
+# ===== 디버그 설정 =====
+debug:
+  save_agent_outputs: true        # /tmp에 에이전트 JSON 출력 저장
+  verbose: false                  # 상세 진행 상태 출력

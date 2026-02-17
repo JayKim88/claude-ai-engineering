@@ -1,0 +1,32 @@
+{
+  "name": "rich-guide",
+  "version": "2.0.0",
+  "description": "재테크/투자/부업 정보 파편화 문제를 해결하는 다중 에이전트 개인화 부자 전략 시스템. 6개 전문 AI 에이전트(재무진단+정보수집+시장분석+전략생성+리스크평가+실행계획)가 협력하여 사용자 재무 상태를 진단하고, 화이트리스트 기반 신뢰 정보를 큐레이션하여, 맞춤형 부자 전략과 12주 주간 실행 체크리스트를 생성합니다.",
+  "author": {
+    "name": "Jay Kim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "재테크",
+    "투자",
+    "부자",
+    "wealth",
+    "personal-finance",
+    "investment",
+    "side-hustle",
+    "financial-planning",
+    "multi-agent",
+    "korean-finance",
+    "strategy",
+    "roadmap",
+    "부업",
+    "재무설계",
+    "asset-management",
+    "ISA",
+    "ETF",
+    "financial-diagnosis",
+    "action-plan",
+    "weekly-checklist"
+  ]
+}
