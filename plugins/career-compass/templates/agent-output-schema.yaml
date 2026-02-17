@@ -1,0 +1,10 @@
+# Agent Output Schema
+AgentOutput:
+  required: [status, agent_name, timestamp, data]
+  properties:
+    status: {enum: [success, partial, failed]}
+    agent_name: {type: string}
+    timestamp: {type: string}
+    data: {type: object}
+    errors: {type: array}
+    metadata: {type: object}

@@ -1,0 +1,20 @@
+# Agent Configuration
+
+timeouts:
+  career_trend_researcher: 180
+  strategy_advisor: 180
+  career_path_generator: 120
+
+models:
+  career_trend_researcher: opus
+  career_path_generator: opus
+  strategy_advisor: opus
+
+features:
+  enable_jd_integration: true
+  enable_web_research: true
+  enable_parallel_execution: true
+
+output:
+  roadmap_directory: "~/.career-compass/roadmaps"
+  strategy_directory: "~/.career-compass/strategy"

@@ -1,0 +1,25 @@
+{
+  "name": "career-compass",
+  "version": "1.0.0",
+  "description": "Comprehensive AI-powered career guidance with multi-agent analysis pipeline. Analyzes resume, job market trends, skill gaps, and generates personalized career paths with detailed learning roadmaps.",
+  "author": {
+    "name": "Jay Kim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "career",
+    "guidance",
+    "resume",
+    "job-market",
+    "skill-gap",
+    "career-path",
+    "roadmap",
+    "multi-agent",
+    "career-transition",
+    "learning-path",
+    "salary-analysis",
+    "strategy",
+    "AI-career-advisor"
+  ]
+}
