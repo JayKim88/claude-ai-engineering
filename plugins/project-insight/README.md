@@ -83,33 +83,39 @@ Claude: I'll analyze your project using a multi-agent pipeline.
 
 ## Multi-Agent Architecture
 
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"analyze project / project insight"| B[Phase 1: Parallel Analysis]
+
+    subgraph Phase1["Phase 1: Parallel Analysis"]
+        direction LR
+        C1["🔵 Tech Stack Analyzer<br/>• Languages & versions<br/>• Frameworks & libraries<br/>• Dependency health"]
+        C2["🟢 Structure Analyzer<br/>• Directory organization<br/>• File naming consistency<br/>• Separation of concerns"]
+        C3["🟣 README Analyzer<br/>• Completeness check<br/>• Documentation quality<br/>• Missing sections"]
+    end
+
+    B --> C1 & C2 & C3
+
+    C1 & C2 & C3 --> D[Phase 2: Synthesis]
+
+    subgraph Phase2["Phase 2: Synthesis"]
+        E["🟡 Insight Synthesizer<br/>• Deduplicate findings<br/>• Prioritize by impact<br/>• Identify quick wins<br/>• Cross-cutting patterns"]
+    end
+
+    D --> E
+    E --> F[Generate Insight Report]
+    F --> G([Dashboard: Health Score + Prioritized Recommendations])
+```
+
 ### Phase 1: Parallel Analysis (3 agents)
 
-```
-┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-│ Tech Stack       │  │ Structure        │  │ README           │
-│ Analyzer         │  │ Analyzer         │  │ Analyzer         │
-│                  │  │                  │  │                  │
-│ • Languages      │  │ • Organization   │  │ • Completeness   │
-│ • Frameworks     │  │ • Patterns       │  │ • Quality        │
-│ • Dependencies   │  │ • Metrics        │  │ • Missing info   │
-└────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘
-         └────────────────┬────────────────────────┘
-                          ▼
-```
+- **🔵 Tech Stack Analyzer**: Languages, frameworks, dependencies
+- **🟢 Structure Analyzer**: Organization, patterns, metrics
+- **🟣 README Analyzer**: Completeness, quality, missing info
 
 ### Phase 2: Synthesis (1 agent)
 
-```
-                  ┌──────────────────┐
-                  │ Insight          │
-                  │ Synthesizer      │
-                  │                  │
-                  │ • Deduplicate    │
-                  │ • Prioritize     │
-                  │ • Quick wins     │
-                  └──────────────────┘
-```
+- **🟡 Insight Synthesizer**: Deduplicates, prioritizes, identifies quick wins
 
 ## Agent Responsibilities
 

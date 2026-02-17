@@ -2,6 +2,62 @@
 
 > Transform vague product ideas into comprehensive PRDs through AI-powered, adaptive interviews
 
+## Process Flow
+
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"planning interview / 기획해줘"| B[Context Detection]
+    B --> C{Role & Complexity?}
+
+    C -->|"Solo developer / Side project"| D["Solo Mode<br/>15-20 min"]
+    C -->|"Startup founder / Small team"| E["Startup Mode<br/>25-30 min"]
+    C -->|"Product manager / Enterprise team"| F["Team Mode<br/>35-45 min"]
+
+    subgraph SoloFlow["Solo: 3-4 Rounds → Lean Canvas"]
+        S1[Problem & Customers]
+        S2[Solution & UVP]
+        S3[Revenue & Metrics]
+        S4[Risks & Assumptions]
+        S1 --> S2 --> S3 --> S4
+    end
+
+    subgraph StartupFlow["Startup: 5-6 Rounds → Product Brief"]
+        ST1[Problem & Market]
+        ST2[Solution & Competitors]
+        ST3[GTM Strategy]
+        ST4[Team, Timeline, Risks]
+        ST1 --> ST2 --> ST3 --> ST4
+    end
+
+    subgraph TeamFlow["Team: 8-9 Rounds → Full PRD"]
+        T1[Background & Goals]
+        T2[Users & Personas]
+        T3[User Stories & Jobs-to-be-Done]
+        T4[Requirements - MoSCoW]
+        T5[UX, Tech, KPIs, Rollout]
+        T1 --> T2 --> T3 --> T4 --> T5
+    end
+
+    D --> SoloFlow
+    E --> StartupFlow
+    F --> TeamFlow
+
+    subgraph Scoring["Answer Completeness Scoring 1-5"]
+        SC1{Score < 3?}
+        SC2[Targeted Follow-up]
+        SC1 -->|Yes| SC2 --> SC1
+        SC1 -->|No| SC3[Next Question]
+    end
+
+    SoloFlow & StartupFlow & TeamFlow -.- Scoring
+
+    SoloFlow --> G[Lean Canvas 1-2 pages]
+    StartupFlow --> H[Product Brief 3-5 pages]
+    TeamFlow --> I[Full PRD 8-12 pages]
+
+    G & H & I --> J([Saved Markdown PRD Document])
+```
+
 ## Overview
 
 The **planning-interview** plugin conducts context-aware product planning interviews to create structured PRDs in 15-45 minutes. It adapts to your role and project complexity with three modes:

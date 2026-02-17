@@ -11,6 +11,46 @@ AI-driven requirements gathering through in-depth interviews. Transform vague id
 - **Multiple Rounds**: Continues interviewing until all critical aspects are covered
 - **Adaptive Depth**: Simple features get 3-5 rounds, complex projects get 5-8 rounds
 
+## Process Flow
+
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"interview me about X"| B[Detect Complexity]
+    B --> C{Simple or Complex?}
+    C -->|Simple feature| D[3-5 Interview Rounds]
+    C -->|Complex project| E[5-8 Interview Rounds]
+
+    subgraph Rounds["Interview Round Loop"]
+        direction TB
+        R1[Ask 2-3 Non-Obvious Questions]
+        R2[User Answers]
+        R3{Answer Complete?}
+        R4[Smart Follow-up]
+        R5{More Rounds Needed?}
+        R1 --> R2 --> R3
+        R3 -->|Incomplete| R4 --> R1
+        R3 -->|Complete| R5
+        R5 -->|Yes| R1
+    end
+
+    D & E --> Rounds
+
+    subgraph Categories["Question Categories (rotated)"]
+        direction LR
+        Q1[Technical Implementation]
+        Q2[User Experience]
+        Q3[Business Logic]
+        Q4[Concerns & Risks]
+        Q5[Trade-offs]
+        Q6[Non-functional Req.]
+    end
+
+    Rounds -.- Categories
+    R5 -->|No| F[Generate Spec Document]
+    F --> G[Save to ./feature-spec.md]
+    G --> H(["Done ✅<br/>Spec + Optional Task Breakdown"])
+```
+
 ## Why This Approach Works
 
 **Traditional approach:**

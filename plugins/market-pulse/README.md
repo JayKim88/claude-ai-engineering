@@ -75,55 +75,58 @@ Customize tracked symbols, sector ETFs, news RSS feeds, and scoring keywords.
 
 ## Architecture
 
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"시장 분석 / market overview"| B{Analysis Type}
+
+    B -->|Market Dashboard| C[Phase 1: Python Data Fetch]
+    B -->|Value Investing| G[MCP Layer]
+
+    subgraph DataFetch["Phase 1: Data Fetch"]
+        D1["yfinance<br/>US stocks, ETFs, Crypto"]
+        D2["pykrx<br/>KOSPI/KOSDAQ"]
+        D3["feedparser<br/>Financial News RSS"]
+    end
+
+    C --> DataFetch
+
+    DataFetch --> E[Phase 2: Parallel Analysis]
+
+    subgraph Analysis["Phase 2: 3 Parallel Agents"]
+        direction LR
+        A1["US Market Analyzer<br/>S&P500, NASDAQ, VIX<br/>11 Sector ETFs"]
+        A2["KR Market Analyzer<br/>KOSPI/KOSDAQ<br/>Foreign/Institutional flows"]
+        A3["Crypto+Macro Analyzer<br/>BTC/ETH/SOL<br/>Treasury, Gold, Oil, FX"]
+    end
+
+    E --> A1 & A2 & A3
+    A1 & A2 & A3 --> F[Market Synthesizer]
+    F --> F2([Dashboard HTML + Key Insights])
+
+    subgraph ValueInvesting["Phase 2.5: Value Investing"]
+        G["Stock MCP Server<br/>yfinance wrapper<br/>9 tools"]
+        G --> H1["Safety Margin Calculator<br/>Graham: IV = EPS × 8.5 + 2g"]
+        G --> H2[GARP Screener / Lynch: PEG < 1.0]
+        G --> H3["Company Deep Dive<br/>8 Perspectives: Graham/Buffett<br/>Lynch/Munger/Asness/Dalio/Fisher"]
+        G --> H4["Equity Report Generator<br/>Investment firm-style report"]
+    end
+
+    H1 & H2 & H3 & H4 --> I([Markdown Tables / Reports / JSON])
+```
+
 ### Phase 1-2: Market Analysis
 
-```
-Phase 1: Python Data Fetch (yfinance + pykrx + feedparser)
-                    ↓
-Phase 2: Parallel Analysis (3 agents)
-┌──────────────┐  ┌──────────────┐  ┌──────────────────┐
-│ US Market    │  │ KR Market    │  │ Crypto + Macro    │
-│ Analyzer     │  │ Analyzer     │  │ Analyzer          │
-└──────┬───────┘  └──────┬───────┘  └────────┬─────────┘
-       └─────────────────┼──────────────────┘
-                         ↓
-Phase 3: Synthesis (market-synthesizer)
-                         ↓
-              Dashboard Output
-```
+- **Phase 1**: Python data fetch (yfinance + pykrx + feedparser)
+- **Phase 2**: 3 parallel agents (US Market, KR Market, Crypto+Macro)
+- **Phase 3**: Market Synthesizer → Dashboard output
 
 ### Phase 2.5: Value Investing Analysis ⭐ NEW
 
-```
-┌─ MCP Layer ──────────────────────────────────┐
-│  Stock MCP Server (yfinance wrapper)          │
-│  9 tools: fundamentals, financials, info...   │
-└───────────────────────────────────────────────┘
-                    ↓
-┌─ Analysis Engines ────────────────────────────┐
-│  1. Safety Margin Calculator (Graham)         │
-│     → Intrinsic Value = EPS × (8.5 + 2g)     │
-│                                                │
-│  2. GARP Screener (Lynch)                     │
-│     → PEG < 1.0, 6 stock categories           │
-│                                                │
-│  3. Company Deep Dive (8 Perspectives)        │
-│     → Graham, Buffett, Lynch, Munger          │
-│     → Asness, Dalio, Fisher, Synthesis        │
-│                                                │
-│  4. Value Investing Analyzer                  │
-│     → All-in-One CLI tool                     │
-│                                                │
-│  5. Equity Report Generator ⭐ NEW            │
-│     → Investment firm-style markdown reports  │
-└───────────────────────────────────────────────┘
-                    ↓
-┌─ Output Formats ──────────────────────────────┐
-│  • Markdown Tables (Terminal)                 │
-│  • Markdown Reports (키움증권 스타일)            │
-│  • JSON (Programmatic access)                 │
-└───────────────────────────────────────────────┘
-```
+- **MCP Layer**: Stock MCP Server (yfinance wrapper, 9 tools)
+- **Safety Margin Calculator** (Graham): IV = EPS × (8.5 + 2g)
+- **GARP Screener** (Lynch): PEG < 1.0, 6 stock categories
+- **Company Deep Dive**: 8 perspectives (Graham, Buffett, Lynch, Munger, Asness, Dalio, Fisher)
+- **Equity Report Generator**: Investment firm-style markdown reports
 
 ## Usage Examples
 

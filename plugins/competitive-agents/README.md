@@ -4,10 +4,44 @@ Two AI agents with different philosophies compete to generate a Claude Code plug
 
 ## How It Works
 
-```
-Mission → Parallel Generation (Alpha vs Beta)
-       → Cross-Review → Improvement (x1-2 rounds)
-       → Judge Evaluation → User Decision
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"compete / competitive agents"| B[Define Mission]
+    B --> C[Parallel Generation]
+
+    subgraph Generation["Phase 1: Parallel Generation"]
+        direction LR
+        GA["Agent Alpha<br/>🔧 Pragmatist<br/>Simplicity, minimal files<br/>works immediately"]
+        GB["Agent Beta<br/>🏗️ Architect<br/>Completeness, extensibility<br/>comprehensive docs"]
+    end
+
+    C --> GA & GB
+
+    GA & GB --> D[Cross-Review]
+
+    subgraph Review["Phase 2: Cross-Review"]
+        direction LR
+        RA["Reviewer A<br/>reviews Beta's impl"]
+        RB["Reviewer B<br/>reviews Alpha's impl"]
+    end
+
+    D --> RA & RB
+
+    RA & RB --> E[Improvement Round]
+
+    subgraph Improve["Phase 3: Improvement"]
+        direction LR
+        IA["Improver A<br/>refines Alpha v2"]
+        IB["Improver B<br/>refines Beta v2"]
+    end
+
+    E --> IA & IB
+
+    IA & IB --> F["Judge<br/>🧑‍⚖️ Opus<br/>100-point evaluation"]
+    F --> G{User Decision}
+    G -->|Pick A or B| H[Use as Final]
+    G -->|Fuse both| I["Fuser<br/>Merge best of A+B"]
+    H & I --> J([Final Plugin in tempo/])
 ```
 
 **Agent Alpha (Pragmatist)**: Simplicity, minimal files, works immediately.

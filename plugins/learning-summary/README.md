@@ -2,6 +2,34 @@
 
 Capture and document key learnings from Claude Code conversations with structured markdown output.
 
+## Process Flow
+
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"summarize / document / what did I learn?"| B[Analyze Conversation]
+    B --> C{Config Exists?}
+    C -->|No| D[Prompt for Learning Repo Path]
+    D --> E[Save Config]
+    E --> F
+    C -->|Yes| F[Extract Key Insights]
+    F --> G[Ask: Which sections to include?]
+    G --> H{Sections Selected}
+    H --> I1[Key Insights]
+    H --> I2[Problem & Solution]
+    H --> I3[Code Examples]
+    H --> I4[Resources & References]
+    H --> I5[Next Steps]
+    I1 & I2 & I3 & I4 & I5 --> J[Generate Markdown Document]
+    J --> K[Save to learning_repo/learnings/YYYY-MM-DD-topic.md]
+    K --> L{auto_commit?}
+    L -->|Yes| M[Git Commit]
+    M --> N{auto_push?}
+    N -->|Yes| O[Git Push]
+    N -->|No| P([Done])
+    O --> P
+    L -->|No| P
+```
+
 ## Features
 
 - **Automatic Analysis**: Extracts insights, patterns, and key takeaways from conversations

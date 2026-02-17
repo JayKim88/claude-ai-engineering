@@ -2,6 +2,39 @@
 
 Automatically aggregates latest AI news from multiple sources and generates a curated Top 5 digest on-demand.
 
+## Process Flow
+
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"latest AI news / AI news digest"| B[Load feeds.yaml Config]
+    B --> C[Fetch RSS Feeds in Parallel]
+
+    subgraph Sources["12+ RSS Sources"]
+        direction LR
+        S1["Official Blogs<br/>Anthropic/OpenAI/Google<br/>(weight: 10)"]
+        S2["Research Papers<br/>ArXiv ML/AI/CL<br/>(weight: 8)"]
+        S3["Community<br/>HN / Reddit<br/>(weight: 6)"]
+        S4["Tech News<br/>Verge / TechCrunch<br/>(weight: 5)"]
+    end
+
+    C --> Sources
+    Sources --> D[Collect All Articles]
+    D --> E[Score Each Article]
+
+    subgraph Scoring["Scoring Formula"]
+        SC1[Base Source Weight]
+        SC2["+ Keyword Boost<br/>high +5 / medium +3 / low +1"]
+        SC3["+ Recency Boost<br/>24h +10 / 48h +5 / week +2"]
+    end
+
+    E --> Scoring
+    Scoring --> F[Sort by Score]
+    F --> G[Select Top 5 Stories]
+    G --> H[Generate Digest Markdown]
+    H --> I[Save ai-news-digest-YYYY-MM-DD.md]
+    I --> J([Done ✅ ~15-20 seconds total])
+```
+
 ## Features
 
 - **Multi-Source Aggregation**: Fetches from 12+ RSS feeds (Anthropic, OpenAI, Google, ArXiv, Hacker News, Reddit, etc.)

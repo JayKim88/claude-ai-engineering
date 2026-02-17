@@ -44,23 +44,53 @@ AI-powered portfolio management plugin with multi-agent architecture and complet
 
 ## Architecture
 
+```mermaid
+flowchart TD
+    A([User Command]) -->|"/portfolio-review /analyze-stock /find-opportunities /portfolio-risk /portfolio-chat"| B[Portfolio Orchestrator]
+
+    B --> C1 & C2 & C3 & C4 & C5
+
+    subgraph Agents["6-Agent Multi-Tier Design"]
+        C1["Data Manager<br/>(Sonnet)<br/>Portfolio CRUD"]
+        C2["Market Analyst<br/>(Sonnet)<br/>Market data fetch"]
+        C3["Metrics Calculator<br/>(Sonnet)<br/>Risk metrics"]
+        C4["Strategic Advisor<br/>(Opus) ⭐<br/>AI insights"]
+        C5["Report Generator<br/>(Haiku)<br/>Dashboard HTML"]
+    end
+
+    C1 & C2 & C3 & C4 & C5 -->|Bash| D[Python Scripts Layer]
+
+    subgraph Scripts["9 Python Scripts"]
+        P1["init_portfolio.py<br/>DB setup"]
+        P2["query_portfolio.py<br/>Read ops"]
+        P3["add_to_portfolio.py<br/>Write ops"]
+        P4["update_prices.py<br/>Price updates"]
+        P5["fetch_stock_data.py<br/>Multi-source fetch"]
+        P6["calculate_score.py<br/>Stock scoring"]
+        P7["calculate_portfolio_metrics.py<br/>Risk calc"]
+        P8["generate_dashboard.py<br/>HTML output"]
+    end
+
+    D --> Scripts
+
+    subgraph DataSources["Data Sources"]
+        DS1["UsStockInfo MCP<br/>Primary - US stocks"]
+        DS2["yfinance<br/>Fallback - Global"]
+        DS3["pykrx<br/>Korean market"]
+    end
+
+    Scripts --> DataSources
+    Scripts --> E[("portfolio.db<br/>SQLite")]
+    Scripts --> F(["Dashboard HTML<br/>+ AI Analysis Report"])
+```
+
 ### 6-Agent Multi-Tier Design
 
-```
-User Request
-    ↓
-Portfolio Orchestrator
-    ↓
-┌──────────────┬──────────────┬──────────────┬──────────────┬──────────────┐
-│ Data Manager │ Market       │ Metrics      │ Strategic    │ Report       │
-│ (Sonnet)     │ Analyst      │ Calculator   │ Advisor      │ Generator    │
-│              │ (Sonnet)     │ (Sonnet)     │ (Opus) ⭐     │ (Haiku)      │
-└──────┬───────┴──────┬───────┴──────┬───────┴──────┬───────┴──────┬───────┘
-       │              │              │              │              │
-    Bash()         Bash()         Bash()         Bash()         Bash()
-       ↓              ↓              ↓              ↓              ↓
-Python Scripts (9 files - complete CRUD + analysis)
-```
+**Benefits**:
+- Clear separation: Agents = AI reasoning, Scripts = data/compute
+- Cost optimization: Opus only for strategic analysis (1 of 6 agents)
+- Maintainable: Modify agents or scripts independently
+- Parallel execution: Multiple agents work simultaneously
 
 **Benefits**:
 - 🎯 Clear separation: Agents = AI reasoning, Scripts = data/compute

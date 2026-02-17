@@ -58,6 +58,47 @@ After ~5-7 minutes, you'll receive:
 
 ## Architecture
 
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"/career-compass"| B["Load Profile<br/>~/.jd-analyzer/profile.yaml"]
+    B --> C{Profile Found?}
+    C -->|No| D["Web Search Fallback<br/>slower, less personalized"]
+    C -->|Yes| E[Phase 1: Parallel Analysis]
+    D --> E
+
+    subgraph Phase1["Phase 1: Analysis"]
+        direction LR
+        P1A["resume-analyzer<br/>Skills, experience<br/>career patterns"]
+        P1B["jd-market-analyzer<br/>100+ job descriptions<br/>market trends & demand"]
+        P1C["career-trend-researcher<br/>Success stories<br/>learning resources"]
+    end
+
+    E --> P1A & P1B & P1C
+
+    P1A & P1B & P1C --> F[Phase 2: Path Generation]
+
+    subgraph Phase2["Phase 2: Generation"]
+        direction LR
+        P2A["skill-gap-analyzer<br/>ROI prioritization<br/>market demand ÷ difficulty"]
+        P2B["career-path-generator<br/>3-5 distinct paths<br/>Direct/Gradual/Bootcamp/Hybrid"]
+        P2C["salary-projector<br/>Salary increase<br/>ROI & breakeven calc"]
+    end
+
+    F --> P2A & P2B & P2C
+
+    P2A & P2B & P2C --> G[User Selects Career Path]
+    G --> H[Phase 3: Detailed Planning]
+
+    subgraph Phase3["Phase 3: Synthesis"]
+        P3A["roadmap-generator<br/>Month-by-month plan<br/>50-100 pages"]
+        P3B["strategy-advisor<br/>Risk mitigation<br/>Networking & positioning"]
+        P3A --> P3B
+    end
+
+    H --> Phase3
+    Phase3 --> I(["Output Files<br/>roadmap-path1-DATE.md<br/>strategy-DATE.md"])
+```
+
 **8-Agent Pipeline:**
 - Phase 1 (Analysis): resume-analyzer + jd-market-analyzer + career-trend-researcher
 - Phase 2 (Generation): skill-gap-analyzer + career-path-generator + salary-projector

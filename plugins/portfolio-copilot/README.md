@@ -2,6 +2,44 @@
 
 Professional-grade portfolio management tool with tax optimization, performance analytics, and risk management.
 
+## Process Flow
+
+```mermaid
+flowchart TD
+    A([User Command]) --> B{Command Type}
+
+    B -->|"analyze-stock TICKER"| C[Stock Analysis]
+    B -->|"portfolio-review"| D[Portfolio Dashboard]
+    B -->|"find-opportunities"| E[Opportunity Scanner]
+    B -->|"portfolio-risk"| F[Risk Analysis]
+    B -->|"portfolio-chat"| G[AI Advisor Chat]
+
+    subgraph DataLayer["Data Layer (Multi-source)"]
+        DS1["UsStockInfo MCP<br/>Primary"]
+        DS2["yfinance<br/>Fallback"]
+        DS3["pykrx<br/>Korean market"]
+    end
+
+    C & D & E & F & G --> DataLayer
+    DataLayer --> H[("portfolio.db<br/>SQLite - 7 tables")]
+
+    subgraph Analysis["Analysis Modules (11 Python scripts)"]
+        AN1["scorecard.py<br/>3D Stock Scoring<br/>Financial/Valuation/Momentum"]
+        AN2["tax_loss_harvester.py<br/>Tax-Loss Opportunities"]
+        AN3["tax_calculator.py<br/>Capital Gains Tax"]
+        AN4["dividend_tracker.py<br/>Dividend Forecasting"]
+        AN5["benchmark_analyzer.py<br/>Alpha/Beta vs S&P500"]
+        AN6["performance_calculator.py<br/>TWR/MWR/Sharpe"]
+        AN7["risk_metrics.py<br/>VaR/CVaR/Correlation"]
+        AN8["rebalance_engine.py<br/>Drift Analysis"]
+        AN9["all_in_one_analysis.py<br/>Comprehensive Report"]
+    end
+
+    H --> Analysis
+    Analysis --> I[dashboard_generator.py]
+    I --> J(["HTML Dashboard<br/>+ Executive Summary<br/>+ Action Items"])
+```
+
 ## Overview
 
 **Portfolio Copilot** is a complete portfolio management solution that provides:

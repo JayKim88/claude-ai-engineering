@@ -6,6 +6,43 @@ Spec Validator helps you track spec-driven development by comparing your specifi
 
 ---
 
+## Process Flow
+
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"validate spec implementation"| B{Checklist Exists?}
+    B -->|No| C["Generate Checklist Template<br/>from spec document"]
+    C --> D[User Fills .spec-checklist.yaml]
+    D --> E
+    B -->|Yes| E{Validation Mode}
+
+    E -->|Full ~30s| F[4-Dimension Validation]
+    E -->|Quick ~10s| G[Completeness + Adherence Only]
+    E -->|Requirements ~15s| H[FR/NFR Progress Only]
+
+    subgraph Dimensions["4-Dimension Scoring (100 pts)"]
+        D1["Implementation Completeness (40pts)<br/>FR, NFR, models, APIs"]
+        D2["Implementation Quality (25pts)<br/>Test coverage, edge cases, docs"]
+        D3["Spec Adherence (20pts)<br/>Checklist matches spec exactly"]
+        D4["Progress Transparency (15pts)<br/>Status tracking, blockers"]
+    end
+
+    F --> Dimensions
+    Dimensions --> I[Calculate Total Score]
+    G & H --> I
+
+    I --> J{Score Grade}
+    J -->|95+| K[A+ Ship it!]
+    J -->|90-94| L[A Grade - Ready]
+    J -->|75-89| M[B Grade - Improve]
+    J -->|< 75| N[C/D/F - Fix Issues]
+
+    K & L & M & N --> O[Generate Validation Report]
+    O --> P(["Report: Score + Issues by Severity<br/>+ Prioritized Recommendations"])
+
+    N -->|Fix & re-validate| A
+```
+
 ## Quick Start
 
 ### 1. Create a Specification

@@ -2,6 +2,37 @@
 
 Digest AI/tech articles and content into structured learning documents for quick reference and practical application.
 
+## Process Flow
+
+```mermaid
+flowchart TD
+    A([User Trigger]) -->|"/ai-digest URL or text"| B{Input Type}
+    B -->|URL| C[Fetch Article via WebFetch]
+    B -->|Pasted Text| D[Use Content Directly]
+    C --> E[Extract Key Content]
+    D --> E
+    E --> F{Focus Specified?}
+    F -->|Yes e.g. 'breaking changes only'| G[Apply Focused Extraction]
+    F -->|No| H[Full Article Analysis]
+    G & H --> I[Structure into Template]
+
+    subgraph Template["Document Template"]
+        T1[Summary 요약]
+        T2[Key Changes / Concepts]
+        T3[Practical Applications 실무 적용]
+        T4[Code Examples 코드 예제]
+        T5[Limitations 주의사항]
+        T6[References + Next Steps]
+    end
+
+    I --> Template
+    Template --> J[Save to learning_repo/digests/YYYY-MM-DD-ai-topic.md]
+    J --> K{auto_commit?}
+    K -->|Yes| L[Git Commit & Push]
+    K -->|No| M([Done ✅])
+    L --> M
+```
+
 ## Overview
 
 With the rapid pace of AI development, keeping track of new features, changes, and best practices is challenging. The AI Digest plugin helps you capture and organize AI/tech content from articles, blog posts, and announcements into structured, searchable learning documents.
