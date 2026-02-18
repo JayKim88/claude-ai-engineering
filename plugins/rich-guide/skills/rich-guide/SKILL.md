@@ -1,13 +1,13 @@
 ---
 name: rich-guide
-description: Use when user says "부자 되는 법", "재테크 가이드", "rich guide", "wealth strategy", "재테크 시작", "투자 방법", "부업 추천", or wants personalized wealth strategy. Conducts financial interview, runs 6-agent pipeline, and generates weekly action checklist.
-version: 2.0.0
+description: Use when user says "부자 되는 법", "재테크 가이드", "rich guide", "wealth strategy", "재테크 시작", "투자 방법", "부업 추천", or wants personalized wealth strategy. Conducts financial interview, runs 7-agent pipeline with expert knowledge base, and generates comprehensive learning + action + workflow roadmap.
+version: 3.0.0
 model: claude-sonnet-4-5-20250929
 ---
 
 # Rich Guide Skill
 
-Personalized Korean personal finance guidance via 6-agent multi-agent pipeline.
+Personalized Korean wealth coaching via 7-agent multi-agent pipeline with curated expert knowledge base.
 
 ## Trigger Phrases
 
@@ -31,6 +31,8 @@ from datetime import datetime
 DB_DIR = os.path.expanduser("~/.claude/skills/rich-guide/data")
 DB_PATH = f"{DB_DIR}/profiles.db"
 ROADMAP_DIR = os.path.expanduser("~/.claude/skills/rich-guide/roadmaps")
+KB_DIR = os.path.expanduser("~/.claude/skills/rich-guide/knowledge")
+WF_DIR = os.path.expanduser("~/.claude/skills/rich-guide/workflows")
 TS = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 # Create directories
@@ -58,17 +60,22 @@ except Exception:
             "financial_diagnostician": 60,
             "market_context_analyzer": 60,
             "risk_reward_evaluator": 60,
-            "info_curator": 90,
+            "knowledge_advisor": 120,
         },
         "retry": {"max_attempts": 2, "fallback_on_fail": True},
         "interview": {"cache_hours": 24, "refresh_days": 30},
+        "levels": {"beginner_threshold": 50, "intermediate_threshold": 75, "min_investment_for_advanced": 2000},
     }
 
 TIMEOUT_STRATEGIST = agent_config.get("timeouts", {}).get("wealth_strategist", 120)
 TIMEOUT_EVALUATOR = agent_config.get("timeouts", {}).get("risk_reward_evaluator", 60)
 TIMEOUT_ACTION = agent_config.get("timeouts", {}).get("action_plan_generator", 120)
+TIMEOUT_KNOWLEDGE = agent_config.get("timeouts", {}).get("knowledge_advisor", 120)
 CACHE_HOURS = agent_config.get("interview", {}).get("cache_hours", 24)
 REFRESH_DAYS = agent_config.get("interview", {}).get("refresh_days", 30)
+LEVEL_BEGINNER = agent_config.get("levels", {}).get("beginner_threshold", 50)
+LEVEL_INTERMEDIATE = agent_config.get("levels", {}).get("intermediate_threshold", 75)
+LEVEL_ADV_INVEST = agent_config.get("levels", {}).get("min_investment_for_advanced", 2000)
 
 # Check existing profile
 result = subprocess.run(
@@ -171,10 +178,24 @@ elif existing.get("exists") and (CACHE_HOURS / 24) <= existing["age_days"] <= RE
             profile["monthly_income"] = income_map.get(new_income, profile["monthly_income"])
         if new_expense != "변경 없음":
             profile["monthly_expense"] = expense_map.get(new_expense, profile["monthly_expense"])
+
+        # Persist partial refresh to DB
+        subprocess.run(["python3", "-c", f"""
+import sqlite3, json
+conn = sqlite3.connect('{DB_PATH}')
+d = json.loads('''{json.dumps(profile)}''')
+conn.execute('''INSERT INTO profiles
+    (monthly_income, monthly_expense, savings, investment_assets, debt, risk_tolerance, goal)
+    VALUES (?, ?, ?, ?, ?, ?, ?)''',
+    (d.get('monthly_income',300), d.get('monthly_expense',180), d.get('savings',500),
+     d.get('investment_assets',0), d.get('debt',0), d.get('risk_tolerance','medium'), d.get('goal','')))
+conn.commit()
+conn.close()
+"""], check=True)
     # else: fall through to new interview below
 
 if profile is None:
-    # Conduct 7-field interview
+    # Conduct 8-field interview (added: experience for level assessment)
     responses = AskUserQuestion(questions=[
         {
             "question": "월 세후 수입은 얼마인가요? (만원 단위)",
@@ -220,7 +241,10 @@ if profile is None:
                 {"label": "2000만원 이상", "description": ""},
                 {"label": "잘 모르겠어요", "description": "기본값 적용 (0원)"}
             ]
-        },
+        }
+    ])
+
+    responses2 = AskUserQuestion(questions=[
         {
             "question": "대출/부채 총액은 얼마인가요?",
             "header": "대출",
@@ -242,6 +266,16 @@ if profile is None:
             ]
         },
         {
+            "question": "현재 재테크/투자 경험은?",
+            "header": "경험",
+            "options": [
+                {"label": "없음", "description": "재테크를 처음 시작합니다"},
+                {"label": "예적금만", "description": "적금/예금만 해봤습니다"},
+                {"label": "주식/펀드 경험", "description": "주식이나 펀드 투자 경험이 있습니다"},
+                {"label": "적극 투자 중", "description": "다양한 자산에 투자하고 있습니다"}
+            ]
+        },
+        {
             "question": "재테크 목표를 선택해주세요",
             "header": "목표",
             "options": [
@@ -253,6 +287,9 @@ if profile is None:
             ]
         }
     ])
+
+    # Merge responses
+    responses.update(responses2)
 
     # Map responses to numeric defaults
     income_map = {
@@ -284,14 +321,21 @@ if profile is None:
         "investment_assets": invest_map.get(responses["투자자산"], 0),
         "debt": debt_map.get(responses["대출"], 0),
         "risk_tolerance": risk_map.get(responses["리스크성향"], "medium"),
-        "goal": responses.get("목표", "내 집 마련 (3-5년)")
+        "goal": responses.get("목표", "내 집 마련 (3-5년)"),
+        "experience": responses.get("경험", "없음")
     }
 
-    # Save to DB
+    # Save to DB via temp JSON file to avoid quote-escaping issues
+    import tempfile
+    profile_tmp = tempfile.mktemp(suffix=".json")
+    with open(profile_tmp, "w") as f:
+        json.dump(profile, f, ensure_ascii=False)
+
     subprocess.run(["python3", "-c", f"""
 import sqlite3, json
+with open('{profile_tmp}') as f:
+    d = json.load(f)
 conn = sqlite3.connect('{DB_PATH}')
-d = {json.dumps(profile)}
 conn.execute('''INSERT INTO profiles
     (monthly_income, monthly_expense, savings, investment_assets, debt, risk_tolerance, goal)
     VALUES (?, ?, ?, ?, ?, ?, ?)''',
@@ -299,21 +343,25 @@ conn.execute('''INSERT INTO profiles
      d['investment_assets'], d['debt'], d['risk_tolerance'], d['goal']))
 conn.commit()
 conn.close()
+import os
+os.remove('{profile_tmp}')
 print("saved")
 """], check=True)
 
-print("재무 정보 저장 완료")
-print(f"월 저축 가능액: 약 {profile['monthly_income'] - profile['monthly_expense']}만원")
+    print("재무 정보 저장 완료")
+    print(f"월 저축 가능액: 약 {profile['monthly_income'] - profile['monthly_expense']}만원")
 ```
 
 ---
 
-### Step 3: Phase 1 - Parallel Diagnosis
+### Step 3: Phase 1 - Parallel Diagnosis + Knowledge Matching
 
-Launch all 3 Phase 1 agents simultaneously. All three Task() calls must appear in a single response block so Claude Code executes them in parallel. Results are read after all three complete.
+Launch all 3 Phase 1 agents simultaneously. All three Task() calls must appear in a single response block so Claude Code executes them in parallel. The knowledge-advisor replaces the previous info-curator by combining knowledge base reading with web search.
 
 ```python
-print("Phase 1: 진단 시작 (3개 에이전트 병렬 실행)...")
+print("Phase 1: 진단 + 지식 매칭 시작 (3개 에이전트 병렬 실행)...")
+
+experience = profile.get("experience", "없음")
 
 # CRITICAL: All 3 Task calls must be in a single response for parallel execution
 Task(
@@ -352,36 +400,67 @@ Task(
 )
 
 Task(
-    subagent_type="info-curator",
-    model="claude-haiku-4-5",
-    description="재테크 정보 큐레이션",
+    subagent_type="knowledge-advisor",
+    model="claude-sonnet-4-5-20250929",
+    description="지식 베이스 매칭 + 정보 큐레이션",
     prompt=f"""
-    사용자 목표 "{profile.get('goal', '재테크')}"와 리스크성향 "{profile['risk_tolerance']}"에 맞는
-    신뢰할 수 있는 재테크 정보를 수집하세요.
+    사용자 프로필에 맞는 전문가 방법론을 매칭하고 학습 커리큘럼을 생성하세요.
 
-    신뢰 도메인 우선순위:
-    1. hankyung.com (한국경제)
-    2. sedaily.com (서울경제)
-    3. finance.naver.com (네이버증권)
-    4. fss.or.kr (금융감독원)
+    사용자 프로필:
+    - 월수입: {profile['monthly_income']}만원
+    - 예금: {profile['savings']}만원
+    - 투자자산: {profile['investment_assets']}만원
+    - 대출: {profile['debt']}만원
+    - 리스크성향: {profile['risk_tolerance']}
+    - 재테크 경험: {experience}
+    - 목표: {profile.get('goal', '미지정')}
 
-    WebSearch로 최신 재테크 트렌드, ISA/연금저축 혜택, 인덱스펀드 등을 검색하고
-    다음 JSON을 /tmp/rich-guide-curator-{TS}.json 에 저장하세요:
+    지식 베이스 파일 경로 (Read 도구로 읽으세요):
+    1. {KB_DIR}/investment-masters.md — 투자 대가 방법론
+    2. {KB_DIR}/entrepreneurs.md — 자수성가 인물 방법론
+    3. {KB_DIR}/side-hustles.md — 부업 가이드
+    4. {KB_DIR}/money-fundamentals.md — 돈의 원리
+
+    워크플로우 파일 경로 (선택 시 파일명만 기록):
+    - first-investment.md, debt-freedom.md, side-hustle-launch.md, wealth-building.md
+
+    레벨 판정 기준:
+    - 입문: health_score < {LEVEL_BEGINNER} 또는 투자자산 = 0 또는 경험 = "없음"/"예적금만"
+    - 중급: {LEVEL_BEGINNER} ≤ score < {LEVEL_INTERMEDIATE} 이고 투자자산 > 0
+    - 고급: score ≥ {LEVEL_INTERMEDIATE} 이고 투자자산 ≥ {LEVEL_ADV_INVEST}만원
+
+    참고: health_score는 아직 계산 전이므로 투자자산({profile['investment_assets']}만원)과 경험({experience})으로 우선 판정하세요.
+
+    작업:
+    1. 4개 지식 베이스 파일을 Read로 읽기
+    2. 사용자 레벨 판정
+    3. 레벨+리스크+목표에 맞는 전문가 방법론 3-5개 매칭
+    4. 학습 커리큘럼 생성 (순서 + 주제 + 출처 + 이유)
+    5. 적합한 워크플로우 1-2개 선택
+    6. WebSearch로 최신 재테크 정보 보충
+
+    다음 JSON을 /tmp/rich-guide-knowledge-{TS}.json 에 저장하세요:
     {{
       "status": "success",
-      "agent": "info-curator",
-      "curated_info": [
-        {{
-          "title": "기사 제목",
-          "source": "도메인",
-          "url": "URL",
-          "summary": "핵심 내용 1-2문장",
-          "verified": true/false,
-          "relevance": "high/medium/low"
-        }}
+      "agent": "knowledge-advisor",
+      "user_level": "입문/중급/고급",
+      "level_reasoning": "판정 이유",
+      "matched_experts": [
+        {{"name": "전문가명", "method": "방법론명", "reason": "매칭 이유", "source_file": "파일명"}}
       ],
-      "key_insights": ["핵심 인사이트1", "핵심 인사이트2", "핵심 인사이트3"],
-      "tax_benefits": ["ISA 세제혜택", "연금저축 세액공제 등 해당되는 것들"]
+      "learning_curriculum": [
+        {{"order": 1, "topic": "주제", "source": "출처", "why": "이유", "estimated_time": "시간"}}
+      ],
+      "recommended_books": [
+        {{"title": "도서명", "author": "저자", "level": "레벨"}}
+      ],
+      "selected_workflows": ["워크플로우 파일명"],
+      "workflow_reasoning": "선택 이유",
+      "curated_info": [
+        {{"title": "기사 제목", "source": "도메인", "url": "URL", "summary": "요약", "verified": true, "relevance": "high"}}
+      ],
+      "key_insights": ["인사이트1", "인사이트2"],
+      "tax_benefits": ["세제혜택1", "세제혜택2"]
     }}
 
     Write 도구로 파일을 저장하세요.
@@ -402,7 +481,7 @@ Task(
     4. 인플레이션 환경 (실질 수익률 관점)
 
     portfolio-copilot 데이터 확인 시도 (선택적):
-    - ~/.claude/plugins/portfolio-copilot/data/portfolio.db 존재 여부 확인 후 활용
+    - {os.path.expanduser("~/.claude/plugins/portfolio-copilot/data/portfolio.db")} 존재 여부 확인 후 활용
     - 파일이 없으면 경고 없이 WebSearch로 대체
 
     다음 JSON을 /tmp/rich-guide-market-{TS}.json 에 저장하세요:
@@ -440,36 +519,39 @@ diag = read_agent_output(f"/tmp/rich-guide-diagnostician-{TS}.json",
     {"status": "failed", "health_score": 50, "monthly_surplus": profile['monthly_income'] - profile['monthly_expense'],
      "diagnosis": "진단 데이터 없음", "strengths": [], "weaknesses": [], "recommended_investment_ratio": 20})
 
-curator = read_agent_output(f"/tmp/rich-guide-curator-{TS}.json",
-    {"status": "failed", "curated_info": [], "key_insights": [], "tax_benefits": []})
+knowledge = read_agent_output(f"/tmp/rich-guide-knowledge-{TS}.json",
+    {"status": "failed", "user_level": "입문", "matched_experts": [],
+     "learning_curriculum": [], "recommended_books": [],
+     "selected_workflows": ["first-investment"],
+     "curated_info": [], "key_insights": [], "tax_benefits": []})
 
 market = read_agent_output(f"/tmp/rich-guide-market-{TS}.json",
     {"status": "failed", "market_summary": "시장 데이터 없음", "key_opportunities": [], "key_risks": [],
      "recommended_asset_allocation": {"deposits": 40, "bonds": 10, "domestic_equity": 20, "global_equity": 20, "real_estate": 10, "alternatives": 0}})
 
 # Save Phase 1 combined
-phase1 = {"diagnostician": diag, "curator": curator, "market": market, "profile": profile}
+phase1 = {"diagnostician": diag, "knowledge": knowledge, "market": market, "profile": profile}
 with open(f"/tmp/rich-guide-phase1-{TS}.json", "w") as f:
     json.dump(phase1, f, ensure_ascii=False, indent=2)
 
-print(f"Phase 1 완료 - 재무건강점수: {diag.get('health_score', 'N/A')}점")
+print(f"Phase 1 완료 - 재무건강점수: {diag.get('health_score', 'N/A')}점, 레벨: {knowledge.get('user_level', 'N/A')}")
 ```
 
 ---
 
 ### Step 4: Phase 2 - Sequential Strategy then Evaluation
 
-wealth-strategist runs first so it produces real strategy IDs. risk-reward-evaluator then runs with those actual strategies, enabling grounded per-strategy suitability scoring.
+wealth-strategist runs first with knowledge context (matched experts), so strategies are grounded in real expert methodologies. risk-reward-evaluator then runs with those actual strategies.
 
 ```python
-print("Phase 2-A: 전략 생성 중 (wealth-strategist)...")
+print("Phase 2-A: 전문가 방법론 기반 전략 생성 중 (wealth-strategist)...")
 
 Task(
     subagent_type="wealth-strategist",
     model="claude-opus-4-6",
-    description="개인화 부자 전략 생성",
+    description="전문가 기반 부자 전략 생성",
     prompt=f"""
-    Phase 1 진단 결과를 바탕으로 3-5개의 다양한 부자 전략을 생성하세요.
+    Phase 1 진단 결과와 지식 베이스 매칭 결과를 바탕으로 3-5개의 전문가 방법론 기반 부자 전략을 생성하세요.
 
     재무 프로필:
     {json.dumps(phase1['profile'], ensure_ascii=False)}
@@ -480,16 +562,31 @@ Task(
     시장 상황:
     {json.dumps(phase1['market'], ensure_ascii=False)}
 
-    큐레이션 인사이트:
-    {json.dumps(phase1['curator'].get('key_insights', []), ensure_ascii=False)}
+    사용자 레벨: {phase1['knowledge'].get('user_level', '입문')}
+
+    매칭된 전문가 방법론 (각 전략은 아래 전문가 중 1명의 방법론에 기반해야 합니다):
+    {json.dumps(phase1['knowledge'].get('matched_experts', []), ensure_ascii=False)}
+
+    학습 커리큘럼 (각 전략에 learning_prerequisites 포함):
+    {json.dumps(phase1['knowledge'].get('learning_curriculum', []), ensure_ascii=False)}
 
     세금 혜택:
-    {json.dumps(phase1['curator'].get('tax_benefits', []), ensure_ascii=False)}
+    {json.dumps(phase1['knowledge'].get('tax_benefits', []), ensure_ascii=False)}
 
     전략 다양성 필수 요건:
     - 리스크 범위: 저위험(예금/채권) + 중위험(인덱스) + 고위험(개별주식) 포함
     - 시간 범위: 단기(1년) + 중기(3년) + 장기(10년) 고루 포함
     - 분야: 투자 / 부업 / 커리어 성장 / 비용 절감 중 최소 2개 이상
+
+    각 전략에는 반드시 expert_source 필드를 포함하세요:
+    "expert_source": {{
+      "name": "전문가명",
+      "method": "방법론명",
+      "key_principle": "핵심 원칙 1문장"
+    }}
+
+    그리고 learning_prerequisites 필드도 포함하세요:
+    "learning_prerequisites": ["이 전략 실행 전 배워야 할 것1", "것2"]
 
     다음 JSON을 /tmp/rich-guide-strategist-{TS}.json 에 저장하세요:
     {{
@@ -498,15 +595,17 @@ Task(
       "strategies": [
         {{
           "id": "S1",
-          "title": "전략명",
-          "category": "investment/side-hustle/career/cost-saving",
+          "title": "전략명 (전문가명 방법론)",
+          "category": "investment/side-hustle/business/cost-saving",
           "risk_level": "low/medium/high",
           "time_horizon": "short/mid/long",
           "expected_return": "연 X%",
           "initial_capital": 초기 자본(만원),
           "monthly_commitment": "월 X시간 또는 X만원",
-          "description": "전략 설명 (3-4문장)",
-          "pros": ["장점1", "장점2", "장점3"],
+          "description": "전략 설명 (3-4문장, 전문가 방법론 언급)",
+          "expert_source": {{"name": "...", "method": "...", "key_principle": "..."}},
+          "learning_prerequisites": ["...", "..."],
+          "pros": ["장점1", "장점2"],
           "cons": ["단점1", "단점2"],
           "first_step": "당장 할 수 있는 첫 번째 행동",
           "sources": []
@@ -521,14 +620,31 @@ Task(
 # Read strategist output before launching evaluator
 strategist = read_agent_output(f"/tmp/rich-guide-strategist-{TS}.json",
     {"status": "failed", "strategies": [
-        {"id": "S1", "title": "ISA 인덱스 ETF 적립식", "category": "investment", "risk_level": "medium",
+        {"id": "S1", "title": "ISA 인덱스 ETF 적립식 (존 리 방법론)", "category": "investment", "risk_level": "medium",
          "time_horizon": "long", "expected_return": "연 7-10%", "initial_capital": 0,
-         "monthly_commitment": "월 30만원", "description": "ISA 계좌를 통해 국내외 인덱스 ETF에 매월 자동 적립하는 방법입니다.",
-         "pros": ["세제 혜택", "복리 효과", "간단함"], "cons": ["장기 투자 필요"],
+         "monthly_commitment": "월 30만원",
+         "description": "존 리의 적립식 투자 철학에 기반하여 ISA 계좌를 통해 국내외 인덱스 ETF에 매월 자동 적립하는 방법입니다.",
+         "expert_source": {"name": "존 리", "method": "적립식 인덱스 투자", "key_principle": "매월 일정액을 인덱스 펀드에 자동 적립"},
+         "learning_prerequisites": ["복리의 원리 이해", "ETF 기초 학습"],
+         "pros": ["전문가 검증 방법론", "세제 혜택", "자동화 가능"], "cons": ["장기 투자 필요"],
          "first_step": "증권사 ISA 계좌 개설", "sources": []}
     ]})
 
 strategies = strategist.get("strategies", [])
+
+# Guard against empty strategies list
+if not strategies:
+    strategies = [
+        {"id": "S1", "title": "비상금 확보 + 파킹통장 (기본 전략)", "category": "cost-saving", "risk_level": "low",
+         "time_horizon": "short", "expected_return": "연 3-4%", "initial_capital": 0,
+         "monthly_commitment": "월 20만원",
+         "description": "비상금 확보를 최우선으로 하고 파킹통장에 예치하는 기본 전략입니다.",
+         "expert_source": {"name": "기본 원칙", "method": "비상금 우선 확보", "key_principle": "투자 전 최소 3개월 생활비를 비상금으로 확보"},
+         "learning_prerequisites": ["자동화 시스템 이해"],
+         "pros": ["원금 보장", "즉시 시작 가능"], "cons": ["낮은 수익률"],
+         "first_step": "파킹통장 개설", "sources": []}
+    ]
+
 print(f"전략 생성 완료 - {len(strategies)}개 전략")
 
 print("Phase 2-B: 리스크/보상 평가 중 (risk-reward-evaluator)...")
@@ -589,14 +705,16 @@ print(f"Phase 2 완료 - {len(strategies)}개 전략 평가 완료")
 ### Step 5: Strategy Selection
 
 ```python
-# Display strategies with risk/reward summary
+# Display strategies with risk/reward summary and expert source
 strategy_options = []
 for s in strategies:
     risk_label = {"low": "저위험", "medium": "중위험", "high": "고위험"}.get(s.get("risk_level"), "중위험")
     horizon_label = {"short": "단기(1년)", "mid": "중기(3년)", "long": "장기(10년+)"}.get(s.get("time_horizon"), "중기")
+    expert = s.get("expert_source", {}).get("name", "")
+    expert_tag = f" [{expert}]" if expert else ""
     strategy_options.append({
         "label": s.get("title", f"전략 {s.get('id', '?')}"),
-        "description": f"{risk_label} | {horizon_label} | {s.get('expected_return', 'N/A')}"
+        "description": f"{risk_label} | {horizon_label} | {s.get('expected_return', 'N/A')}{expert_tag}"
     })
 
 selected = AskUserQuestion(questions=[{
@@ -615,12 +733,12 @@ print(f"선택된 전략: {chosen_strategy.get('title')}")
 
 ---
 
-### Step 6: Phase 3 - Action Plan Generation
+### Step 6: Phase 3 - Action Plan Generation (Learning + Action + Workflow)
 
-The action-plan-generator reads the roadmap template and populates it.
+The action-plan-generator reads the roadmap template AND workflow files, producing a comprehensive 3-section roadmap.
 
 ```python
-print("Phase 3: 실행 계획 생성 중...")
+print("Phase 3: 학습 + 실행 + 워크플로우 통합 로드맵 생성 중...")
 
 roadmap_path = f"{ROADMAP_DIR}/roadmap-{TS}.md"
 template_path = os.path.expanduser("~/.claude/skills/rich-guide/templates/roadmap-template.md")
@@ -633,15 +751,36 @@ try:
 except FileNotFoundError:
     template_content = "(템플릿 파일 없음 - 아래 형식으로 직접 생성하세요)"
 
+# Prepare workflow file paths for agent to Read
+selected_workflows = phase1['knowledge'].get('selected_workflows', ['first-investment'])
+workflow_paths = [f"{WF_DIR}/{wf}" if wf.endswith('.md') else f"{WF_DIR}/{wf}.md" for wf in selected_workflows]
+
+# BUG FIX: Net worth uses profile fields, not diagnostician fields
+net_worth = phase1['profile'].get('savings', 0) + phase1['profile'].get('investment_assets', 0) - phase1['profile'].get('debt', 0)
+
 Task(
     subagent_type="action-plan-generator",
     model="claude-opus-4-6",
-    description="주간 실행 체크리스트 생성",
+    description="학습+실행+워크플로우 통합 로드맵 생성",
     prompt=f"""
-    선택된 전략에 대한 구체적인 주간 실행 계획을 작성하세요.
+    선택된 전략에 대한 3-section 통합 로드맵을 작성하세요:
+    1. 학습 계획 (무엇을 배워야 하는지)
+    2. 실행 계획 (무엇을 해야 하는지)
+    3. 워크플로우 (어떤 순서로 진행해야 하는지)
 
     선택된 전략:
     {json.dumps(chosen_strategy, ensure_ascii=False)}
+
+    사용자 레벨: {phase1['knowledge'].get('user_level', '입문')}
+
+    학습 커리큘럼 (knowledge-advisor가 생성한 학습 순서):
+    {json.dumps(phase1['knowledge'].get('learning_curriculum', []), ensure_ascii=False)}
+
+    추천 도서:
+    {json.dumps(phase1['knowledge'].get('recommended_books', []), ensure_ascii=False)}
+
+    선택된 워크플로우 파일 (Read 도구로 읽어 로드맵에 통합하세요):
+    {json.dumps(workflow_paths, ensure_ascii=False)}
 
     사용자 재무 상황:
     - 월 잉여금: {phase1['diagnostician'].get('monthly_surplus', 100)}만원
@@ -650,19 +789,20 @@ Task(
     - 재무 건강도: {phase1['diagnostician'].get('health_score', 50)}점
     - 주요 강점: {json.dumps(phase1['diagnostician'].get('strengths', []), ensure_ascii=False)}
     - 개선 사항: {json.dumps(phase1['diagnostician'].get('weaknesses', []), ensure_ascii=False)}
-    - 순자산: {phase1['diagnostician'].get('savings', 0) + phase1['profile'].get('investment_assets', 0) - phase1['profile'].get('debt', 0)}만원
+    - 순자산: {net_worth}만원
 
     시장 상황: {phase1['market'].get('market_summary', '')}
 
     평가 요약: {phase2['evaluator'].get('overall_recommendation', '')}
 
     큐레이션 출처:
-    {json.dumps(phase1['curator'].get('curated_info', [])[:3], ensure_ascii=False)}
+    {json.dumps(phase1['knowledge'].get('curated_info', [])[:3], ensure_ascii=False)}
 
     로드맵 템플릿 (아래 플레이스홀더를 실제 값으로 채워서 최종 마크다운을 작성하세요):
     {template_content}
 
     위 템플릿의 모든 {{PLACEHOLDER}} 를 실제 내용으로 채워 완성된 마크다운을 {roadmap_path} 에 저장하세요.
+    워크플로우 파일을 Read로 읽어 {{WORKFLOW_CONTENT}} 섹션에 통합하세요.
 
     Write 도구를 사용해 파일을 저장하세요.
     반드시 파일 경로 {roadmap_path} 에 저장하세요.
@@ -674,7 +814,7 @@ print(f"Phase 3 완료")
 
 ---
 
-### Step 7: Display Final Report & Cleanup
+### Step 7: Display Final Report, Record Session & Cleanup
 
 ```python
 print("\n" + "="*60)
@@ -688,18 +828,32 @@ print(f"""
 중요한 재무 결정 전에는 전문 재무설계사와 상담하시기 바랍니다.
 """)
 
+user_level = phase1['knowledge'].get('user_level', 'N/A')
+print(f"사용자 레벨: {user_level}")
 print(f"재무 건강 점수: {phase1['diagnostician'].get('health_score', 'N/A')}점")
 print(f"월 잉여금: 약 {phase1['diagnostician'].get('monthly_surplus', 'N/A')}만원")
 print()
 print(f"선택된 전략: {chosen_strategy.get('title')}")
+expert_source = chosen_strategy.get('expert_source', {})
+if expert_source:
+    print(f"전문가 근거: {expert_source.get('name', '')} — {expert_source.get('method', '')}")
 print(f"기대 수익: {chosen_strategy.get('expected_return', 'N/A')}")
 print(f"리스크: {chosen_strategy.get('risk_level', 'N/A')}")
 print()
+
+# Show learning curriculum summary
+curriculum = phase1['knowledge'].get('learning_curriculum', [])
+if curriculum:
+    print("학습 계획 요약:")
+    for item in curriculum[:3]:
+        print(f"  {item.get('order', '?')}. {item.get('topic', '')} ({item.get('estimated_time', '')})")
+    print()
+
 print(f"생성된 로드맵: {roadmap_path}")
 print()
 
 # Show verified sources
-sources = [s for s in phase1['curator'].get('curated_info', []) if s.get('verified')]
+sources = [s for s in phase1['knowledge'].get('curated_info', []) if s.get('verified')]
 if sources:
     print("참고 자료:")
     for src in sources[:3]:
@@ -707,9 +861,33 @@ if sources:
 
 print()
 print("다음 단계:")
-print("1. 위 로드맵 파일을 열어 1주차 체크리스트 확인")
-print("2. 재무설계사 상담: https://www.fpsb.or.kr/")
-print("3. 소액 테스트 시작 (첫 달은 월 10만원 이하 권장)")
+print("1. 위 로드맵 파일을 열어 학습 계획부터 확인")
+print("2. 1주차 체크리스트 실행 시작")
+print("3. 재무설계사 상담: https://www.fpsb.or.kr/")
+
+# Record session history to DB
+try:
+    subprocess.run(["python3", "-c", f"""
+import sqlite3, json
+conn = sqlite3.connect('{DB_PATH}')
+# Get latest profile_id
+row = conn.execute("SELECT id FROM profiles ORDER BY id DESC LIMIT 1").fetchone()
+pid = row[0] if row else None
+if pid:
+    conn.execute('''INSERT INTO session_history
+        (profile_id, user_level, selected_strategy, matched_experts, selected_workflows, roadmap_path)
+        VALUES (?, ?, ?, ?, ?, ?)''',
+        (pid,
+         '{phase1["knowledge"].get("user_level", "입문")}',
+         '{chosen_strategy.get("title", "")}',
+         json.dumps({json.dumps(phase1["knowledge"].get("matched_experts", []), ensure_ascii=False)}),
+         json.dumps({json.dumps(phase1["knowledge"].get("selected_workflows", []), ensure_ascii=False)}),
+         '{roadmap_path}'))
+    conn.commit()
+conn.close()
+"""], check=True)
+except (subprocess.CalledProcessError, OSError):
+    pass  # Session tracking failure is non-critical
 
 # Cleanup /tmp files for this session
 import glob
@@ -728,17 +906,19 @@ for tmp_file in glob.glob(f"/tmp/rich-guide-*-{TS}.json"):
 |-------|----------|
 | DB init 실패 | "데이터베이스 초기화 실패. python3 설치 여부 확인 후 재시도하세요." |
 | agent-config.yaml 없음 | 하드코딩된 기본값으로 계속 진행 (경고 표시 없음) |
+| knowledge base 파일 없음 | knowledge-advisor가 WebSearch만으로 대체, 학습 커리큘럼은 기본값 |
 | 에이전트 결과 파일 없음 | 기본값 fallback 적용, 경고 메시지 표시 후 계속 진행 |
-| 모든 에이전트 실패 | "네트워크 연결을 확인하고 다시 시도하세요. 기본 전략을 제공합니다." |
+| 전략 목록 비어있음 | 기본 전략(비상금 확보 + 파킹통장) 1개 자동 생성 |
 | json.loads 파싱 실패 | JSONDecodeError 캐치 → {"exists": False} 기본값 사용 |
+| 세션 기록 실패 | 무시하고 계속 진행 (비핵심 기능) |
 
 ## Model Selection
 
 | Agent | Model | Reason |
 |-------|-------|--------|
 | financial-diagnostician | claude-sonnet-4-5-20250929 | 수치 분석 |
-| info-curator | claude-haiku-4-5 | 정보 수집 속도 우선 |
+| knowledge-advisor | claude-sonnet-4-5-20250929 | 지식 매칭 + 웹서치 |
 | market-context-analyzer | claude-sonnet-4-5-20250929 | 시장 분석 |
-| wealth-strategist | claude-opus-4-6 | 창의적 전략 생성 |
+| wealth-strategist | claude-opus-4-6 | 전문가 기반 전략 생성 |
 | risk-reward-evaluator | claude-sonnet-4-5-20250929 | 정량적 리스크 평가 |
-| action-plan-generator | claude-opus-4-6 | 구체적 계획 작성 |
+| action-plan-generator | claude-opus-4-6 | 3-section 통합 로드맵 |

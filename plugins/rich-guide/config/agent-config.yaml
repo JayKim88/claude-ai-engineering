@@ -13,7 +13,7 @@ models:
   financial_diagnostician: "claude-sonnet-4-5-20250929"   # 재무 분석
   market_context_analyzer: "claude-sonnet-4-5-20250929"   # 시장 분석
   risk_reward_evaluator: "claude-sonnet-4-5-20250929"     # 리스크 평가
-  info_curator: "claude-haiku-4-5"                        # 정보 수집 (속도 우선)
+  knowledge_advisor: "claude-sonnet-4-5-20250929"         # 지식 매칭 + 정보 큐레이션
 
 # ===== 타임아웃 설정 (초) =====
 timeouts:
@@ -26,8 +26,8 @@ timeouts:
   market_context_analyzer: 60
   risk_reward_evaluator: 60
 
-  # Haiku 모델 에이전트 (정보 수집, 웹서치 포함)
-  info_curator: 90
+  # Sonnet 모델 에이전트 (지식 매칭 + 웹서치, 4개 파일 Read 필요)
+  knowledge_advisor: 120
 
   # 재시도 대기 시간
   retry_delay_seconds: 5
@@ -83,6 +83,30 @@ curation:
   max_article_age_days: 90        # 90일 이상 기사 제외
   search_year: 2026               # 검색 키워드에 연도 포함
 
+# ===== 지식 베이스 설정 =====
+knowledge:
+  base_dir: "~/.claude/skills/rich-guide/knowledge"
+  files:
+    - investment-masters.md       # 8명 투자 대가 방법론
+    - entrepreneurs.md            # 8명 자수성가 인물 방법론
+    - side-hustles.md             # 10개 부업 카테고리
+    - money-fundamentals.md       # 핵심 재무 원리
+
+# ===== 워크플로우 설정 =====
+workflows:
+  base_dir: "~/.claude/skills/rich-guide/workflows"
+  files:
+    - first-investment.md         # 첫 투자 시작
+    - debt-freedom.md             # 빚 탈출
+    - side-hustle-launch.md       # 부업 시작
+    - wealth-building.md          # 장기 자산 증식
+
+# ===== 레벨 판정 기준 =====
+levels:
+  beginner_threshold: 50          # health_score < 50 → 입문
+  intermediate_threshold: 75      # 50 ≤ score < 75 → 중급, ≥ 75 → 고급
+  min_investment_for_advanced: 2000  # 고급 레벨 최소 투자자산 (만원)
+
 # ===== 파일 경로 설정 =====
 paths:
   db: "~/.claude/skills/rich-guide/data/profiles.db"
@@ -100,6 +124,22 @@ security:
   db_file_permissions: "600"      # 소유자만 읽기/쓰기
   db_dir_permissions: "700"       # 소유자만 접근
   log_financial_amounts: false    # 금액 정보 로그 기록 금지
+
+# ===== 대화형 모드 설정 (rich-chat) =====
+rich_chat:
+  persona: "부자 멘토"                  # 대화형 페르소나 이름
+  disclaimer_threshold: 1000           # 이 금액(만원) 이상 조언 시 전문가 상담 권장
+  knowledge_files:                     # 컨텍스트 프라이밍 시 로드할 파일 (순서대로)
+    - investment-masters.md
+    - entrepreneurs.md
+    - side-hustles.md
+    - money-fundamentals.md
+  workflow_files:
+    - first-investment.md
+    - debt-freedom.md
+    - side-hustle-launch.md
+    - wealth-building.md
+  recent_sessions_limit: 3             # 프로필 조회 시 최근 세션 수
 
 # ===== 출력 설정 =====
 output:
