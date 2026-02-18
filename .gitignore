@@ -49,3 +49,19 @@ build/
 out/
 
 tempo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Plugin generated files
+plugins/jd-analyzer/scripts/wellfound_*.html
+plugins/jd-analyzer/scripts/wellfound_*.png
+plugins/jd-analyzer/config/profile.yaml
+plugins/ai-news-digest/config/.cache/
+plugins/ai-news-digest/config/__pycache__/
+
+# Personal data
+JDs/
+/jd-analyzer/

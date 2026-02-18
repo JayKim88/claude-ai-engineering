@@ -1,0 +1,158 @@
+# User Profile for JD Matching
+# Fill in your information below
+
+personal:
+  name: "Your Name"
+  location: "City, Country"
+  email: "your.email@example.com"  # Optional
+
+experience:
+  # Total years in industry
+  total_years: 0
+
+  # Years per domain
+  frontend_years: 0
+  backend_years: 0
+  ai_ml_years: 0
+  devops_years: 0
+
+skills:
+  # Organize skills by category and proficiency
+  # Proficiency levels: expert, advanced, intermediate, learning
+
+  frontend:
+    expert:
+      - React
+      - TypeScript
+    advanced:
+      - Next.js
+      - Tailwind CSS
+    intermediate:
+      - Redux
+    learning:
+      - Vue.js
+
+  backend:
+    expert:
+      - Python
+      - FastAPI
+    advanced:
+      - Node.js
+      - Express
+    intermediate:
+      - GraphQL
+    learning:
+      - Go
+
+  ai_ml:
+    expert: []
+    advanced:
+      - Claude AI
+      - Prompt Engineering
+      - LLM
+    intermediate:
+      - RAG
+    learning:
+      - LangChain
+      - Vector Database
+
+  devops:
+    expert: []
+    advanced:
+      - Docker
+      - GitHub Actions
+    intermediate:
+      - AWS
+      - Terraform
+    learning:
+      - Kubernetes
+
+  database:
+    expert: []
+    advanced:
+      - PostgreSQL
+      - MongoDB
+    intermediate:
+      - Redis
+    learning:
+      - Elasticsearch
+
+  testing:
+    expert: []
+    advanced:
+      - Pytest
+      - Jest
+    intermediate:
+      - Cypress
+    learning:
+      - Playwright
+
+  soft_skills:
+    expert: []
+    advanced:
+      - Communication
+      - Team Collaboration
+      - Problem Solving
+    intermediate:
+      - Agile
+      - Code Review
+    learning:
+      - Leadership
+
+  tools:
+    expert:
+      - Git
+      - VSCode
+    advanced:
+      - GitHub
+      - Jira
+      - Figma
+    intermediate:
+      - Postman
+    learning:
+      - Notion
+
+work_experience:
+  # Recent work experience (optional, for context)
+  - company: "Company Name"
+    title: "Your Title"
+    duration: "2020-2023"
+    highlights:
+      - "Built feature X with React and Python"
+      - "Improved performance by 50%"
+
+projects:
+  # Notable projects (optional)
+  - name: "Project Name"
+    description: "AI-powered tool for X"
+    tech_stack:
+      - React
+      - Python
+      - Claude AI
+    url: "https://github.com/..."
+
+preferences:
+  # Job search preferences
+  remote_only: true
+  visa_required: false
+  min_match_score: 70  # Minimum score threshold (0-100)
+
+  # Preferred locations (if not remote_only)
+  preferred_locations:
+    - "Berlin, Germany"
+    - "Remote"
+
+  # Salary expectations (optional)
+  min_salary: 80000
+  currency: "EUR"
+
+  # Company preferences
+  company_size:
+    - startup
+    - scaleup
+
+  # Industries of interest
+  industries:
+    - AI/ML
+    - SaaS
+    - Developer Tools

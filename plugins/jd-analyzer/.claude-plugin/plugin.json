@@ -1,0 +1,28 @@
+{
+  "name": "jd-analyzer",
+  "version": "1.0.0",
+  "description": "Comprehensive AI Product Engineer career transition tool: Automated JD collection from LinkedIn/Wellfound using Playwright, spaCy-based skill extraction with YAML taxonomy, weighted profile matching (Required: 10pt, Nice-to-have: 3pt), actionable insights (Top 5 skills to learn, Top 10 companies), and Jinja2 markdown reports with market trends and remote work statistics.",
+  "skills_directory": "skills",
+  "author": "Agent Beta (Architect)",
+  "keywords": [
+    "job-analysis",
+    "career-transition",
+    "skill-extraction",
+    "web-scraping",
+    "linkedin-automation",
+    "profile-matching",
+    "market-trends",
+    "nlp-analysis",
+    "playwright-automation"
+  ],
+  "dependencies": [
+    "playwright>=1.40.0",
+    "spacy>=3.7.0",
+    "beautifulsoup4>=4.12.0",
+    "requests>=2.31.0",
+    "keyring>=24.0.0",
+    "pyyaml>=6.0.0",
+    "jinja2>=3.1.0",
+    "cryptography>=41.0.0"
+  ]
+}

@@ -1,0 +1,18 @@
+# JD Analyzer Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core Dependencies
+playwright>=1.40.0
+spacy>=3.7.0
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+pyyaml>=6.0.0
+jinja2>=3.1.0
+
+# Security
+keyring>=24.0.0
+cryptography>=41.0.0
+
+# Post-install Steps:
+# 1. Download spaCy model: python -m spacy download en_core_web_sm
+# 2. Install Playwright browsers: playwright install chromium

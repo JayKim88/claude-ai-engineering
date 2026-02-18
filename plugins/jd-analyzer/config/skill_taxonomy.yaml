@@ -1,0 +1,264 @@
+# Comprehensive Skill Taxonomy for JD Analysis
+# User-editable: Add/modify skills as market evolves
+
+categories:
+  frontend:
+    keywords:
+      - React
+      - Vue
+      - Angular
+      - Svelte
+      - Next.js
+      - Nuxt.js
+      - TypeScript
+      - JavaScript
+      - HTML
+      - CSS
+      - SCSS
+      - Tailwind CSS
+      - Bootstrap
+      - Material-UI
+      - Webpack
+      - Vite
+      - Redux
+      - MobX
+      - Zustand
+      - React Query
+      - SWR
+    aliases:
+      React:
+        - ReactJS
+        - React.js
+      TypeScript:
+        - TS
+      JavaScript:
+        - JS
+        - ECMAScript
+      Next.js:
+        - NextJS
+      Vue:
+        - Vue.js
+        - VueJS
+      Tailwind CSS:
+        - Tailwind
+
+  backend:
+    keywords:
+      - Python
+      - Node.js
+      - Java
+      - Go
+      - Rust
+      - C++
+      - Ruby
+      - PHP
+      - FastAPI
+      - Flask
+      - Django
+      - Express
+      - NestJS
+      - Spring Boot
+      - Ruby on Rails
+      - GraphQL
+      - REST API
+      - gRPC
+      - WebSocket
+      - Microservices
+    aliases:
+      Node.js:
+        - Node
+        - NodeJS
+      Python:
+        - Py
+      REST API:
+        - RESTful
+        - REST
+        - RESTful API
+      GraphQL:
+        - GraphQL API
+
+  ai_ml:
+    keywords:
+      - LLM
+      - Machine Learning
+      - Deep Learning
+      - NLP
+      - LangChain
+      - RAG
+      - Claude AI
+      - OpenAI
+      - GPT
+      - Prompt Engineering
+      - Fine-tuning
+      - Vector Database
+      - TensorFlow
+      - PyTorch
+      - scikit-learn
+      - Hugging Face
+      - Anthropic
+      - AI Agents
+      - Embeddings
+      - Semantic Search
+    aliases:
+      LLM:
+        - Large Language Model
+        - Language Model
+      NLP:
+        - Natural Language Processing
+      RAG:
+        - Retrieval Augmented Generation
+      Claude AI:
+        - Claude
+        - Anthropic Claude
+      OpenAI:
+        - Open AI
+      GPT:
+        - GPT-4
+        - GPT-3
+      Machine Learning:
+        - ML
+
+  devops:
+    keywords:
+      - Docker
+      - Kubernetes
+      - AWS
+      - GCP
+      - Azure
+      - CI/CD
+      - Jenkins
+      - GitHub Actions
+      - GitLab CI
+      - CircleCI
+      - Terraform
+      - Ansible
+      - Nginx
+      - Apache
+      - Linux
+      - Bash
+      - CloudFormation
+      - Helm
+      - ArgoCD
+      - Monitoring
+      - Prometheus
+      - Grafana
+    aliases:
+      Kubernetes:
+        - K8s
+      AWS:
+        - Amazon Web Services
+      GCP:
+        - Google Cloud Platform
+        - Google Cloud
+      Azure:
+        - Microsoft Azure
+      CI/CD:
+        - Continuous Integration
+        - Continuous Deployment
+
+  database:
+    keywords:
+      - PostgreSQL
+      - MySQL
+      - MongoDB
+      - Redis
+      - Elasticsearch
+      - DynamoDB
+      - Cassandra
+      - Neo4j
+      - SQL
+      - NoSQL
+      - SQLite
+      - MariaDB
+      - Oracle
+      - MS SQL Server
+      - Snowflake
+      - BigQuery
+      - Pinecone
+      - Weaviate
+      - Chroma
+    aliases:
+      PostgreSQL:
+        - Postgres
+      MongoDB:
+        - Mongo
+      MySQL:
+        - My SQL
+      Redis:
+        - Redis Cache
+      Elasticsearch:
+        - Elastic Search
+
+  testing:
+    keywords:
+      - Pytest
+      - Jest
+      - Mocha
+      - Chai
+      - Cypress
+      - Playwright
+      - Selenium
+      - Unit Testing
+      - Integration Testing
+      - E2E Testing
+      - TDD
+      - BDD
+      - Test Automation
+      - QA
+    aliases:
+      E2E Testing:
+        - End-to-End Testing
+        - E2E
+      TDD:
+        - Test-Driven Development
+      BDD:
+        - Behavior-Driven Development
+      QA:
+        - Quality Assurance
+
+  soft_skills:
+    keywords:
+      - Communication
+      - Leadership
+      - Team Collaboration
+      - Problem Solving
+      - Critical Thinking
+      - Agile
+      - Scrum
+      - Project Management
+      - Stakeholder Management
+      - Mentoring
+      - Code Review
+      - Technical Writing
+      - Presentation Skills
+    aliases:
+      Agile:
+        - Agile Methodology
+      Scrum:
+        - Scrum Master
+
+  tools:
+    keywords:
+      - Git
+      - GitHub
+      - GitLab
+      - Bitbucket
+      - Jira
+      - Confluence
+      - Figma
+      - Sketch
+      - Postman
+      - Insomnia
+      - VSCode
+      - Slack
+      - Notion
+      - Linear
+      - Asana
+    aliases:
+      VSCode:
+        - Visual Studio Code
+        - VS Code
+      GitHub:
+        - Github
+      GitLab:
+        - Gitlab

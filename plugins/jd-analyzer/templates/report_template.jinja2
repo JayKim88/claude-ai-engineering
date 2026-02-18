@@ -1,0 +1,229 @@
+# JD Analysis Report - {{ date }}
+
+---
+
+## 🎯 Executive Summary
+
+| Metric | Value |
+|--------|-------|
+| **Total JDs Analyzed** | {{ total_jds }} |
+| **Average Match Score** | {{ avg_score }}% |
+| **Profile** | {{ profile_name }} |
+| **Top Match** | {{ top_companies[0].jd_company if top_companies else "N/A" }} ({{ top_companies[0].score if top_companies else 0 }}%) |
+
+---
+
+## 📌 Actionable Insights
+
+### 🚀 Top 5 Skills to Learn
+
+These skills appear most frequently in JDs where you don't currently have them. Learning these will maximize your market opportunities.
+
+{% if skills_to_learn %}
+| Rank | Skill | Required in JDs | Percentage |
+|------|-------|-----------------|------------|
+{% for skill, count, pct in skills_to_learn %}
+| {{ loop.index }} | **{{ skill }}** | {{ count }} | {{ pct }}% |
+{% endfor %}
+{% else %}
+*No missing skills identified - you match all JD requirements!*
+{% endif %}
+
+**Recommendation**: Start with **{{ skills_to_learn[0][0] if skills_to_learn else "N/A" }}** - it appears in {{ skills_to_learn[0][1] if skills_to_learn else 0 }} JDs ({{ skills_to_learn[0][2] if skills_to_learn else 0 }}% of analyzed positions).
+
+---
+
+### 🏆 Top 10 Companies to Apply
+
+Companies ranked by match score, filtered by your preferences (min {{ profile.preferences.min_match_score if profile and profile.get("preferences") else 70 }}% match{% if profile.get("preferences", {}).get("remote_only") %}, remote only{% endif %}).
+
+{% if top_companies %}
+{% for match in top_companies %}
+#### {{ loop.index }}. {{ match.jd_company }} - **{{ match.score }}% Match**
+
+- **Title**: {{ match.jd_title }}
+- **Remote**: {{ "✓ Yes" if match.jd_remote else "✗ No" }}
+- **Your Matched Skills**: {{ ", ".join(match.matched_required[:5]) }}{% if match.matched_required|length > 5 %} (+{{ match.matched_required|length - 5 }} more){% endif %}
+- **Missing Skills**: {{ ", ".join(match.missing_skills[:5]) }}{% if match.missing_skills|length > 5 %} (+{{ match.missing_skills|length - 5 }} more){% endif %}
+- **URL**: {{ match.jd_url if match.jd_url else "N/A" }}
+
+{% endfor %}
+{% else %}
+*No companies meet your minimum match threshold. Consider lowering min_match_score in profile.yaml.*
+{% endif %}
+
+---
+
+## 📊 Market Trends
+
+### 📈 Top 20 Most Required Skills
+
+Market demand analysis across all {{ total_jds }} JDs:
+
+| Rank | Skill | Frequency | Percentage | You Have It |
+|------|-------|-----------|------------|-------------|
+{% for skill, count, pct in top_skills %}
+| {{ loop.index }} | {{ skill }} | {{ count }} | {{ pct }}% | {% if skill in profile_skills %}✓{% else %}✗{% endif %} |
+{% endfor %}
+
+**Insight**: The top 3 skills ({{ top_skills[0][0] }}, {{ top_skills[1][0] if top_skills|length > 1 else "N/A" }}, {{ top_skills[2][0] if top_skills|length > 2 else "N/A" }}) appear in {{ top_skills[0][2] if top_skills else 0 }}%, {{ top_skills[1][2] if top_skills|length > 1 else 0 }}%, and {{ top_skills[2][2] if top_skills|length > 2 else 0 }}% of JDs respectively.
+
+---
+
+### 🌍 Remote Work Statistics
+
+| Category | Count | Percentage |
+|----------|-------|------------|
+| **Fully Remote** | {{ remote_stats.remote_count }} | {{ remote_stats.remote_pct }}% |
+| **On-site/Hybrid** | {{ remote_stats.onsite_count }} | {{ remote_stats.onsite_pct }}% |
+
+**Insight**: {{ remote_stats.remote_pct }}% of analyzed positions offer remote work. {% if profile.get("preferences", {}).get("remote_only") %}This aligns with your remote-only preference.{% endif %}
+
+---
+
+### 📉 Match Score Distribution
+
+How your profile matches against all {{ total_jds }} JDs:
+
+```
+80-100% (Excellent):  {{ match_distribution.get("80-100%", 0) }} JDs  {{ "█" * (match_distribution.get("80-100%", 0) // 2) }}
+60-79%  (Good):       {{ match_distribution.get("60-79%", 0) }} JDs  {{ "█" * (match_distribution.get("60-79%", 0) // 2) }}
+40-59%  (Fair):       {{ match_distribution.get("40-59%", 0) }} JDs  {{ "█" * (match_distribution.get("40-59%", 0) // 2) }}
+<40%    (Low):        {{ match_distribution.get("<40%", 0) }} JDs  {{ "█" * (match_distribution.get("<40%", 0) // 2) }}
+```
+
+**Insight**: You have {{ match_distribution.get("80-100%", 0) }} excellent matches (80%+) and {{ match_distribution.get("60-79%", 0) }} good matches (60-79%).
+
+---
+
+## 💼 Your Profile Match Analysis
+
+### ✅ Strengths
+
+{% if top_companies %}
+Your profile strongly matches {{ top_companies|length }} companies with 70%+ scores. Your top matched skills are:
+{% set all_matched = [] %}
+{% for match in top_companies[:5] %}
+{% for skill in match.matched_required %}
+{% if skill not in all_matched %}
+{{ all_matched.append(skill) or "" }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+{% for skill in all_matched[:10] %}
+- {{ skill }}
+{% endfor %}
+{% else %}
+*No strong matches found. Focus on building skills from the "Top Skills to Learn" section.*
+{% endif %}
+
+---
+
+### 🎯 Skill Gap Analysis
+
+Top 5 missing skills across companies you're interested in:
+
+{% if skills_to_learn %}
+| Skill | Appears in JDs | Impact |
+|-------|----------------|--------|
+{% for skill, count, pct in skills_to_learn[:5] %}
+| {{ skill }} | {{ count }} ({{ pct }}%) | {% if pct >= 50 %}Critical{% elif pct >= 30 %}High{% else %}Medium{% endif %} |
+{% endfor %}
+
+**Priority**: Focus on **{{ skills_to_learn[0][0] if skills_to_learn else "N/A" }}** and **{{ skills_to_learn[1][0] if skills_to_learn|length > 1 else "N/A" }}** for maximum impact.
+{% else %}
+*No significant skill gaps identified!*
+{% endif %}
+
+---
+
+## 📋 Next Steps
+
+### Immediate Actions (This Week)
+
+1. **Learn {{ skills_to_learn[0][0] if skills_to_learn else "top missing skill" }}**
+   - Highest ROI skill (needed in {{ skills_to_learn[0][1] if skills_to_learn else 0 }} JDs)
+   - Recommended: Build a small project showcasing this skill
+
+2. **Apply to Top 3 Matches**
+   - {{ top_companies[0].jd_company if top_companies else "Company 1" }} ({{ top_companies[0].score if top_companies else 0 }}% match)
+   - {{ top_companies[1].jd_company if top_companies|length > 1 else "Company 2" }} ({{ top_companies[1].score if top_companies|length > 1 else 0 }}% match)
+   - {{ top_companies[2].jd_company if top_companies|length > 2 else "Company 3" }} ({{ top_companies[2].score if top_companies|length > 2 else 0 }}% match)
+
+3. **Update Resume**
+   - Highlight your matched skills: {{ ", ".join(top_skills[:5] | map(attribute=0)) }}
+   - Quantify impact where possible
+
+### Short-term Goals (This Month)
+
+4. **Build Portfolio Projects**
+   - Project 1: Showcase {{ skills_to_learn[0][0] if skills_to_learn else "Skill 1" }}
+   - Project 2: Combine {{ skills_to_learn[0][0] if skills_to_learn else "Skill 1" }} + {{ skills_to_learn[1][0] if skills_to_learn|length > 1 else "Skill 2" }}
+
+5. **Networking**
+   - Reach out to connections at {{ top_companies[0].jd_company if top_companies else "target companies" }}
+   - Join relevant communities (AI/ML, Product Engineering)
+
+6. **Skill Development**
+   - Complete online course for {{ skills_to_learn[0][0] if skills_to_learn else "Skill 1" }}
+   - Contribute to open source projects using {{ skills_to_learn[1][0] if skills_to_learn|length > 1 else "Skill 2" }}
+
+### Long-term Strategy (3 Months)
+
+7. **Master Top 3 Missing Skills**
+   {% for skill, count, pct in skills_to_learn[:3] %}
+   - {{ skill }} ({{ pct }}% market demand)
+   {% endfor %}
+
+8. **Target {{ remote_stats.remote_pct }}% Remote Market**
+   - Focus applications on fully remote positions
+   - Build async communication skills
+
+9. **Re-analyze Market**
+   - Run this tool again in 1-2 months
+   - Track skill demand trends
+   - Adjust learning path based on changes
+
+---
+
+## 📊 Data Summary
+
+### Collection Metadata
+
+- **Analysis Date**: {{ date }}
+- **Total JDs**: {{ total_jds }}
+- **Platforms**: LinkedIn, Wellfound, Markdown files
+- **Date Range**: Recent postings
+
+### Profile Summary
+
+- **Name**: {{ profile_name }}
+- **Total Skills**: {{ profile_skills|length if profile_skills else "Unknown" }}
+- **Experience**: {{ profile.experience.total_years if profile and profile.get("experience") else "Unknown" }} years
+- **Remote Preference**: {{ "Yes" if profile.get("preferences", {}).get("remote_only") else "No" }}
+
+---
+
+## 🔧 Configuration
+
+To update your profile or preferences, edit:
+```
+~/.jd-analyzer/profile.yaml
+```
+
+To customize skill taxonomy, edit:
+```
+~/.jd-analyzer/skill_taxonomy.yaml
+```
+
+To re-run analysis:
+```
+/jd-analyzer
+```
+
+---
+
+**Report generated by JD Analyzer v1.0.0** | [GitHub](https://github.com/yourusername/jd-analyzer)
+
+*This analysis is based on {{ total_jds }} job descriptions and your profile at time of analysis. Market conditions change rapidly - re-run regularly for best results.*
