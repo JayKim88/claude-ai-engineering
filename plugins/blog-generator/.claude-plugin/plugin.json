@@ -1,0 +1,17 @@
+{
+  "name": "blog-generator",
+  "version": "1.0.0",
+  "description": "Transform technical notes and content into well-structured blog posts with narrative flow",
+  "author": {
+    "name": "jaykim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "blog",
+    "writing",
+    "technical-blog",
+    "content-generation"
+  ]
+}
