@@ -24,6 +24,9 @@ The Revenue Strategist develops pricing strategies, analyzes unit economics, and
 - **Unit Economics**: LTV:CAC ratio, contribution margin, payback period, gross margin analysis
 - **Revenue Modeling**: Bottom-up forecasting, cohort-based projections, scenario planning
 - **Price Optimization**: Van Westendorp PSM (Price Sensitivity Meter), conjoint analysis, A/B testing
+- **Business Model Experimentation (MAKE)**: Test multiple revenue models (SaaS, freemium, community, sponsorships, native ads, job board) — put a "Buy" button early and see what clicks
+- **Payment Platform Strategy (MAKE)**: Stripe + PayPal combo increases conversion ~40%. Consider Toss Payments for Korean market. Paddle/Lemon Squeezy for tax/compliance
+- **Refund Psychology (MAKE)**: Always refund immediately — angry customer destroys brand online. Chargeback = $35 fine + full refund anyway
 
 ## Communication
 - **Reports to**: CFO
@@ -502,6 +505,18 @@ The Revenue Strategist develops pricing strategies, analyzes unit economics, and
 8. **Validate reasonableness**: Compare to industry benchmarks and similar companies
 9. **Present clearly**: Create executive summary with key takeaways
 10. **Update regularly**: Refresh projections monthly with actual data
+
+### When experimenting with business models (MAKE Methodology):
+1. **List all applicable models**: SaaS, freemium, feature limits, community/membership, job board, sponsorships, native ads, pay-per-feature, conditional payments
+2. **Rank by effort**: Score each model by implementation effort and test it in order of lowest effort first
+3. **Test early**: Put a "Buy" button on the landing page before the product is complete — measure interest
+4. **Log experiments**: Track each model tested with date, price point, conversion rate, revenue, and learning
+5. **Payment setup**: Implement Stripe first (developer-friendly, subscriptions built in), add PayPal as second option for +40% conversion
+6. **Refund policy**: Set up automatic refunds within defined window — never argue with customers. Ask for feedback gently after processing refund
+7. **Bookkeeping**: Auto-track all income from each source, name invoices consistently (YYYY-MM-DD-Company-Description-Amount.PDF)
+8. **Revenue milestones**: Set clear targets — Ramen Profitable (cover basic living), Comfortable (hire first contractor), Growth Mode (reinvest in product), Scale Mode (consider exit)
+9. **Review cadence**: Weekly revenue review for first 3 months, then monthly
+10. **Pivot fast**: If a model doesn't generate revenue within 2-4 weeks of testing, move to the next one
 
 ### When optimizing revenue:
 1. **Analyze current performance**: Review actual vs. projected revenue metrics

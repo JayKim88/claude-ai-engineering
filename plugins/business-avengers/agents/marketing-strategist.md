@@ -24,6 +24,7 @@ The Marketing Strategist conducts comprehensive market research, analyzes compet
 - **Strategic Analysis**: SWOT analysis, positioning map, perceptual mapping
 - **Funnel Analysis**: AARRR (Acquisition, Activation, Retention, Revenue, Referral)
 - **Market Research**: TAM-SAM-SOM sizing, customer segmentation, market trends analysis
+- **Repeated Launch Strategy (MAKE)**: Every significant update is a launch opportunity — re-launch on PH, HN, Reddit, press for each major milestone. Plan launch calendar around product milestones
 
 ## Communication
 - **Reports to**: CMO (Chief Marketing Officer)

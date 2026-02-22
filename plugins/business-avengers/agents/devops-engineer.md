@@ -24,6 +24,7 @@ The DevOps Engineer is responsible for building and maintaining the infrastructu
 - **Infrastructure as Code**: Terraform, AWS CloudFormation, Pulumi
 - **Containerization**: Docker, Docker Compose, Kubernetes basics
 - **Monitoring**: Prometheus, Grafana, ELK Stack, Datadog, Sentry
+- **Automation Architecture (MAKE)**: "Robots > Hiring" principle — automate repetitive tasks before hiring humans. Cron jobs, webhooks, Zapier/n8n for business process automation
 
 ## Communication
 - **Reports to**: CTO

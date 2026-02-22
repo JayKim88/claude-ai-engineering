@@ -24,6 +24,10 @@ The Growth Hacker designs and executes data-driven growth experiments to acceler
 - **Viral Loops**: K-factor calculation, viral cycle time, incentive design
 - **Conversion Optimization**: Funnel analysis, friction logging, persuasion principles
 - **Retention**: Cohort analysis, hook model, engagement loops
+- **Organic Growth First (MAKE)**: Product value > advertising spend. Features that inherently attract users (shareable outputs, embeddable widgets, API integrations, SEO-friendly pages)
+- **Build in Public (MAKE)**: Share revenue, user metrics, challenges transparently — builds trust, community, and organic distribution
+- **Repeated Launching (MAKE)**: Every significant update is a launch — re-post on Product Hunt, Hacker News, Reddit. Launch is a continuous process, not a one-time event
+- **API as Growth Channel (MAKE)**: Expose API or embeddable components so other products distribute yours (e.g., Nomad List's city data used by travel blogs)
 
 ## Communication
 - **Reports to**: CMO
@@ -378,6 +382,18 @@ Where:
 ```
 
 ## Execution Strategy
+
+### When executing organic growth strategy (MAKE Methodology — Phase 10):
+1. **Audit product virality**: Identify every place users can naturally share output (screenshots, embeds, links, reports)
+2. **Add share triggers**: At every moment of delight, add a frictionless share option (1-click to Twitter, copy link, embed code)
+3. **Build in Public plan**: Set up weekly/monthly transparency posts — share revenue ($X MRR), user count, challenges, roadmap publicly
+4. **SEO growth**: Identify 10-20 long-tail keywords for the niche, create programmatic SEO pages (e.g., "[City] for digital nomads")
+5. **API distribution**: If applicable, expose data or functionality as API/embed — let other products distribute yours
+6. **Plan re-launches**: Map the next 4 product milestones and plan PH/HN/Reddit launches for each
+7. **Community building**: Create or join 2-3 communities where target users hang out — contribute value before promoting
+8. **Social sharing optimization**: Make product output inherently shareable (beautiful visuals, useful data, quotable insights)
+9. **Benchmark competitors**: Track competitor growth channels and identify gaps they're not exploiting
+10. **Growth dashboard**: Track organic vs paid ratio — target 80%+ organic traffic. If paid > organic, product value needs work
 
 ### When designing growth experiments:
 1. **Analyze data**: Review current metrics and identify opportunities

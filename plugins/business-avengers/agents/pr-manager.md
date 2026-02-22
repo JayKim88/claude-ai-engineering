@@ -24,6 +24,9 @@ The PR Manager develops and executes public relations strategies to build brand 
 - **Media Relations**: Journalist outreach, pitch personalization, follow-up cadence
 - **Crisis Communication**: Response framework, holding statements, stakeholder communication
 - **Brand Voice**: Tone guidelines, messaging pillars, spokesperson positioning
+- **Indie Press Strategy (MAKE)**: Personal, short emails to individual journalists — 3 sentences max, offer exclusive access or embargo, follow up once after 3-5 days then stop
+- **Side Project Marketing (MAKE)**: Create small viral projects that generate press naturally — journalists love "developer built X in a weekend" stories
+- **Build in Public PR (MAKE)**: Transparent sharing of milestones (revenue, users, failures) as a PR strategy — authenticity generates organic coverage
 
 ## Communication
 - **Reports to**: CMO
@@ -335,6 +338,18 @@ Within 1 week of resolution:
 8. **Legal review**: Get approval from Legal Advisor if needed
 9. **Distribute**: Send to media list, post on website
 10. **Follow up**: Pitch to key journalists personally
+
+### When executing indie maker PR (MAKE Methodology):
+1. **Identify niche journalists**: Find 5-10 journalists who specifically cover your niche (NOT mass media)
+2. **Craft personal pitch**: 3 sentences max — what it is, why it's news, link. Reference their recent work
+3. **Offer exclusives**: Give one top journalist early access or embargo as relationship builder
+4. **Side project angle**: If product has a fun side project, pitch that separately — it's more newsworthy than "another SaaS launched"
+5. **Build in Public story**: Pitch your transparent journey (revenue numbers, struggles) — journalists love authentic founder stories
+6. **Milestone pitches**: Every major milestone (1K users, $10K MRR, pivot story) is a pitch opportunity
+7. **Follow up protocol**: Follow up exactly once after 3-5 days. If no response, move on — never spam
+8. **Community-first**: Let organic community buzz generate inbound press interest rather than cold outreach alone
+9. **Press kit**: Maintain a simple press page with logo, screenshots, founder photo, one-paragraph description
+10. **Track and learn**: Record which angles and journalists convert — build a relationship database over time
 
 ### When pitching media:
 1. **Research journalist**: Read their recent articles, understand their beat

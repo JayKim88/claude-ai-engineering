@@ -1,17 +1,19 @@
 # Business Avengers
 
 > AI Partner Organization for Solo Entrepreneurs
-> 23 AI agents + You as CEO — plan, research, design, develop, market, and monetize your online service.
+> 23 AI agents + You as CEO — plan, research, design, develop, market, monetize, grow, automate, and exit your online service.
 
 ## What is Business Avengers?
 
-Business Avengers is a Claude Code plugin that creates a **virtual company** to help solo entrepreneurs build and launch online services. Unlike MetaGPT or ChatDev which focus only on software development, Business Avengers covers the **entire business lifecycle** — from market research and product planning to marketing strategy and monetization.
+Business Avengers is a Claude Code plugin that creates a **virtual company** to help solo entrepreneurs build, launch, and scale online services. Unlike MetaGPT or ChatDev which focus only on software development, Business Avengers covers the **complete business lifecycle** — from ideation to acquisition — including market research, product planning, marketing strategy, monetization, growth optimization, automation, and exit strategy.
+
+Powered by the **MAKE methodology** (Indie Maker Handbook by @levelsio), it's designed for solo entrepreneurs who want to build profitable products with lean, automated operations.
 
 You are the **CEO**. Your AI team handles the rest.
 
 ---
 
-## Value Stream: Idea to Revenue
+## Value Stream: Idea to Acquisition
 
 ```mermaid
 graph TD
@@ -29,22 +31,33 @@ graph TD
     I["🚀 Pricing & Revenue"]:::launchNode
     J["🚀 Operations"]:::launchNode
     L4("운영 체계 구축"):::step
-    K(["💰 Revenue"]):::outputNode
+    K(["💰 Revenue"]):::revenueNode
+    L5("수익 달성"):::step
+    M["📈 Growth"]:::growNode
+    N["🤖 Automation"]:::growNode
+    L6("자율 운영 달성"):::step
+    O["🏦 Scale & Exit"]:::exitNode
+    P(["🎯 Acquisition / FIRE"]):::outputNode
 
     A --> L1 --> B --> C
     C --> L2 --> D --> E --> F --> G
     G --> L3 --> H --> I --> J
     J --> L4 --> K
+    K --> L5 --> M --> N
+    N --> L6 --> O --> P
 
     classDef inputNode fill:#f0f4ff,stroke:#4a6cf7
     classDef validateNode fill:#fff8e6,stroke:#f5a623
     classDef buildNode fill:#e6fff0,stroke:#27ae60
     classDef launchNode fill:#ffe6e6,stroke:#e74c3c
+    classDef revenueNode fill:#fff0e6,stroke:#f59e0b
+    classDef growNode fill:#e6f0ff,stroke:#6366f1
+    classDef exitNode fill:#f0e6ff,stroke:#a855f7
     classDef outputNode fill:#f0f4ff,stroke:#4a6cf7
     classDef step fill:#f8f9fa,stroke:#dee2e6,color:#6c757d
 ```
 
-각 Phase에서 **추상적 아이디어가 구체적 수익으로** 변환됩니다. CEO는 전략적 의사결정에 집중하고, 23개 AI 에이전트가 실행을 담당합니다.
+13개 Phase에서 **추상적 아이디어가 매각 가능한 자산으로** 변환됩니다. CEO는 전략적 의사결정에 집중하고, 23개 AI 에이전트가 실행을 담당합니다.
 
 ---
 
@@ -125,9 +138,12 @@ graph TD
 
 ### Choose Your Mode
 ```
-/business-avengers new --mode idea-first "My app idea"     # Start from idea
-/business-avengers new --mode market-first "Find opportunities"  # Research first
-/business-avengers new --mode mvp-build "Quick MVP"        # Fast track
+/business-avengers new --mode idea-first "My app idea"        # Start from idea
+/business-avengers new --mode market-first "Find opportunities"   # Research first
+/business-avengers new --mode mvp-build "Quick MVP"           # Fast track
+/business-avengers new --mode make "Indie product"            # MAKE: Lean indie maker path
+/business-avengers new --mode full-lifecycle "Complete journey"  # Full: Idea to Exit
+/business-avengers new --mode post-launch "Scale existing"     # Growth → Automation → Exit
 ```
 
 ### Talk to Specific Agents
@@ -142,6 +158,8 @@ graph TD
 ```
 /business-avengers sprint "Add social login feature"
 /business-avengers sprint "Update pricing based on user feedback"
+/business-avengers sprint --phase 10 "Quarterly growth review"   # Growth sprint
+/business-avengers sprint --phase 8 "Test new pricing model"     # Revenue sprint
 ```
 
 ### Project Management
@@ -167,14 +185,17 @@ flowchart TD
     C -->|idea-first| G["Phase 0→1→2→3→4→5→6→7→8→9<br/>아이디어가 있을 때"]
     C -->|market-first| H["Phase 1→0→2→3→4→5→6→7→8→9<br/>시장 기회를 먼저 탐색"]
     C -->|mvp-build| I["Phase 0→2→4→5→7<br/>최소 기능 빠른 검증"]
+    C -->|make| M2["Phase 0→1→7→8→10→11<br/>린 인디메이커 경로"]
+    C -->|full-lifecycle| FL["Phase 0→12 전체<br/>아이디어부터 매각까지"]
+    C -->|post-launch| PL["Phase 10→11→12<br/>런칭 후 성장/최적화"]
     C -->|custom| J["CEO가 Phase 직접 선택<br/>필요한 Phase만 조합"]
 
-    G & H & I & J --> K["Phase Execution Pipeline"]
+    G & H & I & M2 & FL & PL & J --> K["Phase Execution Pipeline"]
     E --> L["Sprint Planning<br/>변경할 Phase 선택"] --> K
 
     D --> M(["Agent Response<br/>전문 분야 답변"])
     F --> N(["Project Status<br/>현재 진행 상황"])
-    K --> O(["Project Complete<br/>35+ 문서 산출물"])
+    K --> O(["Project Complete<br/>50+ 문서 산출물"])
 
     style A fill:#f0f4ff,stroke:#4a6cf7
     style D fill:#e6fff0,stroke:#27ae60
@@ -208,7 +229,13 @@ flowchart TD
     G8{{"CEO<br/>Approve?"}}
     P9["Phase 9: Operations<br/>CS ∥ LG ∥ DA"]
     G9{{"CEO<br/>Confirm"}}
-    DONE(["Project Complete<br/>35+ Documents"])
+    P10["Phase 10: Growth<br/>GH ∥ CC ∥ DA"]
+    G10{{"CEO<br/>Approve?"}}
+    P11["Phase 11: Automation<br/>DvO ∥ BA"]
+    G11{{"CEO<br/>Approve?"}}
+    P12["Phase 12: Scale & Exit<br/>RS ∥ BA ∥ LG"]
+    G12{{"CEO<br/>Deep Dialogue"}}
+    DONE(["Project Complete<br/>50+ Documents"])
 
     P0 --> G0
     G0 -->|"승인"| P1
@@ -235,7 +262,15 @@ flowchart TD
     G8 -->|"승인"| P9
     G8 -->|"수정"| P8
     P9 --> G9
-    G9 --> DONE
+    G9 --> P10
+    P10 --> G10
+    G10 -->|"승인"| P11
+    G10 -->|"수정"| P10
+    P11 --> G11
+    G11 -->|"승인"| P12
+    G11 -->|"수정"| P11
+    P12 --> G12
+    G12 -->|"완료"| DONE
 
     style P0 fill:#f0f4ff,stroke:#4a6cf7
     style P1 fill:#fff8e6,stroke:#f5a623
@@ -247,6 +282,9 @@ flowchart TD
     style P7 fill:#ffe6e6,stroke:#e74c3c
     style P8 fill:#ffe6e6,stroke:#e74c3c
     style P9 fill:#ffe6e6,stroke:#e74c3c
+    style P10 fill:#e6f0ff,stroke:#6366f1
+    style P11 fill:#e6f0ff,stroke:#6366f1
+    style P12 fill:#f0e6ff,stroke:#a855f7
     style DONE fill:#4a6cf7,color:#fff,stroke:#3451b2
     style STOP fill:#999,color:#fff,stroke:#666
 ```
@@ -258,6 +296,7 @@ flowchart TD
 - **Approve**: 산출물 리뷰 후 승인/수정/피봇/중단 선택
 - **Delegate**: C-Level이 자율 판단, CEO에게 결과 보고
 - **Confirm**: CEO가 결과 확인 후 자동 진행
+- **Deep Dialogue**: CEO와 전략적 대화 (장기 목표, 매각 의사 등 심층 논의)
 
 ---
 
@@ -312,6 +351,24 @@ graph LR
         UE["unit-economics.md"]
     end
 
+    subgraph P10["Phase 10"]
+        GEP["growth-execution-plan.md"]
+        BIP["build-in-public-plan.md"]
+        OGP["organic-growth-playbook.md"]
+    end
+
+    subgraph P11["Phase 11"]
+        AA["automation-audit.md"]
+        RS2["robot-specs.md"]
+        MON["monitoring-setup.md"]
+    end
+
+    subgraph P12["Phase 12"]
+        SVE["scale-vs-exit-analysis.md"]
+        VR["valuation-report.md"]
+        FP2["fire-plan.md"]
+    end
+
     IC --> MA & CA & RMD
     IC --> PRD
     MA & CA --> PRD
@@ -325,6 +382,11 @@ graph LR
     UP --> GTM
     RMD --> PS & FIN & UE
     PRD --> PS
+    GTM & GS --> GEP & BIP & OGP
+    PS --> GEP
+    DEP --> AA & RS2 & MON
+    GEP --> AA
+    PS & FIN & GEP & AA --> SVE & VR & FP2
 
     style P0 fill:#f0f4ff,stroke:#4a6cf7
     style P1 fill:#fff8e6,stroke:#f5a623
@@ -334,6 +396,9 @@ graph LR
     style P5 fill:#e6fff0,stroke:#27ae60
     style P7 fill:#ffe6e6,stroke:#e74c3c
     style P8 fill:#ffe6e6,stroke:#e74c3c
+    style P10 fill:#e6f0ff,stroke:#6366f1
+    style P11 fill:#e6f0ff,stroke:#6366f1
+    style P12 fill:#f0e6ff,stroke:#a855f7
 ```
 
 각 Phase의 산출물이 다음 Phase의 **입력**으로 흘러갑니다. 에이전트는 직접 통신하지 않고, **구조화된 문서**를 통해 협업합니다 (MetaGPT 패턴).
@@ -392,14 +457,19 @@ phase-2-product-planning/
 | 7 | **Launch Strategy** | GTM, content plan, growth strategy, PR | MS, CC, GH, PR | Approve |
 | 8 | **Monetization** | Pricing strategy, financial projections, unit economics | RS, BA | Approve |
 | 9 | **Operations** | CS playbook, legal docs, metrics dashboard | CS, LG, DA | Confirm |
+| 10 | **Growth** | Organic growth, Build in Public, retention, metrics | GH, CC, DA | Approve |
+| 11 | **Automation** | Task automation, monitoring, contractor playbook, Bus Test | DvO, BA | Approve |
+| 12 | **Scale & Exit** | Valuation, exit readiness, acquisition strategy, FIRE plan | RS, BA, LG | Deep Dialogue |
 
 ## Key Features
 
-- **Flexible Phase Order**: Run phases in any order (idea-first, market-first, MVP, custom)
+- **Full Lifecycle**: 13 phases covering idea to acquisition (powered by MAKE methodology)
+- **6 Execution Modes**: idea-first, market-first, mvp-build, make, full-lifecycle, post-launch
 - **Sprint Cycles**: Iterate on your product with version-controlled documents
 - **Real-Time Research**: Agents use WebSearch/WebFetch for live market data
 - **CEO Approval Gates**: You control strategy, agents handle execution
-- **Knowledge Base**: 8 domain-specific guides power agent expertise
+- **Knowledge Base**: 11 domain-specific guides power agent expertise
+- **50+ Output Templates**: Structured documents for every business function
 - **Document Versioning**: Every change is tracked with history and changelogs
 
 ## Output Structure
@@ -419,7 +489,26 @@ your-project/
 │   ├── prd.md
 │   ├── user-personas.md
 │   └── ...
-└── ... (10 phase directories, 35+ documents)
+├── ...
+├── phase-10-growth/
+│   ├── growth-execution-plan.md
+│   ├── build-in-public-plan.md
+│   ├── organic-growth-playbook.md
+│   ├── user-retention-plan.md
+│   └── growth-metrics-report.md
+├── phase-11-automation/
+│   ├── automation-audit.md
+│   ├── robot-specs.md
+│   ├── contractor-playbook.md
+│   ├── autonomous-org-design.md
+│   └── monitoring-setup.md
+├── phase-12-scale-exit/
+│   ├── scale-vs-exit-analysis.md
+│   ├── valuation-report.md
+│   ├── exit-readiness-checklist.md
+│   ├── acquisition-playbook.md
+│   └── fire-plan.md
+└── ... (13 phase directories, 50+ documents)
 ```
 
 ## Cost
@@ -428,7 +517,10 @@ your-project/
 
 | Mode | Agents | Time |
 |------|--------|------|
-| Full E2E | ~24 calls | 30-50 min |
+| Full Lifecycle (0-12) | ~33 calls | 45-70 min |
+| Full E2E (0-9) | ~24 calls | 30-50 min |
+| MAKE Mode | ~16 calls | 20-35 min |
+| Post-Launch (10-12) | ~9 calls | 15-25 min |
 | MVP Build | ~10 calls | 15-25 min |
 | Single Phase | 1-4 calls | 3-10 min |
 | Sprint | 5-10 calls | 15-25 min |
@@ -448,6 +540,8 @@ npx github:JayKim88/claude-ai-engineering business-avengers
 
 1. **Start with "ask" mode** to explore before committing to a full pipeline
 2. **Use market-first mode** if you're not sure what to build yet
-3. **Sprint frequently** — real products evolve, your documents should too
-4. **Review outputs critically** — AI is your team, but you're still the CEO
-5. **Combine with other plugins** — use `project-insight` to analyze the generated code later
+3. **Use MAKE mode** for lean indie maker approach (skip heavy phases, focus on launch + growth)
+4. **Sprint frequently** — real products evolve, your documents should too
+5. **Use post-launch mode** after you've shipped to focus on growth, automation, and exit strategy
+6. **Review outputs critically** — AI is your team, but you're still the CEO
+7. **Combine with other plugins** — use `project-insight` to analyze the generated code later

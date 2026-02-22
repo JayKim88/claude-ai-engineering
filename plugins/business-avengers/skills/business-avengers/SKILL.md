@@ -2,7 +2,7 @@
 
 ## Purpose
 
-AI partner organization for solo entrepreneurs. 23 AI agents + You as CEO (24 roles) that plan, research, design, develop, market, and monetize your online service from idea to launch — with sprint cycles for continuous improvement.
+AI partner organization for solo entrepreneurs. 23 AI agents + You as CEO (24 roles) that plan, research, design, develop, market, monetize, grow, automate, and exit your online service from idea to acquisition — with sprint cycles for continuous improvement. Powered by the MAKE (Indie Maker Handbook) methodology for the complete business lifecycle.
 
 ## Trigger Phrases
 
@@ -72,9 +72,9 @@ sprint_goal = user_input if is_sprint else ""
 ```
 
 **Mode routing:**
-- If mode = STATUS → Go to Step 12
-- If mode = HISTORY → Go to Step 13
-- If mode = ASK → Go to Step 14
+- If mode = STATUS → Go to Step 17
+- If mode = HISTORY → Go to Step 18
+- If mode = ASK → Go to Step 19
 - If mode = RESUME → Go to Step 3 (load project, continue from last phase)
 - If mode = SINGLE PHASE → Go to Step 3 (load project, run specific phase)
 - If mode = SPRINT → Go to Step 3 (load project, enter sprint mode)
@@ -103,6 +103,9 @@ if not specified:
       "아이디어 우선 (Recommended) - 아이디어가 있으면 이 모드",
       "시장 우선 - 시장 기회를 먼저 탐색",
       "MVP 빌드 - 최소 기능으로 빠르게",
+      "MAKE 모드 - 인디메이커 린 경로 (아이디어→시장→런칭→수익화→성장→자동화)",
+      "풀 라이프사이클 - 아이디어부터 매각까지 전체 13단계",
+      "포스트런칭 - 이미 런칭한 서비스의 성장/자동화/매각 전략",
       "커스텀 - Phase를 직접 선택"
     ]
   )
@@ -150,6 +153,9 @@ elif mode == SPRINT:
       "디자인 수정 (Phase 3)",
       "기술 설계 수정 (Phase 4)",
       "마케팅 전략 수정 (Phase 7)",
+      "성장 전략 업데이트 (Phase 10)",
+      "자동화 업데이트 (Phase 11)",
+      "전략/매각 분석 (Phase 12)",
       "직접 선택"
     ],
     multiSelect=true
@@ -1076,7 +1082,7 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 7 compl
 
 ---
 
-### Step 11.5: Execute Phase 8 - Monetization
+### Step 12: Execute Phase 8 - Monetization
 
 **Condition**: Only runs if Phase 8 is in phases_to_run
 **Lead**: CFO
@@ -1084,7 +1090,7 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 7 compl
 **CEO Interaction**: Strategic Approval (pricing decisions)
 
 ```python
-# 11.5.1 Read previous phase outputs
+# 12.1 Read previous phase outputs
 idea_canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
 idea_canvas = Read(idea_canvas_files[0]) if idea_canvas_files else ""
 prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
@@ -1094,7 +1100,7 @@ revenue_draft = Read("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.
 feature_priority_files = Glob("{PROJECT_DIR}/phase-2-product-planning/feature-priority.md")
 feature_priority = Read(feature_priority_files[0]) if feature_priority_files else ""
 
-# 11.5.2 Sprint mode: backup existing docs
+# 12.2 Sprint mode: backup existing docs
 sprint_context = ""
 if is_sprint:
   existing = Glob("{PROJECT_DIR}/phase-8-monetization/*.md")
@@ -1103,7 +1109,7 @@ if is_sprint:
     existing_pricing = Read("{PROJECT_DIR}/phase-8-monetization/pricing-strategy.md")
     sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 가격 전략:\n{existing_pricing}"
 
-# 11.5.3 Launch 2 agents in PARALLEL
+# 12.3 Launch 2 agents in PARALLEL
 Task(
   subagent_type="revenue-strategist",
   model="sonnet",
@@ -1182,7 +1188,7 @@ Task(
      - {PROJECT_DIR}/phase-8-monetization/unit-economics.md
   """)
 
-# 11.5.4 CFO presents to CEO for strategic approval
+# 12.4 CFO presents to CEO for strategic approval
 """
 [CFO] 수익화 전략이 완료되었습니다:
 - 가격 전략: tier별 가격 및 기능 매핑
@@ -1200,7 +1206,7 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 8 compl
 
 ---
 
-### Step 11.6: Execute Phase 9 - Operations
+### Step 13: Execute Phase 9 - Operations
 
 **Condition**: Only runs if Phase 9 is in phases_to_run
 **Lead**: COO
@@ -1208,14 +1214,14 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 8 compl
 **CEO Interaction**: Delegate + Report
 
 ```python
-# 11.6.1 Read previous phase outputs
+# 13.1 Read previous phase outputs
 prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
 personas = Read("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
 pricing_files = Glob("{PROJECT_DIR}/phase-8-monetization/pricing-strategy.md")
 pricing = Read(pricing_files[0]) if pricing_files else ""
 tech_arch = Read("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
 
-# 11.6.2 Sprint mode: backup existing docs
+# 13.2 Sprint mode: backup existing docs
 sprint_context = ""
 if is_sprint:
   existing = Glob("{PROJECT_DIR}/phase-9-operations/*.md")
@@ -1224,7 +1230,7 @@ if is_sprint:
     existing_cs = Read("{PROJECT_DIR}/phase-9-operations/cs-playbook.md")
     sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 CS 플레이북:\n{existing_cs}"
 
-# 11.6.3 Launch 3 agents in PARALLEL (CRITICAL: all in single response block)
+# 13.3 Launch 3 agents in PARALLEL (CRITICAL: all in single response block)
 Task(
   subagent_type="cs-manager",
   model="sonnet",
@@ -1276,7 +1282,7 @@ Task(
   - 가격 전략: {pricing}
 
   Knowledge Base (Read로 읽으세요):
-  - {KNOWLEDGE_DIR}/legal-compliance.md
+  - {KNOWLEDGE_DIR}/legal-templates.md
 
   템플릿 (Read로 읽으세요):
   - {TEMPLATE_DIR}/legal-docs.md
@@ -1332,7 +1338,7 @@ Task(
      - {PROJECT_DIR}/phase-9-operations/feedback-loop.md
   """)
 
-# 11.6.4 COO reports to CEO
+# 13.4 COO reports to CEO
 """
 [COO] 운영 계획이 완료되었습니다:
 - CS 플레이북: 고객 대응 시나리오 및 FAQ
@@ -1351,7 +1357,423 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 9 compl
 
 ---
 
-### Step 12: Status Mode
+### Step 14: Execute Phase 10 - Growth (MAKE Methodology)
+
+**Condition**: Only runs if Phase 10 is in phases_to_run
+**Lead**: CMO
+**Agents**: growth-hacker + content-creator + data-analyst (PARALLEL)
+**CEO Interaction**: Approve (growth strategy selection)
+**Knowledge Base**: knowledge/growth-tactics.md
+
+```python
+# 14.1 Read previous phase outputs
+gtm_files = Glob("{PROJECT_DIR}/phase-7-launch-strategy/gtm-strategy.md")
+gtm = Read(gtm_files[0]) if gtm_files else ""
+pricing_files = Glob("{PROJECT_DIR}/phase-8-monetization/pricing-strategy.md")
+pricing = Read(pricing_files[0]) if pricing_files else ""
+metrics_files = Glob("{PROJECT_DIR}/phase-9-operations/metrics-dashboard.md")
+metrics = Read(metrics_files[0]) if metrics_files else ""
+prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+
+# 14.2 Sprint mode
+sprint_context = ""
+if is_sprint:
+  existing = Glob("{PROJECT_DIR}/phase-10-growth/*.md")
+  if existing:
+    Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-10-growth growth-execution-plan.md {current_version}")
+    existing_growth = Read("{PROJECT_DIR}/phase-10-growth/growth-execution-plan.md")
+    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 성장 계획:\n{existing_growth}"
+
+# 14.3 Launch 3 agents in PARALLEL
+Task(
+  subagent_type="growth-hacker",
+  model="sonnet",
+  description="Growth execution plan and organic growth playbook",
+  prompt=f"""
+  당신은 Business Avengers의 Growth Hacker입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/growth-hacker.md
+
+  프로젝트 컨텍스트:
+  - PRD: {prd}
+  - GTM 전략: {gtm}
+  - 가격 전략: {pricing}
+  - 메트릭 대시보드: {metrics}
+
+  Knowledge Base (Read로 읽으세요):
+  - {KNOWLEDGE_DIR}/growth-tactics.md
+
+  템플릿 (Read로 읽으세요):
+  - {TEMPLATE_DIR}/growth-execution-plan.md
+  - {TEMPLATE_DIR}/organic-growth-playbook.md
+  - {TEMPLATE_DIR}/user-retention-plan.md
+
+  {sprint_context}
+
+  작업:
+  1. 에이전트 정의와 Knowledge Base를 Read로 읽고 숙지하세요
+  2. 분기별 성장 실행 계획을 수립하세요 (MAKE 유기적 성장 우선 원칙)
+  3. SEO, API 성장, 소셜 공유, 반복 런칭 전략을 포함한 유기적 성장 플레이북 작성
+  4. 리텐션 전략(Hook Model, Win-back, 이탈 방지)을 설계하세요
+  5. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+     - {PROJECT_DIR}/phase-10-growth/growth-execution-plan.md
+     - {PROJECT_DIR}/phase-10-growth/organic-growth-playbook.md
+     - {PROJECT_DIR}/phase-10-growth/user-retention-plan.md
+  """)
+
+Task(
+  subagent_type="content-creator",
+  model="sonnet",
+  description="Build in Public plan",
+  prompt=f"""
+  당신은 Business Avengers의 Content Creator입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/content-creator.md
+
+  프로젝트 컨텍스트:
+  - PRD: {prd}
+  - GTM 전략: {gtm}
+
+  Knowledge Base (Read로 읽으세요):
+  - {KNOWLEDGE_DIR}/growth-tactics.md
+
+  템플릿 (Read로 읽으세요):
+  - {TEMPLATE_DIR}/build-in-public-plan.md
+
+  {sprint_context}
+
+  작업:
+  1. Build in Public 전략을 수립하세요 (투명성, 커뮤니티 빌딩, 신뢰 구축)
+  2. 공유할 메트릭, 빈도, 채널, 톤앤매너를 정의하세요
+  3. 마일스톤별 공유 전략 (매출, 유저 수, 실패 경험 포함)
+  4. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+     - {PROJECT_DIR}/phase-10-growth/build-in-public-plan.md
+  """)
+
+Task(
+  subagent_type="data-analyst",
+  model="sonnet",
+  description="Growth metrics report",
+  prompt=f"""
+  당신은 Business Avengers의 Data Analyst입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/data-analyst.md
+
+  프로젝트 컨텍스트:
+  - 메트릭 대시보드: {metrics}
+  - 가격 전략: {pricing}
+
+  Knowledge Base (Read로 읽으세요):
+  - {KNOWLEDGE_DIR}/growth-tactics.md
+
+  템플릿 (Read로 읽으세요):
+  - {TEMPLATE_DIR}/growth-metrics-report.md
+
+  {sprint_context}
+
+  작업:
+  1. 성장 KPI 대시보드를 설계하세요 (유기적 vs 유료 트래픽 비율 포함)
+  2. 주간/월간/분기별 리포트 템플릿을 작성하세요
+  3. 성장 실험 추적 프레임워크를 포함하세요
+  4. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+     - {PROJECT_DIR}/phase-10-growth/growth-metrics-report.md
+  """)
+
+# 14.4 CMO presents to CEO
+"""
+[CMO] 성장 전략이 완료되었습니다:
+- 분기별 성장 실행 계획
+- Build in Public 전략
+- 유기적 성장 플레이북 (SEO, API, 소셜, 반복 런칭)
+- 리텐션 & 이탈 방지 전략
+- 성장 KPI 대시보드
+
+상세 문서는 프로젝트 폴더에 저장되었습니다.
+"""
+
+AskUserQuestion("[CMO] 성장 전략을 검토해주세요.",
+  options=["승인 - 성장 전략 확정", "수정 요청 - 전략 조정", "재검토 - 성장 방향 재설정"])
+
+Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 10 completed v1.0")
+```
+
+---
+
+### Step 15: Execute Phase 11 - Automation (MAKE Methodology)
+
+**Condition**: Only runs if Phase 11 is in phases_to_run
+**Lead**: COO + CTO
+**Agents**: devops-engineer + business-analyst (PARALLEL)
+**CEO Interaction**: Approve (automation priorities)
+**Knowledge Base**: knowledge/automation-guide.md
+
+```python
+# 15.1 Read previous phase outputs
+deployment_files = Glob("{PROJECT_DIR}/phase-5-development/deployment-strategy.md")
+deployment = Read(deployment_files[0]) if deployment_files else ""
+cs_files = Glob("{PROJECT_DIR}/phase-9-operations/cs-playbook.md")
+cs_playbook = Read(cs_files[0]) if cs_files else ""
+growth_files = Glob("{PROJECT_DIR}/phase-10-growth/growth-execution-plan.md")
+growth_plan = Read(growth_files[0]) if growth_files else ""
+
+# 15.2 Sprint mode
+sprint_context = ""
+if is_sprint:
+  existing = Glob("{PROJECT_DIR}/phase-11-automation/*.md")
+  if existing:
+    Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-11-automation automation-audit.md {current_version}")
+    existing_automation = Read("{PROJECT_DIR}/phase-11-automation/automation-audit.md")
+    sprint_context = f"기존 문서를 업데이트하세요. 기존 자동화 감사:\n{existing_automation}\n변경사항만 반영하고, 기존 분석은 유지하세요."
+
+# 15.3 Launch agents in PARALLEL
+Task(
+  subagent_type="devops-engineer",
+  model="sonnet",
+  description="Automation audit, robot specs, and monitoring",
+  prompt=f"""
+  당신은 Business Avengers의 DevOps Engineer입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/devops-engineer.md
+
+  프로젝트 컨텍스트:
+  - 배포 전략: {deployment}
+  - CS 플레이북: {cs_playbook}
+  - 성장 계획: {growth_plan}
+
+  Knowledge Base (Read로 읽으세요):
+  - {KNOWLEDGE_DIR}/automation-guide.md
+
+  템플릿 (Read로 읽으세요):
+  - {TEMPLATE_DIR}/automation-audit.md
+  - {TEMPLATE_DIR}/robot-specs.md
+  - {TEMPLATE_DIR}/monitoring-setup.md
+
+  {sprint_context}
+
+  작업:
+  1. 에이전트 정의와 Knowledge Base를 Read로 읽고 숙지하세요
+  2. 전체 비즈니스의 반복 업무를 감사하고 자동화 기회를 식별하세요 (ROI 계산 포함)
+  3. 자동화 스크립트 사양서를 작성하세요 (cron job, webhook, Zapier/n8n)
+  4. 모니터링/알림 시스템을 설계하세요 (UptimeRobot, 3단계 알림 체계)
+  5. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+     - {PROJECT_DIR}/phase-11-automation/automation-audit.md
+     - {PROJECT_DIR}/phase-11-automation/robot-specs.md
+     - {PROJECT_DIR}/phase-11-automation/monitoring-setup.md
+  """)
+
+Task(
+  subagent_type="business-analyst",
+  model="sonnet",
+  description="Contractor playbook and autonomous org design",
+  prompt=f"""
+  당신은 Business Avengers의 Business Analyst입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/business-analyst.md
+
+  프로젝트 컨텍스트:
+  - CS 플레이북: {cs_playbook}
+  - 성장 계획: {growth_plan}
+
+  Knowledge Base (Read로 읽으세요):
+  - {KNOWLEDGE_DIR}/automation-guide.md
+
+  템플릿 (Read로 읽으세요):
+  - {TEMPLATE_DIR}/contractor-playbook.md
+  - {TEMPLATE_DIR}/autonomous-org-design.md
+
+  {sprint_context}
+
+  작업:
+  1. 계약직 관리 가이드를 작성하세요 (채용, 자율성, 보상, 커뮤니케이션)
+  2. 계약직 vs 자동화 결정 매트릭스를 포함하세요
+  3. Bus Test 체크리스트를 작성하세요 (사업이 창업자 없이 돌아가는가?)
+  4. 자율 조직 설계를 작성하세요 (로봇 + 계약직 + 창업자 역할 분리)
+  5. 최소 유지보수 모델을 설계하세요
+  6. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+     - {PROJECT_DIR}/phase-11-automation/contractor-playbook.md
+     - {PROJECT_DIR}/phase-11-automation/autonomous-org-design.md
+  """)
+
+# 15.4 COO reports to CEO
+"""
+[COO] 자동화 전략이 완료되었습니다:
+- 자동화 감사: 반복 업무 분석 및 ROI 기반 자동화 기회
+- 로봇 사양서: cron job, webhook, 워크플로우 자동화 설계
+- 계약직 관리: 채용, 운영, 평가 가이드
+- 자율 조직 설계: Bus Test 체크리스트, 최소 유지보수 모델
+- 모니터링 셋업: UptimeRobot 설정 및 알림 체계
+
+상세 문서는 프로젝트 폴더에 저장되었습니다.
+"""
+
+AskUserQuestion("[COO] 자동화 전략을 검토해주세요.",
+  options=["승인 - 자동화 우선순위 확정", "수정 요청 - 우선순위 조정", "질문 있음"])
+
+Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 11 completed v1.0")
+```
+
+---
+
+### Step 16: Execute Phase 12 - Scale & Exit (MAKE Methodology)
+
+**Condition**: Only runs if Phase 12 is in phases_to_run
+**Lead**: CFO
+**Agents**: revenue-strategist + business-analyst + legal-advisor (PARALLEL)
+**CEO Interaction**: Deep Dialogue (strategic conversation)
+**Knowledge Base**: knowledge/exit-guide.md
+
+```python
+# 16.1 Read previous phase outputs
+pricing_files = Glob("{PROJECT_DIR}/phase-8-monetization/pricing-strategy.md")
+pricing = Read(pricing_files[0]) if pricing_files else ""
+financial_files = Glob("{PROJECT_DIR}/phase-8-monetization/financial-projections.md")
+financials = Read(financial_files[0]) if financial_files else ""
+growth_files = Glob("{PROJECT_DIR}/phase-10-growth/growth-execution-plan.md")
+growth = Read(growth_files[0]) if growth_files else ""
+automation_files = Glob("{PROJECT_DIR}/phase-11-automation/autonomous-org-design.md")
+automation = Read(automation_files[0]) if automation_files else ""
+
+# 16.2 Strategic dialogue with CEO
+"""
+[CFO] CEO님, 전략적인 대화가 필요한 단계입니다.
+사업의 미래 방향(계속 성장 vs 매각 vs 유지)에 대해 논의하겠습니다.
+"""
+
+AskUserQuestion(
+  "[CFO] 현재 사업의 장기 목표는 무엇인가요?",
+  options=[
+    "계속 성장 - 규모를 키우고 싶다",
+    "라이프스타일 비즈니스 - 현재 수준 유지하며 자유를 누리고 싶다",
+    "매각 검토 - 적절한 시점에 매각을 고려한다",
+    "아직 모르겠다 - 모든 시나리오를 분석해달라"
+  ]
+)
+ceo_goal = selected_option  # CEO의 장기 목표 선택 결과
+
+# 16.3 Launch 3 agents in PARALLEL
+Task(
+  subagent_type="revenue-strategist",
+  model="sonnet",
+  description="Scale vs exit analysis and valuation",
+  prompt=f"""
+  당신은 Business Avengers의 Revenue Strategist입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/revenue-strategist.md
+
+  프로젝트 컨텍스트:
+  - 가격 전략: {pricing}
+  - 재무 예측: {financials}
+  - 성장 계획: {growth}
+  - 자율 조직 설계: {automation}
+  - CEO 장기 목표: {ceo_goal}
+
+  Knowledge Base (반드시 Read로 읽으세요 — 밸류에이션/매각 전략 참조):
+  - {KNOWLEDGE_DIR}/exit-guide.md
+
+  템플릿 (Read로 읽으세요):
+  - {TEMPLATE_DIR}/scale-vs-exit-analysis.md
+  - {TEMPLATE_DIR}/valuation-report.md
+
+  작업:
+  1. 에이전트 정의와 Knowledge Base를 Read로 읽고 숙지하세요
+  2. 계속 성장 vs 매각 vs 유지 3가지 시나리오를 분석하세요
+  3. 밸류에이션을 산정하세요 (매출 배수, SDE, 성장률 기반)
+  4. 구매자 유형별 예상 매각가를 제시하세요
+  5. FIRE 4% 룰 시나리오 분석을 포함하세요
+  6. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+     - {PROJECT_DIR}/phase-12-scale-exit/scale-vs-exit-analysis.md
+     - {PROJECT_DIR}/phase-12-scale-exit/valuation-report.md
+  """)
+
+Task(
+  subagent_type="business-analyst",
+  model="sonnet",
+  description="FIRE plan",
+  prompt=f"""
+  당신은 Business Avengers의 Business Analyst입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/business-analyst.md
+
+  프로젝트 컨텍스트:
+  - 재무 예측: {financials}
+  - 성장 계획: {growth}
+  - CEO 장기 목표: {ceo_goal}
+
+  Knowledge Base (Read로 읽으세요):
+  - {KNOWLEDGE_DIR}/exit-guide.md
+
+  템플릿 (Read로 읽으세요):
+  - {TEMPLATE_DIR}/fire-plan.md
+
+  작업:
+  1. FIRE (재정적 독립) 시나리오를 분석하세요
+  2. 4% 룰 기반 필요 자산을 계산하세요
+  3. 매각 대금 투자 전략을 제시하세요
+  4. 매각 후 심리적 준비 사항을 포함하세요 (정체성 상실 경고)
+  5. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+     - {PROJECT_DIR}/phase-12-scale-exit/fire-plan.md
+  """)
+
+Task(
+  subagent_type="legal-advisor",
+  model="sonnet",
+  description="Exit readiness checklist and acquisition playbook",
+  prompt=f"""
+  당신은 Business Avengers의 Legal Advisor입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/legal-advisor.md
+
+  프로젝트 컨텍스트:
+  - 가격 전략: {pricing}
+  - 재무 예측: {financials}
+
+  Knowledge Base (Read로 읽으세요):
+  - {KNOWLEDGE_DIR}/exit-guide.md
+
+  템플릿 (Read로 읽으세요):
+  - {TEMPLATE_DIR}/exit-readiness-checklist.md
+  - {TEMPLATE_DIR}/acquisition-playbook.md
+
+  작업:
+  1. 매각 준비 체크리스트를 작성하세요 (회계, 코드 라이선스, 법적 준비)
+  2. 구매자 유형별 협상 전략을 포함하세요
+  3. LOI, 실사, 계약 구조(현금 vs 주식 vs earnout)를 안내하세요
+  4. Breakup fee, 비경쟁 조항 등 핵심 계약 조건을 다루세요
+  5. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+     - {PROJECT_DIR}/phase-12-scale-exit/exit-readiness-checklist.md
+     - {PROJECT_DIR}/phase-12-scale-exit/acquisition-playbook.md
+  """)
+
+# 16.4 CFO presents to CEO for deep dialogue
+"""
+[CFO] 전략 분석이 완료되었습니다:
+- 계속 성장 vs 매각 vs 유지 시나리오 비교
+- 기업 가치 평가 (밸류에이션)
+- 매각 준비 체크리스트
+- 인수 플레이북 (협상 전략, 계약 구조)
+- FIRE 시나리오 분석
+
+이 문서들은 향후 전략적 의사결정의 기반이 됩니다.
+언제든 '/business-avengers sprint' 으로 업데이트할 수 있습니다.
+"""
+
+AskUserQuestion("[CFO] 전략 분석을 검토해주세요.",
+  options=["확인 - 분석 완료", "추가 시나리오 요청", "특정 시나리오 심층 분석 요청"])
+
+Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 12 completed v1.0")
+```
+
+---
+
+### Step 17: Status Mode
 
 ```python
 result = Bash("python3 {PLUGIN_DIR}/config/init-project.py load '{project_slug}'")
@@ -1375,7 +1797,7 @@ project = parse_json(result)
 
 ---
 
-### Step 13: History Mode
+### Step 18: History Mode
 
 ```python
 # Read all changelogs
@@ -1406,7 +1828,7 @@ Sprint 3 (진행중): 소셜 로그인 추가
 
 ---
 
-### Step 14: Ask Mode (Direct Agent Conversation)
+### Step 19: Ask Mode (Direct Agent Conversation)
 
 ```python
 # Parse: /business-avengers ask {agent_or_team} "{question}"
@@ -1466,7 +1888,7 @@ Task(
 
 ---
 
-### Step 15: Sprint Completion
+### Step 20: Sprint Completion
 
 After all sprint phases are executed:
 
@@ -1506,7 +1928,7 @@ AskUserQuestion(
 
 ---
 
-### Step 16: Project Completion (Orchestra Mode)
+### Step 21: Project Completion (Orchestra Mode)
 
 When all phases are completed:
 
@@ -1516,16 +1938,19 @@ When all phases are completed:
 🎉 프로젝트 완료: {project.name}
 
 📁 생성된 산출물:
-├── Phase 0: Idea Canvas
+├── Phase 0: Idea Canvas (자기 문제 검증, 마이크로 니치 전략 포함)
 ├── Phase 1: 시장 분석, 경쟁 분석, 수익 모델
-├── Phase 2: PRD, 페르소나, 유저 스토리, 기능 우선순위
+├── Phase 2: PRD, 페르소나, 유저 스토리, 기능 우선순위 (MVP 빌드 전략 포함)
 ├── Phase 3: 디자인 시스템, 와이어프레임, UI 스펙
 ├── Phase 4: 기술 아키텍처, API 설계, DB 스키마
 ├── Phase 5: 프론트/백엔드 가이드, 배포 전략
 ├── Phase 6: 테스트 계획, QA 체크리스트
-├── Phase 7: GTM 전략, 콘텐츠 플랜, 성장 전략, PR
-├── Phase 8: 가격 전략, 재무 예측, Unit Economics
-└── Phase 9: CS 플레이북, 법무, 메트릭 대시보드
+├── Phase 7: GTM 전략, 콘텐츠 플랜, 성장 전략, PR (인디메이커 런칭 플레이북 포함)
+├── Phase 8: 가격 전략, 재무 예측, Unit Economics (비즈니스 모델 실험 포함)
+├── Phase 9: CS 플레이북, 법무, 메트릭 대시보드 (셀프서비스 대시보드 포함)
+├── Phase 10: 성장 실행 계획, Build in Public, 유기적 성장, 리텐션 (MAKE)
+├── Phase 11: 자동화 감사, 로봇 사양서, 계약직 관리, 자율 조직 (MAKE)
+└── Phase 12: 성장 vs 매각 분석, 밸류에이션, 인수 플레이북, FIRE 계획 (MAKE)
 
 📂 프로젝트 폴더: {PROJECT_DIR}
 

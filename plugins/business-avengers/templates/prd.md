@@ -273,6 +273,54 @@
 
 ---
 
+## Build Strategy (MAKE Methodology)
+
+<!-- Indie Maker Principle: Ship fast with tools you know. Don't over-engineer. The goal is to validate the core value proposition, not build a perfect system. -->
+
+### Build with What You Know
+
+**Primary Tech Stack (tools the team already knows):**
+{{KNOWN_TECH_STACK}}
+
+**New Tech Considered:**
+| Technology | Why Considered | Learning Cost | Decision |
+|------------|---------------|---------------|----------|
+| {{NEW_TECH_1}} | {{REASON_1}} | {{COST_1}} | {{DECISION_1}} |
+| {{NEW_TECH_2}} | {{REASON_2}} | {{COST_2}} | {{DECISION_2}} |
+
+**Rule:** Only adopt new tech if it saves >40 hours over the project lifecycle vs known alternatives.
+
+### No-Code / Low-Code Alternatives
+
+<!-- Before building custom, check if existing tools can solve it. -->
+
+| Feature | Custom Build (hrs) | No-Code Alternative | Decision |
+|---------|-------------------|---------------------|----------|
+| {{NC_FEATURE_1}} | {{NC_BUILD_1}} | {{NC_ALT_1}} | {{NC_DECISION_1}} |
+| {{NC_FEATURE_2}} | {{NC_BUILD_2}} | {{NC_ALT_2}} | {{NC_DECISION_2}} |
+| {{NC_FEATURE_3}} | {{NC_BUILD_3}} | {{NC_ALT_3}} | {{NC_DECISION_3}} |
+
+**Common No-Code Stack:**
+- Forms & Surveys: Typeform, Tally
+- Payments: Stripe Checkout (drop-in), Gumroad
+- Landing Pages: Carrd, Framer
+- Automation: Zapier, n8n, Make
+- Database: Airtable, Supabase
+- Auth: Clerk, Auth0
+
+### MVP Validation Criteria
+
+<!-- What must be true before investing in v1.1? Don't build more until the core is validated. -->
+
+**Validation Gate (before expanding MVP):**
+- [ ] {{VALIDATION_GATE_1}} (e.g., 50 users signed up organically)
+- [ ] {{VALIDATION_GATE_2}} (e.g., 10 paying customers)
+- [ ] {{VALIDATION_GATE_3}} (e.g., NPS > 40 from first 20 users)
+
+**If validation fails:** {{PIVOT_OR_KILL_CRITERIA}}
+
+---
+
 ## Dependencies
 
 ### External Dependencies

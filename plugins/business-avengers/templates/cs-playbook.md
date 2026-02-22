@@ -221,3 +221,47 @@ A: {{FAQ_9_A}}
 
 **Expansion Opportunities:**
 {{EXPANSION_PROCESS}}
+
+---
+
+## Customer Self-Service Strategy (MAKE Methodology)
+
+<!-- MAKE Principle: Automate customer support. 90%+ of CS requests can be handled by self-service. Scale without hiring. -->
+
+### Self-Service Capabilities
+
+| Action | Self-Service? | Implementation | Priority |
+|--------|--------------|----------------|----------|
+| Sign up / Create account | Yes | Auth system | Must-have |
+| View billing history | Yes | Payment provider portal | Must-have |
+| Change subscription plan | Yes | Payment provider portal | Must-have |
+| Cancel subscription | Yes | Payment provider portal | Must-have |
+| Request refund | Yes | Auto-refund within {{REFUND_WINDOW}} | Must-have |
+| Update payment method | Yes | Payment provider portal | Must-have |
+| Update profile / settings | Yes | User settings page | Must-have |
+| View usage / limits | Yes | Dashboard | Should-have |
+| Export personal data | Yes | GDPR compliance | Should-have |
+| Delete account | Yes | Account deletion flow | Should-have |
+
+**Estimated CS Reduction:** {{ESTIMATED_CS_REDUCTION}}%
+
+### Remaining Human-Touch CS
+
+| Scenario | Why Human Needed | Resolution SLA |
+|----------|-----------------|----------------|
+| {{HUMAN_CS_1}} | {{HUMAN_REASON_1}} | {{HUMAN_SLA_1}} |
+| {{HUMAN_CS_2}} | {{HUMAN_REASON_2}} | {{HUMAN_SLA_2}} |
+| {{HUMAN_CS_3}} | {{HUMAN_REASON_3}} | {{HUMAN_SLA_3}} |
+
+---
+
+## Basic Uptime Monitoring
+
+<!-- Minimal monitoring for Phase 9. Full monitoring setup in Phase 11 (monitoring-setup.md). -->
+
+**Recommended Tool:** UptimeRobot or equivalent (free tier available)
+
+**Minimum Setup:**
+- Site health check: Every 5 min → SMS + Email on failure
+- API endpoint check: Every 5 min → Email on error rate > 5%
+- Performance degradation: Daily digest via Slack/Email

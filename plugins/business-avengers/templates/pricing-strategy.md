@@ -6,6 +6,33 @@
 
 ---
 
+## Business Model Experimentation (MAKE Methodology)
+
+<!-- Don't commit to one model. Test multiple approaches. Put a "Buy" button early and see what people click. -->
+
+### Model Experimentation Log
+
+| Week | Model Tested | Price Point | Conversion | Revenue | Learning |
+|------|-------------|-------------|------------|---------|----------|
+| {{EXP_WEEK_1}} | {{EXP_MODEL_1}} | {{EXP_PRICE_1}} | {{EXP_CONV_1}} | {{EXP_REV_1}} | {{EXP_LEARNING_1}} |
+| {{EXP_WEEK_2}} | {{EXP_MODEL_2}} | {{EXP_PRICE_2}} | {{EXP_CONV_2}} | {{EXP_REV_2}} | {{EXP_LEARNING_2}} |
+| {{EXP_WEEK_3}} | {{EXP_MODEL_3}} | {{EXP_PRICE_3}} | {{EXP_CONV_3}} | {{EXP_REV_3}} | {{EXP_LEARNING_3}} |
+
+### Alternative Revenue Models to Test
+
+<!-- From MAKE: Feature limits, Pay-per-feature, Native ads, Sponsorships, Patronage, SaaS, Community, Job board, Conditional payments -->
+
+| Model | Applicability | Effort to Test | Priority |
+|-------|--------------|----------------|----------|
+| Subscription/SaaS | {{SUB_APPLICABILITY}} | {{SUB_EFFORT}} | {{SUB_PRIORITY}} |
+| Feature Limit (Freemium) | {{FREEMIUM_APPLICABILITY}} | {{FREEMIUM_EFFORT}} | {{FREEMIUM_PRIORITY}} |
+| Community/Membership | {{COMMUNITY_APPLICABILITY}} | {{COMMUNITY_EFFORT}} | {{COMMUNITY_PRIORITY}} |
+| Job Board (B2B) | {{JOB_APPLICABILITY}} | {{JOB_EFFORT}} | {{JOB_PRIORITY}} |
+| Sponsorships | {{SPONSOR_APPLICABILITY}} | {{SPONSOR_EFFORT}} | {{SPONSOR_PRIORITY}} |
+| Native Ads | {{ADS_APPLICABILITY}} | {{ADS_EFFORT}} | {{ADS_PRIORITY}} |
+
+---
+
 ## Pricing Model
 
 **Selected Model:** {{PRICING_MODEL}}
@@ -193,3 +220,71 @@
 - {{UPGRADE_INCENTIVE_1}}
 - {{UPGRADE_INCENTIVE_2}}
 - {{UPGRADE_INCENTIVE_3}}
+
+---
+
+## Payment Platform Strategy
+
+### Platform Comparison
+
+| Platform | Pros | Cons | Fees | Available in KR |
+|----------|------|------|------|-----------------|
+| Stripe | Developer-friendly, subscription billing, webhooks | Not available everywhere | 2.9% + $0.30 | Yes |
+| PayPal | High conversion (no CC needed), global reach | Archaic API, account freezing risk | 3.49% + $0.49 | Yes |
+| Toss Payments | Korean market optimized | Korea only | ~3.5% | Yes |
+| Paddle/Lemon Squeezy | Handle tax/compliance | Higher fees | 5-8% | Limited |
+
+**Selected Platform(s):** {{SELECTED_PAYMENT_PLATFORM}}
+**Rationale:** {{PAYMENT_PLATFORM_RATIONALE}}
+
+**Multi-Platform Strategy:**
+{{MULTI_PLATFORM_APPROACH}}
+<!-- Tip: Offering both Stripe + PayPal can increase conversion by ~40% -->
+
+---
+
+## Refund & Chargeback Policy
+
+<!-- MAKE Principle: Always refund immediately. An angry customer destroys your brand online. A refund is a moment of critical feedback. -->
+
+**Refund Policy:** {{REFUND_POLICY}}
+**Refund Window:** {{REFUND_WINDOW}}
+
+**Refund Process:**
+1. Customer requests refund → Acknowledge immediately
+2. Process refund within {{REFUND_SLA}} hours
+3. Ask (don't demand): "Would you share what didn't meet your expectations?"
+4. Log feedback for product improvement
+5. Never argue or delay — it costs more (chargeback = $35 fine + full refund)
+
+**Expected Refund Rate:** {{EXPECTED_REFUND_RATE}}%
+
+---
+
+## Bookkeeping & Tax Automation
+
+### Transaction Tracking
+
+**Income Sources:**
+| Source | Platform | Auto-sync | Notes |
+|--------|----------|-----------|-------|
+| {{INCOME_1}} | {{INCOME_1_PLATFORM}} | {{INCOME_1_SYNC}} | {{INCOME_1_NOTES}} |
+| {{INCOME_2}} | {{INCOME_2_PLATFORM}} | {{INCOME_2_SYNC}} | {{INCOME_2_NOTES}} |
+
+**Expense Tracking:**
+- Invoice naming: `./Expenses/YYYY-MM-DD - Company - Description - Amount.PDF`
+- Storage: {{EXPENSE_STORAGE}} (e.g., Dropbox, Google Drive)
+
+**Accountant:**
+- Needed when: Revenue > $50,000/year
+- Requirements: Understands tech, Stripe, international transactions
+- Budget: Up to $5,000/year
+
+### Revenue Milestone Planning
+
+| Milestone | Monthly Revenue | Actions Needed |
+|-----------|----------------|----------------|
+| Ramen Profitable | {{RAMEN_REVENUE}} | {{RAMEN_ACTIONS}} |
+| Comfortable | {{COMFORTABLE_REVENUE}} | {{COMFORTABLE_ACTIONS}} |
+| Growth Mode | {{GROWTH_REVENUE}} | {{GROWTH_ACTIONS}} |
+| Scale Mode | {{SCALE_REVENUE}} | {{SCALE_ACTIONS}} |

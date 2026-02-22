@@ -1,5 +1,20 @@
-# Business Avengers - Organization Structure
-# This file defines the organizational hierarchy and agent relationships
+# Business Avengers - Organization Structure & Pipeline
+# This file defines the org hierarchy, agent relationships, and phase pipeline.
+
+# --- Settings ---
+settings:
+  # Base directory for all project outputs.
+  # Override with BUSINESS_AVENGERS_DIR env var.
+  projects_dir: "~/.business-avengers/projects"
+
+  # Required permissions for sub-agents (must be in ~/.claude/settings.json global allow list).
+  # Project-level settings.local.json does NOT apply to background sub-agents.
+  # IMPORTANT: Use // (double slash) for absolute paths. Single / is relative to settings file.
+  required_permissions:
+    - WebSearch
+    - WebFetch
+    - "Write(~/.business-avengers/**)"    # check_permissions expands ~ to //absolute/path
+    - "Read(~/.business-avengers/**)"     # check_permissions expands ~ to //absolute/path
 
 organization:
   name: "Business Avengers"
@@ -57,86 +72,144 @@ departments:
     lead: coo
     members: [legal-advisor, data-analyst, cs-manager]
 
+# --- Phase Pipeline ---
+# inputs_from: list of phase numbers whose outputs this phase reads.
+#   The runtime provides whatever is available (supports both idea-first and market-first).
+# outputs: files this phase produces, saved to phase-N-{dir_name}/.
 phases:
   0:
     name: Ideation
+    dir_name: ideation
     lead: cpo
     agents: [product-manager, ux-researcher]
     ceo_interaction: dialogue
+    inputs_from: [1]  # In market-first: reads Phase 1 outputs. In idea-first: nothing available yet.
     outputs: [idea-canvas.md]
 
   1:
     name: Market Research
+    dir_name: market-research
     lead: cfo
     agents: [business-analyst, marketing-strategist, revenue-strategist]
     parallel: true
     ceo_interaction: approve
+    inputs_from: [0]  # In idea-first: reads Phase 0 output. In market-first: nothing available yet.
     outputs: [market-analysis.md, competitive-analysis.md, revenue-model-draft.md]
 
   2:
     name: Product Planning
+    dir_name: product-planning
     lead: cpo
     agents: [product-manager, ux-researcher]
     parallel: true
     ceo_interaction: approve
+    inputs_from: [0, 1]  # Always needs both ideation + market research
     outputs: [prd.md, user-personas.md, user-stories.md, feature-priority.md]
 
   3:
     name: Design
+    dir_name: design
     lead: cpo
     agents: [design-lead, ui-designer]
     parallel: false  # sequential: design-lead first, then ui-designer
     ceo_interaction: approve
+    inputs_from: [2]
     outputs: [design-system.md, wireframes.md, ui-specifications.md]
 
   4:
     name: Technical Planning
+    dir_name: tech-planning
     lead: cto
     agents: [tech-lead]
     ceo_interaction: delegate_report
+    inputs_from: [2, 3]
     outputs: [tech-architecture.md, api-design.md, database-schema.md, tech-stack-decision.md]
 
   5:
     name: Development Guide
+    dir_name: development
     lead: cto
     agents: [frontend-dev, backend-dev, devops-engineer]
     parallel: true
     ceo_interaction: confirm
+    inputs_from: [4]
     outputs: [frontend-guide.md, backend-guide.md, deployment-strategy.md, implementation-roadmap.md]
 
   6:
     name: QA Planning
+    dir_name: qa
     lead: cto
     agents: [qa-lead]
     ceo_interaction: confirm
+    inputs_from: [2, 4, 5]
     outputs: [test-plan.md, qa-checklist.md]
 
   7:
     name: Launch Strategy
+    dir_name: launch
     lead: cmo
     agents: [marketing-strategist, content-creator, growth-hacker, pr-manager]
     parallel: true
     ceo_interaction: approve
+    inputs_from: [1, 2]
     outputs: [gtm-strategy.md, content-plan.md, growth-strategy.md, pr-plan.md, launch-checklist.md]
 
   8:
     name: Monetization
+    dir_name: monetization
     lead: cfo
     agents: [revenue-strategist, business-analyst]
     parallel: true
     ceo_interaction: approve
+    inputs_from: [1, 2, 7]
     outputs: [pricing-strategy.md, financial-projections.md, unit-economics.md]
 
   9:
     name: Operations
+    dir_name: operations
     lead: coo
     agents: [cs-manager, legal-advisor, data-analyst]
     parallel: true
     ceo_interaction: confirm
+    inputs_from: [2, 4, 7, 8]
     outputs: [cs-playbook.md, legal-docs.md, metrics-dashboard.md, feedback-loop.md]
+
+  # --- Post-Launch Phases (MAKE Methodology) ---
+  10:
+    name: Growth
+    dir_name: growth
+    lead: cmo
+    agents: [growth-hacker, content-creator, data-analyst]
+    parallel: true
+    ceo_interaction: approve
+    inputs_from: [7, 8, 9]
+    outputs: [growth-execution-plan.md, build-in-public-plan.md, organic-growth-playbook.md, user-retention-plan.md, growth-metrics-report.md]
+
+  11:
+    name: Automation
+    dir_name: automation
+    lead: coo
+    agents: [devops-engineer, business-analyst]
+    parallel: true
+    ceo_interaction: approve
+    inputs_from: [5, 9, 10]
+    outputs: [automation-audit.md, robot-specs.md, contractor-playbook.md, autonomous-org-design.md, monitoring-setup.md]
+
+  12:
+    name: Scale & Exit
+    dir_name: scale-exit
+    lead: cfo
+    agents: [revenue-strategist, business-analyst, legal-advisor]
+    parallel: true
+    ceo_interaction: dialogue
+    inputs_from: [8, 10, 11]
+    outputs: [scale-vs-exit-analysis.md, valuation-report.md, exit-readiness-checklist.md, acquisition-playbook.md, fire-plan.md]
 
 workflow_presets:
   idea-first: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
   market-first: [1, 0, 2, 3, 4, 5, 6, 7, 8, 9]
   mvp-build: [0, 2, 4, 5, 7]
+  post-launch: [10, 11, 12]
+  full-lifecycle: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+  make: [0, 1, 7, 8, 10, 11]  # Lean indie maker path
   custom: []  # CEO selects phases

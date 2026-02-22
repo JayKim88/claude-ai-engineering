@@ -69,6 +69,61 @@
 
 ---
 
+## Own Problem Validation (MAKE Methodology)
+
+<!-- Indie Maker Principle: The best products solve YOUR OWN problem. Validate that this idea comes from genuine personal experience, not from trend-chasing or "solution in search of a problem". -->
+
+**Is this YOUR problem?**
+- [ ] I personally experience this problem regularly
+- [ ] I have tried existing solutions and found them lacking
+- [ ] I can describe the last time I faced this problem in detail
+- [ ] This problem keeps coming back to my mind over weeks/months
+
+**Problem Origin:**
+{{PROBLEM_ORIGIN}}
+<!-- Example: "I was frustrated trying to find reliable wifi cafes while traveling in Lisbon" -->
+
+**If NOT your problem, why are you qualified?**
+{{QUALIFICATION_REASON}}
+
+---
+
+## Micro-Niche Strategy
+
+<!-- Start with the smallest possible niche. Dominate it. Then expand. Example: Nomad List started for "digital nomads" (tiny niche) → expanded to "remote workers" → "general travelers & expats" (1000x larger market) -->
+
+**Micro-Niche (Start Here):**
+{{MICRO_NICHE}}
+<!-- The smallest, most specific audience. "Digital nomads in Southeast Asia" not "travelers" -->
+
+**Expansion Path:**
+1. **Niche Level 1 (Month 1-6):** {{NICHE_LEVEL_1}} — {{NICHE_1_SIZE_ESTIMATE}}
+2. **Niche Level 2 (Month 6-12):** {{NICHE_LEVEL_2}} — {{NICHE_2_SIZE_ESTIMATE}}
+3. **Broad Market (Year 2+):** {{BROAD_MARKET}} — {{BROAD_MARKET_SIZE}}
+
+**Niche Validation:**
+- Where does this niche hang out online? {{NICHE_COMMUNITY}}
+- What do they currently use? {{NICHE_CURRENT_TOOLS}}
+- Would 100 people in this niche pay $X/month? {{NICHE_WILLINGNESS_TO_PAY}}
+
+---
+
+## Idea Source Check
+
+<!-- Avoid "Solution in Search of a Problem". Technology/trends should NOT be the starting point. -->
+
+**Idea Origin Type:**
+- [ ] Problem-first: Started from a real frustration/pain (GOOD)
+- [ ] Technology-first: Started from "I want to use AI/blockchain/etc" (RISKY)
+- [ ] Trend-first: Started from "X is hot right now" (RISKY)
+- [ ] Copy-first: Started from "Competitor X is successful, I'll copy" (RISKY)
+
+**If Technology/Trend/Copy-first, reframe:**
+{{REFRAME_TO_PROBLEM}}
+<!-- Force yourself to articulate the PROBLEM, not the solution -->
+
+---
+
 ## Key Assumptions
 
 <!-- Critical assumptions that must be true for this idea to work. Rank by risk. -->

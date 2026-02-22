@@ -211,6 +211,43 @@
 
 ---
 
+## Indie Maker Launch Strategy (MAKE Methodology)
+
+<!-- Launch is NOT a one-time event — re-launch every significant update. Detailed channel playbooks are executed by the Growth Hacker. -->
+
+### Launch Principles
+
+1. **Repeated Launching**: Every major update is a launch event — PH re-post, HN Show HN, press, newsletter
+2. **Community First**: Build genuine presence in communities (Reddit, HN) before promoting — 2-4 weeks of participation minimum
+3. **Authenticity Wins**: Share the maker story, technical challenges, and real metrics (Build in Public)
+4. **Side Project Marketing**: Create a small, free, fun project related to your niche with viral potential
+5. **Press = Individual Outreach**: Email journalists personally, 3 sentences max, never mass email
+
+### Launch Calendar
+
+| Launch Event | When | Channels | Expected Impact |
+|-------------|------|----------|-----------------|
+| Initial Launch | {{INITIAL_LAUNCH_DATE}} | PH, HN, Reddit, BetaList | {{LAUNCH_1_IMPACT}} |
+| V1.1 Feature Launch | {{V1_1_DATE}} | PH (re-post), Twitter, Newsletter | {{LAUNCH_2_IMPACT}} |
+| Major Update | {{MAJOR_UPDATE_DATE}} | HN (Show HN), Reddit, Press | {{LAUNCH_3_IMPACT}} |
+| Milestone (e.g., 1K users) | {{MILESTONE_DATE}} | Twitter (Build in Public), Blog | {{LAUNCH_4_IMPACT}} |
+
+### Side Project Marketing
+
+**Side Project Idea:** {{SIDE_PROJECT_IDEA}}
+**Connection to Main Product:** {{SIDE_PROJECT_CONNECTION}}
+**Viral Potential:** {{SIDE_PROJECT_VIRAL_SCORE}} (1-10)
+
+### Target Press List
+
+| Outlet | Journalist | Beat | Contact | Status |
+|--------|-----------|------|---------|--------|
+| {{PRESS_1}} | {{JOURNALIST_1}} | {{BEAT_1}} | {{CONTACT_1}} | {{STATUS_1}} |
+| {{PRESS_2}} | {{JOURNALIST_2}} | {{BEAT_2}} | {{CONTACT_2}} | {{STATUS_2}} |
+| {{PRESS_3}} | {{JOURNALIST_3}} | {{BEAT_3}} | {{CONTACT_3}} | {{STATUS_3}} |
+
+---
+
 ## Appendix
 
 ### Marketing Assets Needed
