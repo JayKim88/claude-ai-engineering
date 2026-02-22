@@ -1,0 +1,17 @@
+{
+  "name": "business-avengers",
+  "version": "1.0.0",
+  "description": "AI partner organization for solo entrepreneurs - 23 AI agents + You as CEO that plan, research, design, develop, market, and monetize your online service from idea to launch",
+  "author": "Jay Kim",
+  "license": "MIT",
+  "keywords": [
+    "business",
+    "startup",
+    "solo-entrepreneur",
+    "multi-agent",
+    "product-development",
+    "market-research",
+    "monetization",
+    "sprint-cycle"
+  ]
+}

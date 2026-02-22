@@ -1,0 +1,142 @@
+# Business Avengers - Organization Structure
+# This file defines the organizational hierarchy and agent relationships
+
+organization:
+  name: "Business Avengers"
+  ceo: user  # The plugin user is the CEO
+
+c_level:
+  - id: cpo
+    title: Chief Product Officer
+    reports_to: ceo
+    manages: [product-manager, ux-researcher, design-lead, ui-designer]
+    model: sonnet
+
+  - id: cto
+    title: Chief Technology Officer
+    reports_to: ceo
+    manages: [tech-lead, frontend-dev, backend-dev, devops-engineer, qa-lead]
+    model: sonnet
+
+  - id: cmo
+    title: Chief Marketing Officer
+    reports_to: ceo
+    manages: [marketing-strategist, content-creator, growth-hacker, pr-manager]
+    model: sonnet
+
+  - id: cfo
+    title: Chief Financial Officer
+    reports_to: ceo
+    manages: [business-analyst, revenue-strategist]
+    model: sonnet
+
+  - id: coo
+    title: Chief Operating Officer
+    reports_to: ceo
+    manages: [legal-advisor, data-analyst, cs-manager]
+    model: sonnet
+
+departments:
+  product:
+    lead: cpo
+    members: [product-manager, ux-researcher, design-lead, ui-designer]
+
+  engineering:
+    lead: cto
+    members: [tech-lead, frontend-dev, backend-dev, devops-engineer, qa-lead]
+
+  marketing:
+    lead: cmo
+    members: [marketing-strategist, content-creator, growth-hacker, pr-manager]
+
+  finance:
+    lead: cfo
+    members: [business-analyst, revenue-strategist]
+
+  operations:
+    lead: coo
+    members: [legal-advisor, data-analyst, cs-manager]
+
+phases:
+  0:
+    name: Ideation
+    lead: cpo
+    agents: [product-manager, ux-researcher]
+    ceo_interaction: dialogue
+    outputs: [idea-canvas.md]
+
+  1:
+    name: Market Research
+    lead: cfo
+    agents: [business-analyst, marketing-strategist, revenue-strategist]
+    parallel: true
+    ceo_interaction: approve
+    outputs: [market-analysis.md, competitive-analysis.md, revenue-model-draft.md]
+
+  2:
+    name: Product Planning
+    lead: cpo
+    agents: [product-manager, ux-researcher]
+    parallel: true
+    ceo_interaction: approve
+    outputs: [prd.md, user-personas.md, user-stories.md, feature-priority.md]
+
+  3:
+    name: Design
+    lead: cpo
+    agents: [design-lead, ui-designer]
+    parallel: false  # sequential: design-lead first, then ui-designer
+    ceo_interaction: approve
+    outputs: [design-system.md, wireframes.md, ui-specifications.md]
+
+  4:
+    name: Technical Planning
+    lead: cto
+    agents: [tech-lead]
+    ceo_interaction: delegate_report
+    outputs: [tech-architecture.md, api-design.md, database-schema.md, tech-stack-decision.md]
+
+  5:
+    name: Development Guide
+    lead: cto
+    agents: [frontend-dev, backend-dev, devops-engineer]
+    parallel: true
+    ceo_interaction: confirm
+    outputs: [frontend-guide.md, backend-guide.md, deployment-strategy.md, implementation-roadmap.md]
+
+  6:
+    name: QA Planning
+    lead: cto
+    agents: [qa-lead]
+    ceo_interaction: confirm
+    outputs: [test-plan.md, qa-checklist.md]
+
+  7:
+    name: Launch Strategy
+    lead: cmo
+    agents: [marketing-strategist, content-creator, growth-hacker, pr-manager]
+    parallel: true
+    ceo_interaction: approve
+    outputs: [gtm-strategy.md, content-plan.md, growth-strategy.md, pr-plan.md, launch-checklist.md]
+
+  8:
+    name: Monetization
+    lead: cfo
+    agents: [revenue-strategist, business-analyst]
+    parallel: true
+    ceo_interaction: approve
+    outputs: [pricing-strategy.md, financial-projections.md, unit-economics.md]
+
+  9:
+    name: Operations
+    lead: coo
+    agents: [cs-manager, legal-advisor, data-analyst]
+    parallel: true
+    ceo_interaction: confirm
+    outputs: [cs-playbook.md, legal-docs.md, metrics-dashboard.md, feedback-loop.md]
+
+workflow_presets:
+  idea-first: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  market-first: [1, 0, 2, 3, 4, 5, 6, 7, 8, 9]
+  mvp-build: [0, 2, 4, 5, 7]
+  custom: []  # CEO selects phases

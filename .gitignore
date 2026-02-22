@@ -62,6 +62,11 @@ plugins/jd-analyzer/config/profile.yaml
 plugins/ai-news-digest/config/.cache/
 plugins/ai-news-digest/config/__pycache__/
 
+# SupportBot project
+projects/supportbot/.venv/
+projects/supportbot/.env
+projects/supportbot/data/chroma_db/
+
 # Personal data
 JDs/
 /jd-analyzer/
