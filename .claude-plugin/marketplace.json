@@ -60,6 +60,41 @@
       "name": "business-avengers",
       "description": "AI partner organization for solo entrepreneurs. 23 AI agents + You as CEO that plan, research, design, develop, market, and monetize your online service from idea to launch with sprint cycles",
       "source": "./plugins/business-avengers"
+    },
+    {
+      "name": "blog-generator",
+      "description": "Transform technical notes and content into well-structured blog posts with narrative flow and SEO optimization",
+      "source": "./plugins/blog-generator"
+    },
+    {
+      "name": "career-compass",
+      "description": "AI-powered career path analysis with 8-agent pipeline: resume analysis, market trends, skill gap assessment, and personalized roadmap",
+      "source": "./plugins/career-compass"
+    },
+    {
+      "name": "factor-lab",
+      "description": "Quantitative stock screening and backtesting platform with multi-factor analysis and systematic trading strategies",
+      "source": "./plugins/factor-lab"
+    },
+    {
+      "name": "jd-analyzer",
+      "description": "Job description analysis with multi-source collection from LinkedIn/Wellfound and skill matching for career transitions",
+      "source": "./plugins/jd-analyzer"
+    },
+    {
+      "name": "planning-interview",
+      "description": "Adaptive product planning interviews that transform vague ideas into comprehensive PRDs (Lean Canvas, Product Brief, Full PRD)",
+      "source": "./plugins/planning-interview"
+    },
+    {
+      "name": "portfolio-copilot",
+      "description": "AI-powered portfolio management and stock analysis with comprehensive scoring, P&L tracking, and interactive dashboards",
+      "source": "./plugins/portfolio-copilot"
+    },
+    {
+      "name": "rich-guide",
+      "description": "Personalized wealth strategy system with 6 AI agents: financial diagnosis, market analysis, strategy generation, risk evaluation, and action roadmap (Korean)",
+      "source": "./plugins/rich-guide"
     }
   ]
 }

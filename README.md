@@ -1,341 +1,174 @@
 # Claude AI Engineering Toolkit
 
-A curated collection of Claude Code plugins featuring skills, agents, and multi-agent workflows for enhancing developer productivity.
+A curated collection of **18 Claude Code plugins** featuring skills, agents, and multi-agent workflows — from solo developer productivity tools to full business automation pipelines.
 
-## Overview
+## Plugins
 
-This repository serves as both a learning playground and a production-ready toolkit for working with Claude Code. It includes reusable plugins with skills, specialized agents, and experiments that demonstrate various AI engineering patterns and best practices.
+### Business & Product
 
-## Features
+| Plugin | Description | Agents | Key Feature |
+|--------|------------|--------|-------------|
+| [**business-avengers**](./plugins/business-avengers/) | AI partner organization for solo entrepreneurs | 23 | Full business lifecycle: idea to revenue with sprint cycles |
+| [**planning-interview**](./plugins/planning-interview/) | Adaptive product planning interviews | 1 | Generates Lean Canvas / Product Brief / Full PRD |
+| [**spec-interview**](./plugins/spec-interview/) | AI-driven requirements gathering | 1 | Deep Q&A to comprehensive specifications |
+| [**future-architect**](./plugins/future-architect/) | Thought organization to actionable plans | 1 | Conversational interviews with Mermaid diagrams |
 
-- **Plugin-Based Architecture**: Self-contained plugins following official Claude Code patterns
-- **Multi-Agent Workflows**: Parallel and sequential agent pipelines for complex analysis
-- **Dual Installation**: Support for both local development (symlinks) and user installation (npx)
-- **Marketplace Ready**: Compatible with Claude Code's decentralized marketplace system
-- **Portfolio Quality**: Production-ready code with comprehensive documentation
+### Development & Quality
 
-## Available Plugins
+| Plugin | Description | Agents | Key Feature |
+|--------|------------|--------|-------------|
+| [**project-insight**](./plugins/project-insight/) | Multi-agent project analysis | 4 | Tech stack, structure, docs review with health scoring |
+| [**competitive-agents**](./plugins/competitive-agents/) | Dual-agent competitive generation | 7 | Alpha vs Beta, cross-review, judge, fusion |
+| [**spec-validator**](./plugins/spec-validator/) | Validate code against specs | 1 | YAML checklists with 4-dimension scoring |
 
-### 1. learning-summary
+### Content & Learning
 
-Capture and document key learnings from Claude Code conversations with structured markdown output.
+| Plugin | Description | Agents | Key Feature |
+|--------|------------|--------|-------------|
+| [**learning-summary**](./plugins/learning-summary/) | Capture learnings from conversations | 1 | Structured markdown with git integration |
+| [**ai-digest**](./plugins/ai-digest/) | Digest AI/tech articles | 1 | URL fetch to structured learning documents |
+| [**ai-news-digest**](./plugins/ai-news-digest/) | AI news aggregation | 1 | Multi-source RSS to curated Top 5 digest |
+| [**blog-generator**](./plugins/blog-generator/) | Technical notes to blog posts | 1 | Narrative flow with SEO optimization |
 
-**Features:**
-- Automatic conversation analysis and insight extraction
-- Structured document generation with customizable sections
-- Git integration (auto-commit/push support)
-- Bilingual support (English/Korean)
-- Session history integration (planned)
+### Finance & Investment
 
-**Usage:**
-```
-"document this conversation"
-"summarize key learnings"
-"save this as learning notes"
-```
+| Plugin | Description | Agents | Key Feature |
+|--------|------------|--------|-------------|
+| [**market-pulse**](./plugins/market-pulse/) | Financial market analysis dashboard | 5 | Graham/Lynch/Buffett analysis + safety margin |
+| [**portfolio-analyzer-fused**](./plugins/portfolio-analyzer-fused/) | Multi-agent portfolio management | 5 | Stock scoring, risk analytics, AI advisor |
+| [**portfolio-copilot**](./plugins/portfolio-copilot/) | Portfolio tracking with dashboards | 1 | P&L tracking, comprehensive stock scoring |
+| [**factor-lab**](./plugins/factor-lab/) | Quantitative stock screening | 2 | Multi-factor backtesting + systematic strategies |
+| [**rich-guide**](./plugins/rich-guide/) | Personalized wealth strategy system | 6 | Financial diagnosis to expert-matched roadmap (Korean) |
 
-**[View Plugin →](./plugins/learning-summary/README.md)**
+### Career
 
-### 2. project-insight
+| Plugin | Description | Agents | Key Feature |
+|--------|------------|--------|-------------|
+| [**career-compass**](./plugins/career-compass/) | AI-powered career path analysis | 8 | Resume analysis, market trends, skill gap, roadmap |
+| [**jd-analyzer**](./plugins/jd-analyzer/) | Job description analysis | 3 | Multi-source JD collection + skill matching |
 
-Comprehensive project analysis using a multi-agent pipeline to evaluate code quality, structure, and documentation.
+---
 
-**Features:**
-- 4 specialized agents in 2-phase pipeline
-- Tech stack detection (languages, frameworks, dependencies)
-- Structure analysis (organization, patterns, metrics)
-- Documentation review (README quality, missing sections)
-- Actionable recommendations (Critical/Important/Beneficial)
-- Health scoring (X/10)
+## Quick Start
 
-**Usage:**
-```
-/insight
-"analyze this project"
-"project health check"
-```
-
-**[View Plugin →](./plugins/project-insight/README.md)**
-
-### 3. ai-digest
-
-Digest AI/tech articles and content into structured learning documents for quick reference and practical application.
-
-**Features:**
-- URL-based article fetching and analysis
-- Direct content analysis (paste text)
-- Focused extraction (specify what to extract)
-- AI-optimized bilingual template (Korean/English)
-- Git integration (auto-commit/push support)
-- Shared configuration with learning-summary
-
-**Usage:**
-```
-/ai-digest https://anthropic.com/news/...
-"digest this article [URL]"
-"analyze this AI news"
-```
-
-**[View Plugin →](./plugins/ai-digest/README.md)**
-
-## Installation
-
-### For Users: Install via npx
+### Install via npx
 
 ```bash
 # Install all plugins
 npx github:JayKim88/claude-ai-engineering
 
 # Install specific plugin
-npx github:JayKim88/claude-ai-engineering learning-summary
-npx github:JayKim88/claude-ai-engineering project-insight
-npx github:JayKim88/claude-ai-engineering ai-digest
+npx github:JayKim88/claude-ai-engineering business-avengers
+npx github:JayKim88/claude-ai-engineering market-pulse
 
 # List available plugins
 npx github:JayKim88/claude-ai-engineering --list
 ```
 
-### For Developers: Local Development
-
-Clone and link to Claude Code for live development:
+### Local Development
 
 ```bash
-# Clone the repository
-cd ~/Documents/Projects
 git clone https://github.com/JayKim88/claude-ai-engineering.git
 cd claude-ai-engineering
-
-# Link all plugins to Claude Code
-npm run link
-
-# Now edit files in plugins/ and test immediately in Claude Code
+npm run link    # Symlink all plugins to Claude Code
 ```
 
-**Benefits of local development:**
-- Edit files in your IDE
-- Changes reflect immediately via symlinks
-- Test in Claude Code without reinstalling
-- Commit and push directly to git
+Edit files in `plugins/` — changes reflect immediately in Claude Code.
 
-### Via Claude Code Marketplace (Coming Soon)
-
-```bash
-/plugin marketplace add JayKim88/claude-ai-engineering
-/plugin install learning-summary
-/plugin install project-insight
-```
+---
 
 ## Repository Structure
 
 ```
 claude-ai-engineering/
-├── plugins/                    # All plugins (self-contained)
-│   ├── learning-summary/
-│   │   ├── .claude-plugin/
-│   │   ├── skills/
-│   │   ├── README.md          # User documentation
-│   │   └── CLAUDE.md          # Developer guide
-│   └── project-insight/
-│       ├── .claude-plugin/
-│       ├── agents/            # Multi-agent components
-│       ├── skills/
-│       ├── commands/
-│       ├── README.md
-│       └── CLAUDE.md
-├── templates/                  # Templates for new plugins
+├── plugins/                    # 18 self-contained plugins
+│   ├── business-avengers/     #   23-agent business pipeline
+│   ├── planning-interview/    #   PRD generation
+│   ├── project-insight/       #   Multi-agent project analysis
+│   ├── competitive-agents/    #   Dual-agent generation
+│   ├── market-pulse/          #   Financial market dashboard
+│   ├── career-compass/        #   8-agent career analysis
+│   ├── rich-guide/            #   6-agent wealth strategy
+│   └── ...                    #   11 more plugins
+├── templates/                  # Plugin creation templates
 │   ├── plugin-template/
-│   └── NEW_PLUGIN_GUIDE.md    # Step-by-step guide
+│   └── NEW_PLUGIN_GUIDE.md
+├── projects/                   # Skill execution outputs
 ├── scripts/
-│   └── link-local.sh          # Local development setup
+│   └── link-local.sh
 ├── bin/
 │   └── install.js             # npx installer
 └── .claude-plugin/
-    └── marketplace.json       # Marketplace manifest
+    └── marketplace.json       # Plugin registry
 ```
 
-## Creating New Plugins
-
-We provide templates and a comprehensive guide to create new plugins following the established structure.
-
-### Quick Start
-
-```bash
-# Copy the template
-cp -r templates/plugin-template plugins/your-plugin-name
-
-# Customize files (see NEW_PLUGIN_GUIDE.md)
-
-# Link and test
-npm run link
-
-# Commit
-git add plugins/your-plugin-name
-git commit -m "feat: add your-plugin-name plugin"
-```
-
-### Detailed Guide
-
-See **[templates/NEW_PLUGIN_GUIDE.md](./templates/NEW_PLUGIN_GUIDE.md)** for a complete step-by-step guide including:
-
-- Plugin planning and structure
-- File customization checklist
-- Multi-agent vs simple skill patterns
-- Testing and deployment
-- Best practices and examples
+---
 
 ## Plugin Patterns
 
 ### Pattern 1: Simple Skill
 
-**Example:** learning-summary
+Single skill with direct user interaction.
 
-**Use when:**
-- Single-step task
-- Direct user interaction
-- No parallel processing needed
+**Examples:** learning-summary, ai-digest, blog-generator
 
 ### Pattern 2: Multi-Agent Pipeline
 
-**Example:** project-insight
+Parallel agents followed by synthesis/validation phase.
 
-**Use when:**
-- Multi-dimensional analysis
-- Parallel processing beneficial
-- Need to consolidate results
+**Examples:** project-insight (4 agents), career-compass (8 agents)
 
-**2-Phase Pipeline:**
 ```
 Phase 1 (Parallel)          Phase 2 (Sequential)
 ┌─────────────┐             ┌─────────────┐
 │  Agent A    │────┐        │             │
-├─────────────┤    ├───────▶│  Validator  │
+├─────────────┤    ├───────▶│  Synthesizer│
 │  Agent B    │────┤        │             │
 ├─────────────┤    │        └─────────────┘
 │  Agent C    │────┘
 └─────────────┘
 ```
 
-## Development
+### Pattern 3: Competitive Generation
 
-### Local Development Workflow
+Two agents compete, then cross-review, improve, judge, and fuse.
 
-1. **Edit files** in `plugins/your-plugin/`
-2. **Changes reflect immediately** (via symlinks)
-3. **Test in Claude Code**
-4. **Commit when satisfied**
+**Example:** competitive-agents (7 agents across 5 rounds)
 
-### Adding a New Plugin
+### Pattern 4: Orchestrated Organization
 
-Follow the guide in `templates/NEW_PLUGIN_GUIDE.md`.
+CEO-led multi-department pipeline with approval gates and sprint cycles.
 
-### Updating marketplace.json
-
-When adding a new plugin:
-
-```json
-{
-  "plugins": [
-    {
-      "name": "your-plugin-name",
-      "description": "Brief description",
-      "source": "./plugins/your-plugin-name"
-    }
-  ]
-}
-```
-
-## Best Practices
-
-### Plugin Development
-- Keep plugins self-contained and focused
-- Include both README.md (user) and CLAUDE.md (developer)
-- Follow the template structure
-- Provide comprehensive error handling
-- Document trigger phrases clearly
-
-### Documentation
-- README.md: User-facing installation and usage
-- CLAUDE.md: Developer notes, architecture, testing
-- SKILL.md: Execution algorithm with trigger phrases
-- Progressive disclosure (overview → details → references)
-
-### Testing
-- Test with local symlinks first
-- Verify npx installation works
-- Test all trigger phrases
-- Validate error scenarios
-
-## Contributing
-
-Contributions are welcome! This repository serves as both a personal learning space and a community resource.
-
-### Guidelines
-1. Follow existing plugin patterns and structure
-2. Use templates for new plugins
-3. Include comprehensive documentation (README + CLAUDE)
-4. Test both local and npx installation
-5. Update marketplace.json when adding plugins
-
-### Pull Request Checklist
-- [ ] Plugin follows template structure
-- [ ] README.md is user-friendly and complete
-- [ ] CLAUDE.md has development notes
-- [ ] Tested locally (`npm run link`)
-- [ ] Tested npx installation
-- [ ] marketplace.json updated
-- [ ] Commit message follows conventional commits
-
-## Project Goals
-
-This repository aims to:
-- **Learn**: Explore Claude Code capabilities and AI engineering patterns
-- **Build**: Create production-ready tools for developer productivity
-- **Share**: Contribute to the Claude Code ecosystem
-- **Document**: Capture learnings and best practices along the way
-
-## Roadmap
-
-- [x] Plugin-based architecture
-- [x] Multi-agent workflow (project-insight)
-- [x] Learning documentation tool
-- [x] Template system for new plugins
-- [ ] More analysis plugins (git, code quality, security)
-- [ ] Integration plugins (GitHub, Linear, Notion)
-- [ ] CI/CD for testing and validation
-- [ ] Example outputs and demos
-
-## Technical Stack
-
-- **Runtime**: Claude Code CLI
-- **Languages**: Bash, JavaScript (Node.js), Markdown
-- **Configuration**: YAML, JSON
-- **Distribution**: npm/npx, Git, Marketplace
-- **Documentation**: Markdown with code examples
-
-## Resources
-
-- **Plugin Templates**: `templates/plugin-template/`
-- **Creation Guide**: `templates/NEW_PLUGIN_GUIDE.md`
-- **Example Plugins**: `plugins/learning-summary/`, `plugins/project-insight/`
-- **Official Patterns**: [plugins-for-claude-natives](https://github.com/team-attention/plugins-for-claude-natives)
-- **Claude Code Docs**: https://code.claude.com/docs
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Author
-
-**Jay Kim**
-- GitHub: [@JayKim88](https://github.com/JayKim88)
-
-## Acknowledgments
-
-- Anthropic team for Claude Code
-- Claude Code community for patterns and best practices
-- Inspired by [plugins-for-claude-natives](https://github.com/team-attention/plugins-for-claude-natives) architecture
-- Multi-agent patterns from [session-wrap](https://github.com/team-attention/plugins-for-claude-natives/tree/main/plugins/session-wrap)
+**Example:** business-avengers (23 agents, 10 phases)
 
 ---
 
-**Note**: This is an active learning project. Plugins are continuously evolving based on real-world usage and experimentation.
+## Creating New Plugins
+
+```bash
+cp -r templates/plugin-template plugins/your-plugin-name
+# Customize files (see templates/NEW_PLUGIN_GUIDE.md)
+npm run link
+```
+
+See **[templates/NEW_PLUGIN_GUIDE.md](./templates/NEW_PLUGIN_GUIDE.md)** for the full guide.
+
+---
+
+## Contributing
+
+1. Follow existing plugin patterns and structure
+2. Include README.md (user) + CLAUDE.md (developer)
+3. Test locally (`npm run link`)
+4. Update marketplace.json
+5. Commit with conventional commits
+
+---
+
+## Author
+
+**Jay Kim** — [@JayKim88](https://github.com/JayKim88)
+
+## License
+
+MIT
