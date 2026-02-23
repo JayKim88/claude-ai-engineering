@@ -184,7 +184,7 @@ output_dir: "~/Documents/plans"
 auto_open: true
 diagram_direction: "TD"
 priority_system: "3-tier"
-filename_format: "{date}-{topic1}-{topic2}-....md"
+filename_format: "{date}-{topic1}-{topic2}-....md"  # Must run `date '+%Y-%m-%d'` to get exact date. Never estimate.
 ```
 
 If config doesn't exist, the agent uses these defaults.

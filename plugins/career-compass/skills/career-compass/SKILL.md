@@ -291,6 +291,7 @@ roadmap_task = Task(
     prompt=f"""
     Create month-by-month plan for: {selected_path['title']}
     Include: courses, projects, milestones
+    IMPORTANT: Run `date '+%Y-%m-%d'` to get the exact current date. Never estimate.
     Write to: ~/.career-compass/roadmaps/roadmap-{date}.md
     """
 )

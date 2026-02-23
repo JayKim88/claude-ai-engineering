@@ -159,7 +159,7 @@ Create comprehensive spec document using all gathered information.
 ```markdown
 # [Feature/Project Name] - Technical Specification
 
-> **Generated**: YYYY-MM-DD
+> **Generated**: YYYY-MM-DD  <!-- Must run `date '+%Y-%m-%d'` to get exact date. Never estimate. -->
 > **Author**: [User name if known]
 > **Status**: Draft
 

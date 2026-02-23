@@ -60,7 +60,7 @@ session = {
   completeness_score: {},  // Track answer quality per category (1-5 scale)
   template_type: null,     // lean-canvas / product-brief / full-prd
   project_name: null,      // Derived from user input
-  start_time: timestamp,   // For duration tracking
+  start_time: timestamp,   // Run `date '+%Y-%m-%d %H:%M'` to get exact time. Never estimate.
   language: detect_from_trigger(), // 'en' or 'ko'
   quick_mode: false        // true if triggered via Quick Mode
 }

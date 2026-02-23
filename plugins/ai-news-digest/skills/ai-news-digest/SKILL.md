@@ -160,6 +160,8 @@ Parse the JSON output and display results directly in the terminal. **DO NOT sav
 Format each entry as:
 
 ```
+**IMPORTANT**: Run `date '+%Y-%m-%d %H:%M'` to get the exact current date/time. Never estimate.
+
 ## AI News Top 10 — {today's date} (최근 {period})
 
 ---

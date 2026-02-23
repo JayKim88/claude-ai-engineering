@@ -170,7 +170,7 @@ Write the blog post following this template structure. **Adapt sections based on
 ```markdown
 ---
 title: "[SEO-Friendly, Engaging Title]"
-date: YYYY-MM-DD
+date: YYYY-MM-DD  # Must run `date '+%Y-%m-%d'` to get exact date. Never estimate.
 tags: [tag1, tag2, tag3]
 read_time: "N min read"
 audience: "beginner|intermediate|advanced"
