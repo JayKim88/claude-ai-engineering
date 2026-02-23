@@ -9,53 +9,27 @@ flowchart TD
     A([User Trigger]) -->|"planning interview / 기획해줘"| B[Context Detection]
     B --> C{Role & Complexity?}
 
-    C -->|"Solo developer / Side project"| D["Solo Mode<br/>15-20 min"]
-    C -->|"Startup founder / Small team"| E["Startup Mode<br/>25-30 min"]
-    C -->|"Product manager / Enterprise team"| F["Team Mode<br/>35-45 min"]
+    C -->|Solo developer| D["Solo Mode · 15-20 min"]
+    C -->|Startup founder| E["Startup Mode · 25-30 min"]
+    C -->|Product manager| F["Team Mode · 35-45 min"]
 
-    subgraph SoloFlow["Solo: 3-4 Rounds → Lean Canvas"]
-        S1[Problem & Customers]
-        S2[Solution & UVP]
-        S3[Revenue & Metrics]
-        S4[Risks & Assumptions]
-        S1 --> S2 --> S3 --> S4
-    end
+    D --> D1["3-4 Rounds<br/>Problem → Solution → Revenue → Risks"]
+    E --> E1["5-6 Rounds<br/>Problem → Solution → GTM → Team/Risks"]
+    F --> F1["8-9 Rounds<br/>Background → Users → Stories → Reqs → UX/Tech"]
 
-    subgraph StartupFlow["Startup: 5-6 Rounds → Product Brief"]
-        ST1[Problem & Market]
-        ST2[Solution & Competitors]
-        ST3[GTM Strategy]
-        ST4[Team, Timeline, Risks]
-        ST1 --> ST2 --> ST3 --> ST4
-    end
-
-    subgraph TeamFlow["Team: 8-9 Rounds → Full PRD"]
-        T1[Background & Goals]
-        T2[Users & Personas]
-        T3[User Stories & Jobs-to-be-Done]
-        T4[Requirements - MoSCoW]
-        T5[UX, Tech, KPIs, Rollout]
-        T1 --> T2 --> T3 --> T4 --> T5
-    end
-
-    D --> SoloFlow
-    E --> StartupFlow
-    F --> TeamFlow
-
-    subgraph Scoring["Answer Completeness Scoring 1-5"]
-        SC1{Score < 3?}
-        SC2[Targeted Follow-up]
-        SC1 -->|Yes| SC2 --> SC1
+    subgraph Scoring ["Answer Completeness Scoring (1-5)"]
+        direction LR
+        SC1{Score < 3?} -->|Yes| SC2[Targeted Follow-up] --> SC1
         SC1 -->|No| SC3[Next Question]
     end
 
-    SoloFlow & StartupFlow & TeamFlow -.- Scoring
+    D1 & E1 & F1 -.- Scoring
 
-    SoloFlow --> G[Lean Canvas 1-2 pages]
-    StartupFlow --> H[Product Brief 3-5 pages]
-    TeamFlow --> I[Full PRD 8-12 pages]
+    D1 --> G["Lean Canvas · 1-2 pages"]
+    E1 --> H["Product Brief · 3-5 pages"]
+    F1 --> I["Full PRD · 8-12 pages"]
 
-    G & H & I --> J([Saved Markdown PRD Document])
+    G & H & I --> J([Saved Markdown PRD])
 ```
 
 ## Overview
