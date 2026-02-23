@@ -3,6 +3,28 @@
 > **Project**: `/Users/jaykim/Documents/Projects/claude-ai-engineering`
 > **Scope**: `plugins/wrap-up/`
 
+## Session: 2026-02-23 22:50
+
+> **Context**: wrap-up 스킬에 Context 라인 및 세션 타임스탬프 기능 적용
+
+### Done
+- feat: 세션 헤더에 항상 시간 포함 (`## Session: YYYY-MM-DD HH:MM`) — SKILL.md, CLAUDE.md 템플릿 업데이트
+- feat: `> **Context**: {요약}` 라인 추가 — 세션 식별용 1줄 요약, SKILL.md + CLAUDE.md 템플릿 및 예시 반영
+- docs: README.md 출력 예시에 Context 라인 추가, Features 테이블에 "Session timestamp" + "Context line" 행 추가
+- feat: CLAUDE.md 3개 예시(new/append/multiple)에 Context 라인 + 시간 포함 헤더 반영
+- verify: /wrap-up Append 동작 검증 (from previous Next) — 컨텍스트 로딩, 체크박스 업데이트 정상 동작 확인
+
+### Decisions
+- **세션 헤더 항상 시간 포함**: 같은 날 두 번째 세션부터가 아닌, 모든 세션에 시간 포함 → 대화 추적 용이
+- **Context 라인 도입**: 파일 스캔 시 세션별 작업 내용을 빠르게 파악할 수 있도록 1줄 요약 추가
+
+### Next
+- [ ] 프로젝트 변경사항 커밋
+- [ ] 불필요 파일 정리 (config.yaml, references/template.md)
+- [ ] version bump: plugin.json 버전 업데이트 (현재 1.0.0 → Context/timestamp 반영 버전)
+
+---
+
 ## Session: 2026-02-23
 
 ### Done
@@ -39,25 +61,3 @@
 - [x] 새 세션에서 /wrap-up Append 동작 검증 (컨텍스트 로딩 + 체크박스 업데이트)
 - [ ] 프로젝트 변경사항 커밋
 - [ ] 불필요 파일 정리 (config.yaml, references/template.md — config 읽기 제거 후 사용하지 않음)
-
----
-
-## Session: 2026-02-23 22:50
-
-> **Context**: wrap-up 스킬에 Context 라인 및 세션 타임스탬프 기능 적용
-
-### Done
-- feat: 세션 헤더에 항상 시간 포함 (`## Session: YYYY-MM-DD HH:MM`) — SKILL.md, CLAUDE.md 템플릿 업데이트
-- feat: `> **Context**: {요약}` 라인 추가 — 세션 식별용 1줄 요약, SKILL.md + CLAUDE.md 템플릿 및 예시 반영
-- docs: README.md 출력 예시에 Context 라인 추가, Features 테이블에 "Session timestamp" + "Context line" 행 추가
-- feat: CLAUDE.md 3개 예시(new/append/multiple)에 Context 라인 + 시간 포함 헤더 반영
-- verify: /wrap-up Append 동작 검증 (from previous Next) — 컨텍스트 로딩, 체크박스 업데이트 정상 동작 확인
-
-### Decisions
-- **세션 헤더 항상 시간 포함**: 같은 날 두 번째 세션부터가 아닌, 모든 세션에 시간 포함 → 대화 추적 용이
-- **Context 라인 도입**: 파일 스캔 시 세션별 작업 내용을 빠르게 파악할 수 있도록 1줄 요약 추가
-
-### Next
-- [ ] 프로젝트 변경사항 커밋
-- [ ] 불필요 파일 정리 (config.yaml, references/template.md)
-- [ ] version bump: plugin.json 버전 업데이트 (현재 1.0.0 → Context/timestamp 반영 버전)

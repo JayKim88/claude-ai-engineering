@@ -42,12 +42,12 @@ Records what was done in the current session and what needs to be done next, sav
 
 ---
 
-### Step 2: Load Context (Append only)
+### Step 2: Load Context (Prepend only)
 
-If appending to an existing file:
+If adding to an existing file:
 
 1. **Read the entire file**
-2. **Parse the most recent `### Next` section** to identify pending items
+2. **Parse the FIRST (most recent) `### Next` section** to identify pending items
 3. **Cross-reference** with current session's work to determine which Next items were completed
 4. This context informs Step 3 (Analyze Conversation)
 
@@ -73,18 +73,23 @@ Review the entire conversation history to extract:
 - Write new file with topic header + session entry
 
 **If EXISTING file** (user selected existing file):
-- Update previous session's **Next** checkboxes: completed items `[ ]` → `[x]`
-- Append `---` separator + new session entry at the bottom
+- Update the FIRST (most recent) session's **Next** checkboxes: completed items `[ ]` → `[x]`
+- **Insert new session entry AFTER the header block** (after `> **Scope**:` line), BEFORE existing sessions
+- Add `---` separator between the new entry and the previous most-recent session
+- This ensures **newest session is always at the top**, oldest at the bottom (reverse chronological order)
 
 **Session date format:**
-- Always include time: `## Session: 2026-02-23 14:00`
+- **Must run `date '+%Y-%m-%d %H:%M'`** to get the exact current time. Never estimate or guess the time.
+- Format: `## Session: 2026-02-23 14:00`
 - Time helps identify and trace specific sessions across conversation history
 
 **Context line:**
 - Each session entry includes `> **Context**: {brief summary}` right after the session header
 - 1-line summary of what the session was about (for quick identification when scanning the file)
 
-Template:
+**Session ordering:** Reverse chronological (newest first, oldest last).
+
+Template (new file):
 
 ```markdown
 # {Topic Name} - Wrap Up
@@ -104,6 +109,38 @@ Template:
 
 ### Next
 - [ ] ...
+```
+
+Template (existing file — insert new session at top):
+
+```markdown
+# {Topic Name} - Wrap Up
+
+> **Project**: `{CWD}`
+> **Scope**: `...`
+
+## Session: 2026-02-24 10:00        ← NEW (inserted here)
+
+> **Context**: ...
+
+### Done
+- ...
+
+### Next
+- [ ] ...
+
+---
+
+## Session: 2026-02-23 14:00        ← PREVIOUS (pushed down)
+
+> **Context**: ...
+
+### Done
+- ...
+
+### Next
+- [x] completed item (from previous Next)
+- [ ] remaining item
 ```
 
 **Section omission rules:**
