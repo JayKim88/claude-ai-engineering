@@ -1,0 +1,19 @@
+{
+  "name": "market-research-by-desire",
+  "version": "1.0.0",
+  "description": "Desire-based market research automation: reverse-engineer market opportunities from human desires through 3-phase multi-agent analysis",
+  "author": {
+    "name": "Jay Kim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "market-research",
+    "desire-mapping",
+    "competitive-analysis",
+    "revenue-modeling",
+    "business-intelligence",
+    "opportunity-discovery",
+    "korean-market"
+  ]
+}

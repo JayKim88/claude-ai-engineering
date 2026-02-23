@@ -1,0 +1,119 @@
+# Market Research by Desire - Configuration
+
+# Output Settings
+output:
+  language: "ko"  # Output language: "ko" (Korean) or "en" (English)
+  base_directory: "~/.market-research-by-desire/projects"
+  create_readme: true
+  encoding: "utf-8"
+
+# Agent Timeouts (seconds)
+timeouts:
+  desire_cartographer: 300  # 5 minutes
+  market_trend_researcher: 600  # 10 minutes (WebSearch intensive)
+  competitive_scanner: 600  # 10 minutes
+  gap_opportunity_analyzer: 300  # 5 minutes
+  revenue_model_architect: 600  # 10 minutes
+
+# WebSearch Settings
+web_search:
+  max_results_per_query: 20
+  enable_web_fetch: true  # Set to false to use snippets only (faster, cheaper)
+  max_fetch_per_agent: 10  # Limit full page fetches
+  retry_on_failure: true
+  timeout_per_request: 30  # seconds
+
+# Market Research Defaults
+market_research:
+  default_target_market: "Korea"
+  default_currency: "KRW"
+  fallback_tam_multiplier: 0.6  # Use 60% of Japan market if Korea data unavailable
+  min_tam_confidence_sources: 2  # Require at least 2 sources for TAM claim
+  
+  # SOM (Serviceable Obtainable Market) assumptions
+  som_market_share_y1: 0.005  # 0.5% market share in year 1
+  som_market_share_y2: 0.015  # 1.5% in year 2
+  som_market_share_y3: 0.030  # 3% in year 3
+
+# Competitive Analysis
+competitive_analysis:
+  max_competitors_deep_dive: 5  # Full SWOT + features for top 5
+  max_competitors_total: 20  # Basic info for up to 20
+  feature_comparison_count: 15  # Number of features in comparison matrix
+  pricing_benchmark_min: 5  # Minimum competitors for pricing benchmark
+
+# Solo-Dev Feasibility Scoring
+solo_dev:
+  weight_tech_complexity: 0.25
+  weight_ops_overhead: 0.30
+  weight_content_requirements: 0.20
+  weight_distribution: 0.15
+  weight_support_burden: 0.10
+  
+  # Auto-disqualifiers (set score to 0 if detected)
+  disqualify_two_sided_marketplace: true
+  disqualify_physical_inventory: true
+  disqualify_24_7_support_required: true
+  disqualify_heavy_regulation: true
+
+# Gap Analysis
+gap_analysis:
+  min_attractiveness_score: 5.0  # Minimum score to include gap in report
+  weight_market_size: 0.30
+  weight_competitor_difficulty: 0.20
+  weight_monetization_clarity: 0.25
+  weight_desire_intensity: 0.25
+
+# Revenue Model Projections
+revenue_model:
+  model_count_min: 3  # Generate at least 3 models
+  model_count_max: 5  # Up to 5 models
+  projection_years: 3
+  
+  # Conservative defaults for projections
+  default_cac_payback_months: 12
+  default_churn_rate_monthly: 0.05  # 5% monthly churn
+  default_gross_margin: 0.80  # 80% gross margin for SaaS
+  default_ltv_cac_ratio_min: 3.0  # Minimum viable ratio
+
+# Data Sources (Fallback if WebSearch fails)
+data_sources:
+  korea:
+    - name: "통계청 KOSIS"
+      url: "https://kosis.kr"
+      type: "government"
+    - name: "중소벤처기업부"
+      url: "https://www.mss.go.kr"
+      type: "government"
+    - name: "산업통상자원부"
+      url: "https://www.motie.go.kr"
+      type: "government"
+  
+  global:
+    - name: "Statista"
+      url: "https://www.statista.com"
+      type: "commercial"
+    - name: "CB Insights"
+      url: "https://www.cbinsights.com"
+      type: "commercial"
+
+# Error Handling
+error_handling:
+  retry_failed_agents: true
+  max_retries: 2
+  continue_on_agent_failure: true  # Continue pipeline even if one agent fails
+  generate_partial_reports: true  # Generate reports even with incomplete data
+
+# Logging & Debugging
+logging:
+  enable_agent_logs: true
+  log_directory: "~/.market-research-by-desire/logs"
+  log_level: "info"  # debug, info, warning, error
+
+# Feature Flags
+features:
+  enable_desire_intersections: true  # Core differentiator, keep enabled
+  enable_positioning_map: true
+  enable_unit_economics: true
+  enable_sensitivity_analysis: false  # Advanced feature, disable for speed
+  enable_validation_milestones: true
