@@ -1,0 +1,20 @@
+# Wrap Up Configuration
+
+# Output directory name (relative to project root)
+output_dir: "wrap-up"
+
+# Auto-commit to git
+auto_commit: false
+
+# Auto-push to remote (requires auto_commit: true)
+auto_push: false
+
+# Language preference (auto-detect from conversation, or set to 'ko'/'en')
+language: auto
+
+# Sections to include in each session entry
+sections:
+  - done          # Completed tasks (always included)
+  - decisions     # Architecture/approach decisions (omitted if none)
+  - issues        # Blockers, unresolved problems (omitted if none)
+  - next          # Future tasks in checkbox format (always included)

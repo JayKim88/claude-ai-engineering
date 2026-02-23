@@ -95,6 +95,11 @@
       "name": "rich-guide",
       "description": "Personalized wealth strategy system with 6 AI agents: financial diagnosis, market analysis, strategy generation, risk evaluation, and action roadmap (Korean)",
       "source": "./plugins/rich-guide"
+    },
+    {
+      "name": "wrap-up",
+      "description": "Document session work history and todos into a per-project wrap-up file that accumulates across sessions",
+      "source": "./plugins/wrap-up"
     }
   ]
 }
