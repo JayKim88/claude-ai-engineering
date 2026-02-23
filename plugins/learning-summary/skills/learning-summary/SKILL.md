@@ -1,12 +1,13 @@
 ---
 name: learning-summary
 description: Summarize and document key learnings from the conversation. Use when user says "summarize", "document", "what did I learn", or wants to capture insights.
-version: 1.0.0
+version: 2.0.0
 ---
 
 # Learning Summary
 
 Extracts and documents key insights, concepts, and learnings from the current conversation.
+Output is blog-ready with YAML frontmatter for Astro Content Collections.
 
 ---
 
@@ -17,8 +18,8 @@ Extracts and documents key insights, concepts, and learnings from the current co
 Read `~/.claude/skills/learning-summary/config.yaml`:
 
 ```yaml
-learning_repo: "/Users/username/Documents/Projects/ai-learning"
-output_dir: "learnings"
+learning_repo: "/Users/jaykim/Documents/Projects/ai-learning"
+output_dir: "blog/src/content/learnings"
 auto_commit: false
 auto_push: false
 ```
@@ -40,11 +41,23 @@ Review the entire conversation history to identify:
 | **References** | Files, URLs, documentation referenced |
 | **Next Steps** | Follow-up actions, topics to explore |
 
+Also extract metadata for frontmatter:
+
+| Field | How to Derive |
+|-------|---------------|
+| **title** | Main topic as concise title |
+| **description** | 1-2 sentence summary of key insight |
+| **tags** | 3-7 lowercase kebab-case keywords from conversation topics |
+| **source** | Primary URL referenced (if any) |
+| **lang** | Detect from conversation language (`ko` or `en`) |
+
 ---
 
 ### Step 3: Generate Filename
 
 Create descriptive filename based on main topic:
+
+**IMPORTANT**: Run `date '+%Y-%m-%d'` to get the exact current date. Never estimate.
 
 **Format**: `YYYY-MM-DD-brief-topic-description.md`
 
@@ -57,29 +70,53 @@ Create descriptive filename based on main topic:
 
 ### Step 4: Structure Document
 
-Use the template from `references/template.md`:
+Generate a blog-ready markdown file with YAML frontmatter:
 
 ```markdown
-# [Main Topic Title]
+---
+title: "[Main Topic Title]"
+date: YYYY-MM-DD
+description: "[1-2 sentence summary of key insight]"
+category: learnings
+tags: ["tag1", "tag2", "tag3"]
+source: "https://..."
+lang: ko
+draft: false
+---
 
 ## Key Concepts
+
 [Key concepts with clear definitions]
 
 ## New Learnings
+
 [New learnings with before/after]
 
 ## Practical Examples
+
 [Code, commands, examples]
 
 ## Common Misconceptions
+
 [Clarified misconceptions]
 
 ## References
+
 [Files, URLs, resources]
 
 ## Next Steps
+
 [Follow-up actions]
 ```
+
+**Important formatting rules**:
+- Do NOT include `# Title` heading in body (the blog layout renders title from frontmatter)
+- Body starts with `## Key Concepts` or first applicable section
+- `category` is always `learnings`
+- `tags` are lowercase, kebab-case, as a YAML array
+- `source` is optional (omit the field entirely if no primary URL)
+- `description` should be under 160 characters for SEO
+- Empty sections should be omitted entirely
 
 ---
 
@@ -87,7 +124,7 @@ Use the template from `references/template.md`:
 
 **Save location**: `{learning_repo}/{output_dir}/{filename}`
 
-**Example**: `/Users/username/Documents/Projects/ai-learning/learnings/2026-01-17-topic.md`
+**Example**: `/Users/jaykim/Documents/Projects/ai-learning/blog/src/content/learnings/2026-01-17-topic.md`
 
 Use Write tool to create the markdown file.
 
@@ -99,10 +136,10 @@ Only if `auto_commit: true` in config:
 
 ```bash
 cd "$learning_repo"
-git add "learnings/$filename"
+git add "blog/src/content/learnings/$filename"
 git commit -m "Add learning: $topic
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 ```
 
 If `auto_push: true`, also run:
@@ -110,15 +147,18 @@ If `auto_push: true`, also run:
 git push
 ```
 
+When pushed to main, GitHub Actions will automatically build and deploy the blog.
+
 ---
 
 ### Step 7: Confirm to User
 
 Show the user:
-- ✅ Full path of saved file
-- 📝 Brief summary of documented content
-- 🔧 Git commit status (if auto_commit enabled)
-- 💡 Offer to open file or make adjustments
+- Full path of saved file
+- Brief summary of documented content
+- Git commit status (if auto_commit enabled)
+- Blog URL where post will appear after deploy
+- Offer to open file or make adjustments
 
 ---
 
@@ -141,14 +181,14 @@ Show the user:
 
 ### When to Use
 
-✅ **Use this skill when**:
+**Use this skill when**:
 - End of significant learning conversation
 - After understanding a complex topic
 - When you want to preserve key insights
 - Before switching to a different subject
 - After solving a challenging problem
 
-❌ **Skip when**:
+**Skip when**:
 - Very short Q&A (single question/answer)
 - Simple command lookup
 - Already well-documented elsewhere
@@ -160,7 +200,7 @@ Show the user:
 
 | Scenario | Response |
 |----------|----------|
-| Config file not found | Use defaults: `./learnings/`, no auto-commit |
+| Config file not found | Use defaults: `./blog/src/content/learnings/`, no auto-commit |
 | Learning repo doesn't exist | `Error: Directory not found at {path}. Create with: mkdir -p {path}` |
 | Git not initialized | `Warning: Not a git repository. Skipping auto-commit.` |
 | Write permission denied | `Error: Cannot write to {path}. Check permissions: ls -la {dir}` |
@@ -176,12 +216,13 @@ Edit `~/.claude/skills/learning-summary/config.yaml`:
 
 ```yaml
 # Dedicated AI learning repository (absolute path)
-learning_repo: "/Users/username/Documents/Projects/ai-learning"
+learning_repo: "/Users/jaykim/Documents/Projects/ai-learning"
 
 # Output directory (relative to learning_repo)
-output_dir: "learnings"
+# Points to blog content directory for direct blog publishing
+output_dir: "blog/src/content/learnings"
 
-# Filename pattern (auto-generated)
+# Filename pattern (will be auto-generated based on date and topic)
 filename_pattern: "YYYY-MM-DD-topic.md"
 
 # Auto-commit to git

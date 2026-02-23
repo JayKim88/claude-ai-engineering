@@ -4,7 +4,8 @@
 learning_repo: "/Users/jaykim/Documents/Projects/ai-learning"
 
 # Output directory for generated documents (relative to learning_repo)
-output_dir: "learnings"
+# Points to blog content directory for direct blog publishing
+output_dir: "blog/src/content/learnings"
 
 # Filename pattern (will be auto-generated based on date and topic)
 filename_pattern: "YYYY-MM-DD-topic.md"

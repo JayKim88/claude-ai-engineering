@@ -1,13 +1,22 @@
 # Learning Note Template
 
 This is the standard template for learning summary documents.
+Output is blog-ready with YAML frontmatter for Astro Content Collections.
 
 ---
 
 ## Example 1: Technical Concept Learning
 
 ```markdown
-# Understanding Claude Code Marketplaces and Plugins
+---
+title: "Understanding Claude Code Marketplaces and Plugins"
+date: 2026-01-17
+description: "Claude Code의 마켓플레이스는 분산형 시스템으로, GitHub 레포를 통해 플러그인을 관리한다"
+category: learnings
+tags: ["claude-code", "marketplace", "plugins", "ai-tools"]
+lang: ko
+draft: false
+---
 
 ## Key Concepts
 
@@ -81,10 +90,19 @@ npx github:team-attention/agent-council
 
 ---
 
-## Example 2: Programming Technique Learning
+## Example 2: Programming with Source URL
 
 ```markdown
-# Understanding Python Async/Await Patterns
+---
+title: "Python Async/Await Patterns"
+date: 2026-01-17
+description: "async/await is cooperative multitasking, useful only for I/O-bound operations"
+category: learnings
+tags: ["python", "async", "concurrency", "programming"]
+source: "https://docs.python.org/3/library/asyncio.html"
+lang: en
+draft: false
+---
 
 ## Key Concepts
 
@@ -126,14 +144,6 @@ async def fetch_data():
     return data1, data2  # Total: 1 second
 ```
 
-## Common Misconceptions
-
-| Misconception | Reality |
-|---------------|---------|
-| async = multithreading | Single-threaded execution |
-| Use everywhere | Only useful for I/O-bound |
-| Can call without await | Must use await |
-
 ## References
 
 - [Python asyncio docs](https://docs.python.org/3/library/asyncio.html)
@@ -150,7 +160,31 @@ async def fetch_data():
 
 ## Template Structure Guide
 
-### Required Sections
+### Frontmatter (Required)
+
+Every document must start with YAML frontmatter:
+
+```yaml
+---
+title: "Concise Topic Title"         # Required: used as page title
+date: YYYY-MM-DD                      # Required: publication date
+description: "1-2 sentence summary"   # Required: used for SEO and post cards
+category: learnings                   # Required: always "learnings"
+tags: ["tag1", "tag2"]                # Required: 3-7 lowercase kebab-case tags
+source: "https://..."                 # Optional: primary reference URL
+lang: ko                              # Required: "ko" or "en"
+draft: false                          # Required: set true to hide from blog
+---
+```
+
+**Rules**:
+- `title`: Wrap in quotes, escape inner quotes with `\"`
+- `description`: Under 160 characters for SEO
+- `tags`: Lowercase, kebab-case, YAML array format
+- `source`: Omit entirely if no primary URL (do not leave empty)
+- Do NOT include `# Title` heading in body (blog layout renders from frontmatter)
+
+### Body Sections (Required)
 
 1. **Key Concepts**
    - Define main concepts
@@ -159,14 +193,14 @@ async def fetch_data():
 
 2. **New Learnings**
    - Use Before/After format (recommended)
-   - Specific misconception → accurate understanding
+   - Specific misconception to accurate understanding
 
 3. **Practical Examples**
    - Runnable code
    - Command examples
    - Real-world use cases
 
-### Optional Sections
+### Body Sections (Optional)
 
 4. **Common Misconceptions**
    - Table format recommended
@@ -180,6 +214,8 @@ async def fetch_data():
 6. **Next Steps**
    - Specific action items
    - Show priorities
+
+**Omit empty sections entirely** - do not include a section header with no content.
 
 ---
 
@@ -232,3 +268,4 @@ The skill supports both English and Korean content:
 ```
 
 The `language` setting in config.yaml determines the default, but both languages are supported.
+Set `lang` in frontmatter to match the primary language of the document.
