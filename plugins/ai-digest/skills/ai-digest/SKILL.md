@@ -29,9 +29,16 @@ Extract from user message:
 
 ---
 
-### Step 2: Fetch Content
+### Step 2: Resolve Content
 
-**If URL provided:**
+Determine the content source using the following priority:
+
+**Priority 1 — Direct content provided:**
+If the user pasted article text (beyond just a URL), use it directly. Skip WebFetch entirely. This is the most reliable path.
+
+**Priority 2 — Fetchable URL only:**
+If only a URL is provided (no pasted content), attempt WebFetch:
+
 ```python
 WebFetch(
     url=extracted_url,
@@ -50,8 +57,19 @@ WebFetch(
 )
 ```
 
-**If direct content:**
-Use the provided text directly.
+**Priority 3 — Auth-gated URL with no content:**
+If the URL is from a known auth-gated domain AND no direct content is provided, do NOT attempt WebFetch. Instead, ask the user to paste the content.
+
+Known auth-gated domains (non-exhaustive):
+- `linkedin.com` — requires login
+- `x.com`, `twitter.com` — requires login
+- `medium.com` — may be paywalled
+- `substack.com` — may be paywalled
+- `notion.so` — requires access
+- `docs.google.com` — requires access
+
+**When both URL + direct content are provided:**
+Use the direct content for analysis. Retain the URL only as a source reference in the output document.
 
 ---
 
@@ -114,7 +132,15 @@ Create descriptive filename:
 
 ### Step 6: Generate Document
 
-Use AI-optimized template:
+**First, classify the content type** to determine which template variant to use:
+
+| Content Type | Characteristics | Template Variant |
+|-------------|-----------------|------------------|
+| **Technical** | Code changes, API updates, library releases, tutorials | Full template (with code examples, Before/After) |
+| **Strategic/Opinion** | Industry analysis, trend pieces, strategy frameworks | Strategy template (with frameworks, comparison tables) |
+| **News/Announcement** | Product launches, funding, partnerships | News template (concise, fact-focused) |
+
+#### Template: Core (always included)
 
 ```markdown
 # [Article Title or Main Topic]
@@ -146,35 +172,11 @@ Use AI-optimized template:
 ### Use Case 2: [Scenario]
 ...
 
-## 코드 예제 (Code Examples)
-
-### Example 1: [What it demonstrates]
-```language
-[Runnable code]
-```
-
-**설명 (Explanation)**:
-[What this code does]
-
-## Before/After 비교 (If applicable)
-
-### Before (기존 방식)
-```language
-[Old way]
-```
-
-### After (새로운 방식)
-```language
-[New way]
-```
-
-**차이점**: [Key differences]
-
 ## 주의사항 / 제한사항 (Limitations & Gotchas)
 
-- ⚠️ [Warning 1]
-- ⚠️ [Warning 2]
-- 💡 [Tip 1]
+- [Warning 1]
+- [Warning 2]
+- [Tip 1]
 
 ## 참고 링크 (References)
 
@@ -194,10 +196,58 @@ Use AI-optimized template:
 [Personal notes or context]
 ```
 
-**Sections to include:**
+#### Template: Technical Extensions (add when content type is Technical)
+
+Include these sections when the article contains code, API changes, or migration guides:
+
+```markdown
+## 코드 예제 (Code Examples)
+
+### Example 1: [What it demonstrates]
+```language
+[Runnable code]
+```
+
+**설명**: [What this code does]
+
+## Before/After 비교
+
+### Before (기존 방식)
+```language
+[Old way]
+```
+
+### After (새로운 방식)
+```language
+[New way]
+```
+
+**차이점**: [Key differences]
+```
+
+#### Template: Strategy Extensions (add when content type is Strategic/Opinion)
+
+Include these sections when the article discusses frameworks, trends, or strategic analysis:
+
+```markdown
+## 핵심 프레임워크 (Key Framework)
+
+[Visual or structured representation of the article's main framework]
+[Use tables, diagrams (text-based), or hierarchical lists]
+
+## 사례 비교 (Case Comparisons)
+
+| 항목 | [Case A] | [Case B] |
+|------|----------|----------|
+| ... | ... | ... |
+```
+
+**Section inclusion rules:**
 - Always: 요약, 주요 변경사항, 실무 적용, 참고 링크
-- If available: 코드 예제, Before/After, Next Steps
-- Optional: 주의사항 (if important warnings exist)
+- Technical content: + 코드 예제, Before/After
+- Strategic content: + 핵심 프레임워크, 사례 비교
+- Optional: 주의사항 (if important warnings exist), Next Steps
+- Do not include empty sections. If a section has no meaningful content, omit it.
 
 ---
 
@@ -207,12 +257,9 @@ Use AI-optimized template:
 
 **Example**: `/Users/jaykim/Documents/Projects/ai-learning/digests/2026-01-25-ai-claude-sonnet-4-5-release.md`
 
-Use Write tool to create the markdown file.
+**Deduplication check**: Before saving, use Glob to check if a file with the same date and similar topic slug already exists in the digests directory. If a match is found, ask the user whether to overwrite, append, or create with a suffix (e.g., `-2`).
 
-**Create directory if needed**:
-```bash
-mkdir -p {learning_repo}/digests
-```
+**Save**: Use the Write tool directly. Do NOT run `mkdir -p` — the `digests/` directory should already exist in a configured learning repo. If Write fails due to a missing directory, then create it.
 
 ---
 
@@ -225,8 +272,10 @@ cd "$learning_repo"
 git add "digests/$filename"
 git commit -m "Add AI digest: $topic
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude <model> <noreply@anthropic.com>"
 ```
+
+**Note**: Replace `<model>` with the actual model name being used (e.g., "Opus 4.6", "Sonnet 4.5"). Do not hardcode a specific model name.
 
 If `auto_push: true`, also run:
 ```bash
@@ -238,11 +287,12 @@ git push
 ### Step 9: Confirm to User
 
 Show the user:
-- ✅ Full path of saved file
-- 📝 Brief summary of what was captured
-- 🔗 Original URL (if applicable)
-- 🔧 Git commit status (if auto_commit enabled)
-- 💡 Suggest next actions (e.g., "Want to add related articles?")
+- **Saved**: Full path of saved file
+- **Captured**: Brief summary of what was captured (bulleted list of key topics)
+- **Source**: Original URL (if applicable)
+- **Git**: Commit status (only if auto_commit enabled)
+
+Do not use emojis in the confirmation output. Keep it concise and scannable.
 
 ---
 
@@ -282,12 +332,15 @@ Show the user:
 
 | Scenario | Response |
 |----------|----------|
-| Invalid URL | `Error: Cannot fetch URL. Please check the link and try again.` |
+| Auth-gated URL, no content | Ask user to paste the article content. Do NOT attempt WebFetch. |
+| Auth-gated URL + content provided | Use direct content. Retain URL as source reference only. |
 | WebFetch fails | `Error: Failed to fetch content. You can paste the content directly.` |
 | Config not found | Ask user for ai-learning repository path |
+| Write fails (missing directory) | Create directory with `mkdir -p`, then retry Write |
 | Write permission denied | `Error: Cannot write to {path}. Check permissions.` |
 | Git not initialized | `Warning: Not a git repository. Document saved but not committed.` |
 | Empty content | `Error: No content to analyze. Please provide URL or text.` |
+| Duplicate file exists | Ask user: overwrite, append, or save with `-2` suffix |
 
 ---
 
@@ -314,53 +367,57 @@ auto_push: false
 
 ## Examples
 
-### Example 1: URL Digest
+### Example 1: URL Digest (fetchable)
 
 ```
 User: /ai-digest https://anthropic.com/news/claude-sonnet-4-5
 
-Claude: I'll digest this article about Claude Sonnet 4.5 release.
+Claude: [Fetches content via WebFetch, classifies as Technical, generates document]
 
-[Fetches content, analyzes, generates document]
+Saved: .../digests/2026-01-25-ai-claude-sonnet-4-5-release.md
 
-✅ Saved to: /Users/jaykim/Documents/Projects/ai-learning/digests/2026-01-25-ai-claude-sonnet-4-5-release.md
-
-📝 Captured:
-- New Claude Sonnet 4.5 features
-- Performance improvements (2x faster, 3x cheaper)
-- New capabilities (extended context, vision)
+Captured:
+- New Claude Sonnet 4.5 features and performance benchmarks
 - Migration guide from previous versions
-- Practical code examples
-
-Want me to analyze related articles or commit this to git?
+- Code examples showing before/after API changes
 ```
 
-### Example 2: Focused Analysis
+### Example 2: Auth-gated URL + pasted content
+
+```
+User: /ai-digest https://linkedin.com/posts/someone/...
+[pasted article text]
+
+Claude: [Detects LinkedIn URL + direct content → uses direct content, skips WebFetch]
+[Classifies as Strategic/Opinion, uses strategy template variant]
+
+Saved: .../digests/2026-01-25-ai-agent-economy-strategy.md
+Source: https://linkedin.com/posts/someone/...
+
+Captured:
+- Agent economy framework and 3 survival conditions
+- Case comparisons (Supabase vs competitors, Resend vs SendGrid)
+```
+
+### Example 3: Focused Analysis
 
 ```
 User: /ai-digest "Focus on breaking changes only" https://openai.com/blog/gpt-5
 
-Claude: I'll focus on breaking changes from the GPT-5 announcement.
+Claude: [Fetches content, applies user focus filter to analysis]
 
-[Analyzes with focus on breaking changes]
-
-✅ Document saved with emphasis on:
-- API breaking changes
-- Deprecated parameters
-- Migration steps
-- Code examples showing before/after
+Saved with focus on:
+- API breaking changes and deprecated parameters
+- Migration steps with before/after code examples
 ```
 
-### Example 3: Direct Content
+### Example 4: Auth-gated URL only (no content)
 
 ```
-User: /ai-digest "Analyze this: [pastes article text]"
+User: /ai-digest https://linkedin.com/posts/someone/...
 
-Claude: I'll digest this content about [topic].
-
-[Analyzes pasted content, generates document]
-
-✅ Saved to: .../digests/2026-01-25-ai-[detected-topic].md
+Claude: LinkedIn requires authentication, so I can't fetch this content directly.
+Please paste the article text and I'll digest it.
 ```
 
 ---
