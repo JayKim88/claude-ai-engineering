@@ -1,12 +1,13 @@
 ---
 name: ai-digest
 description: Digest AI/tech articles into structured learning documents. Use when user says "digest this article", "/ai-digest", "analyze this AI news", or provides URL/content to summarize.
-version: 1.0.0
+version: 2.0.0
 ---
 
 # AI Digest
 
 Analyzes AI/tech articles, blog posts, or content and creates structured learning documents optimized for quick reference and practical application.
+Output is blog-ready with YAML frontmatter for Astro Content Collections.
 
 ---
 
@@ -86,6 +87,16 @@ Analyze the fetched content to identify:
 | **Migration/Upgrade Notes** | Breaking changes, migration steps |
 | **Limitations** | Known issues, constraints, gotchas |
 
+Also extract metadata for frontmatter:
+
+| Field | How to Derive |
+|-------|---------------|
+| **title** | Article title or main topic |
+| **description** | 1-2 sentence summary under 160 characters |
+| **tags** | 3-7 lowercase kebab-case keywords from content topics |
+| **source** | Original article URL |
+| **lang** | Detect from content language (`ko` or `en`) |
+
 **Consider user's focus** if provided (e.g., "API changes only").
 
 ---
@@ -95,7 +106,7 @@ Analyze the fetched content to identify:
 Read `~/.claude/skills/learning-summary/config.yaml`:
 
 ```yaml
-learning_repo: "/Users/username/Documents/Projects/ai-learning"
+learning_repo: "/Users/jaykim/Documents/Projects/ai-learning"
 auto_commit: false
 auto_push: false
 ```
@@ -106,7 +117,7 @@ auto_push: false
 - No duplicate configuration needed
 - Users only configure once
 
-**Output directory**: Always use `"digests"` subfolder (not "learnings") to separate article digests from conversation summaries.
+**Output directory**: Always use `"blog/src/content/digests"` subfolder to separate article digests from conversation summaries.
 
 **If config not found**: Ask user for learning repository path. You can create the config file or use the provided path for this session only.
 
@@ -115,6 +126,8 @@ auto_push: false
 ### Step 5: Generate Filename
 
 Create descriptive filename:
+
+**IMPORTANT**: Run `date '+%Y-%m-%d'` to get the exact current date. Never estimate.
 
 **Format**: `YYYY-MM-DD-ai-[topic-slug].md`
 
@@ -143,25 +156,30 @@ Create descriptive filename:
 #### Template: Core (always included)
 
 ```markdown
-# [Article Title or Main Topic]
-
-> **Source**: [Original URL or "Direct Input"]
-> **Date**: YYYY-MM-DD
-> **Tags**: #ai #[topic] #[subtopic]
+---
+title: "[Article Title or Main Topic]"
+date: YYYY-MM-DD
+description: "[1-2 sentence summary under 160 chars]"
+category: digests
+tags: ["ai", "topic", "subtopic"]
+source: "https://original-article-url"
+lang: ko
+draft: false
+---
 
 ## 요약 (Summary)
 
 [1-2 paragraph summary in Korean]
 [What this is about and why it matters]
 
-## 주요 변경사항 / 새로운 개념 (Key Changes/Concepts)
+## 주요 개념 (Key Concepts)
 
-### [Change/Concept 1]
+### [Concept 1]
 - **What**: [Description]
 - **Why**: [Reasoning or benefit]
 - **Impact**: [Who/what is affected]
 
-### [Change/Concept 2]
+### [Concept 2]
 ...
 
 ## 실무 적용 방법 (Practical Applications)
@@ -195,6 +213,16 @@ Create descriptive filename:
 **메모 (Notes)**:
 [Personal notes or context]
 ```
+
+**Important formatting rules**:
+- Do NOT include `# Title` heading in body (the blog layout renders title from frontmatter)
+- Do NOT use blockquote metadata (`> **Source**: ...`) — all metadata goes in frontmatter
+- Body starts with `## 요약 (Summary)` or first applicable section
+- `category` is always `digests`
+- `tags` are lowercase, kebab-case, as a YAML array
+- `source` is the original article URL (omit if direct content with no URL)
+- `description` should be under 160 characters for SEO
+- Empty sections should be omitted entirely
 
 #### Template: Technical Extensions (add when content type is Technical)
 
@@ -243,7 +271,7 @@ Include these sections when the article discusses frameworks, trends, or strateg
 ```
 
 **Section inclusion rules:**
-- Always: 요약, 주요 변경사항, 실무 적용, 참고 링크
+- Always: 요약, 주요 개념, 실무 적용, 참고 링크
 - Technical content: + 코드 예제, Before/After
 - Strategic content: + 핵심 프레임워크, 사례 비교
 - Optional: 주의사항 (if important warnings exist), Next Steps
@@ -253,13 +281,13 @@ Include these sections when the article discusses frameworks, trends, or strateg
 
 ### Step 7: Save Document
 
-**Save location**: `{learning_repo}/digests/{filename}`
+**Save location**: `{learning_repo}/blog/src/content/digests/{filename}`
 
-**Example**: `/Users/jaykim/Documents/Projects/ai-learning/digests/2026-01-25-ai-claude-sonnet-4-5-release.md`
+**Example**: `/Users/jaykim/Documents/Projects/ai-learning/blog/src/content/digests/2026-01-25-ai-claude-sonnet-4-5-release.md`
 
 **Deduplication check**: Before saving, use Glob to check if a file with the same date and similar topic slug already exists in the digests directory. If a match is found, ask the user whether to overwrite, append, or create with a suffix (e.g., `-2`).
 
-**Save**: Use the Write tool directly. Do NOT run `mkdir -p` — the `digests/` directory should already exist in a configured learning repo. If Write fails due to a missing directory, then create it.
+**Save**: Use the Write tool directly. Do NOT run `mkdir -p` — the `blog/src/content/digests/` directory should already exist in a configured learning repo. If Write fails due to a missing directory, then create it.
 
 ---
 
@@ -269,7 +297,7 @@ Only if `auto_commit: true` in config:
 
 ```bash
 cd "$learning_repo"
-git add "digests/$filename"
+git add "blog/src/content/digests/$filename"
 git commit -m "Add AI digest: $topic
 
 Co-Authored-By: Claude <model> <noreply@anthropic.com>"
@@ -282,6 +310,8 @@ If `auto_push: true`, also run:
 git push
 ```
 
+When pushed to main, GitHub Actions will automatically build and deploy the blog.
+
 ---
 
 ### Step 9: Confirm to User
@@ -291,6 +321,7 @@ Show the user:
 - **Captured**: Brief summary of what was captured (bulleted list of key topics)
 - **Source**: Original URL (if applicable)
 - **Git**: Commit status (only if auto_commit enabled)
+- **Blog**: URL where post will appear after deploy
 
 Do not use emojis in the confirmation output. Keep it concise and scannable.
 
@@ -315,13 +346,13 @@ Do not use emojis in the confirmation output. Keep it concise and scannable.
 
 ### When to Use
 
-✅ **Use this skill when**:
+**Use this skill when**:
 - User provides URL to AI/tech article
 - User pastes content to analyze
 - Need to capture rapidly changing AI updates
 - Want structured notes for future reference
 
-❌ **Skip when**:
+**Skip when**:
 - General conversation summary (use learning-summary)
 - Code review (use other tools)
 - Already documented elsewhere
@@ -350,7 +381,7 @@ Reuses `~/.claude/skills/learning-summary/config.yaml`:
 
 ```yaml
 # Dedicated AI learning repository (absolute path)
-learning_repo: "/Users/username/Documents/Projects/ai-learning"
+learning_repo: "/Users/jaykim/Documents/Projects/ai-learning"
 
 # Auto-commit to git
 auto_commit: false
@@ -359,7 +390,7 @@ auto_commit: false
 auto_push: false
 ```
 
-**Output directory**: Always uses `digests/` subfolder (hardcoded).
+**Output directory**: Always uses `blog/src/content/digests/` subfolder (hardcoded).
 
 **No separate config needed** - shares learning_repo and git settings with learning-summary for consistency.
 
@@ -374,7 +405,7 @@ User: /ai-digest https://anthropic.com/news/claude-sonnet-4-5
 
 Claude: [Fetches content via WebFetch, classifies as Technical, generates document]
 
-Saved: .../digests/2026-01-25-ai-claude-sonnet-4-5-release.md
+Saved: .../blog/src/content/digests/2026-01-25-ai-claude-sonnet-4-5-release.md
 
 Captured:
 - New Claude Sonnet 4.5 features and performance benchmarks
@@ -388,10 +419,10 @@ Captured:
 User: /ai-digest https://linkedin.com/posts/someone/...
 [pasted article text]
 
-Claude: [Detects LinkedIn URL + direct content → uses direct content, skips WebFetch]
+Claude: [Detects LinkedIn URL + direct content -> uses direct content, skips WebFetch]
 [Classifies as Strategic/Opinion, uses strategy template variant]
 
-Saved: .../digests/2026-01-25-ai-agent-economy-strategy.md
+Saved: .../blog/src/content/digests/2026-01-25-ai-agent-economy-strategy.md
 Source: https://linkedin.com/posts/someone/...
 
 Captured:
@@ -424,7 +455,7 @@ Please paste the article text and I'll digest it.
 
 ## Related Skills
 
-- `learning-summary`: For conversation summaries
+- `learning-summary`: For conversation summaries (saves to `blog/src/content/learnings/`)
 - `project-insight`: For codebase analysis
 
 ---
