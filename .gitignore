@@ -70,3 +70,5 @@ projects/supportbot/data/chroma_db/
 # Personal data
 JDs/
 /jd-analyzer/
+initial-projects
+docs/
