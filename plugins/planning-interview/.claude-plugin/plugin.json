@@ -1,7 +1,7 @@
 {
   "name": "planning-interview",
-  "version": "1.0.0",
-  "description": "AI-powered product planning interview plugin that transforms vague ideas into comprehensive PRDs through adaptive, context-aware questioning. Supports Solo Builder (Lean Canvas), Startup Founder (Product Brief), and Product Manager (Full PRD) workflows.",
+  "version": "2.0.0",
+  "description": "Unified service planning plugin. Generates PRD, User Journey Map, Technical Specification, and Wireframe Specification in a single interview flow. Mode (Solo/Startup/Team) controls interview depth; user selects which documents to generate.",
   "author": "Fused Implementation (Alpha Pragmatist + Beta Architect)",
   "license": "MIT",
   "keywords": [
@@ -12,9 +12,13 @@
     "requirements",
     "lean-canvas",
     "product-brief",
+    "user-journey",
+    "tech-spec",
+    "wireframe",
     "business-planning",
     "startup",
-    "pm-tools"
+    "pm-tools",
+    "unified-planning"
   ],
   "required_tools": [
     "AskUserQuestion",
