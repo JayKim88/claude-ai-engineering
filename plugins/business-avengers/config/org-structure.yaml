@@ -81,9 +81,9 @@ phases:
     name: Ideation
     dir_name: ideation
     lead: cpo
-    agents: [product-manager, ux-researcher]
+    agents: [product-manager]  # M6: ux-researcher listed but never invoked in SKILL.md Phase 0
     ceo_interaction: dialogue
-    inputs_from: [1]  # In market-first: reads Phase 1 outputs. In idea-first: nothing available yet.
+    inputs_from: []  # M5: never actually reads Phase 1. market-first reads Phase 1 via market_first_context (conditional, in Step 4)
     outputs: [idea-canvas.md]
 
   1:
@@ -132,7 +132,7 @@ phases:
     agents: [frontend-dev, backend-dev, devops-engineer]
     parallel: true
     ceo_interaction: confirm
-    inputs_from: [4]
+    inputs_from: [2, 3, 4]  # M1: actually reads Phase 2 (prd), Phase 3 (ui-specs), Phase 4 (tech-arch, api, db)
     outputs: [frontend-guide.md, backend-guide.md, deployment-strategy.md, implementation-roadmap.md]
 
   6:
@@ -143,6 +143,7 @@ phases:
     ceo_interaction: confirm
     inputs_from: [2, 4, 5]
     outputs: [test-plan.md, qa-checklist.md]
+    # M9: QA outputs are terminal — consumed by human developers, not by any later phase. Intentional design.
 
   7:
     name: Launch Strategy
@@ -151,7 +152,7 @@ phases:
     agents: [marketing-strategist, content-creator, growth-hacker, pr-manager]
     parallel: true
     ceo_interaction: approve
-    inputs_from: [1, 2]
+    inputs_from: [0, 1, 2]  # M2: actually reads Phase 0 (idea-canvas) in addition to Phase 1 and 2
     outputs: [gtm-strategy.md, content-plan.md, growth-strategy.md, pr-plan.md, launch-checklist.md]
 
   8:
@@ -161,7 +162,7 @@ phases:
     agents: [revenue-strategist, business-analyst]
     parallel: true
     ceo_interaction: approve
-    inputs_from: [1, 2, 7]
+    inputs_from: [0, 1, 2, 7]  # M3: actually reads Phase 0 (idea-canvas) in addition to Phase 1, 2, 7
     outputs: [pricing-strategy.md, financial-projections.md, unit-economics.md]
 
   9:
@@ -172,7 +173,7 @@ phases:
     parallel: true
     ceo_interaction: confirm
     inputs_from: [2, 4, 7, 8]
-    outputs: [cs-playbook.md, legal-docs.md, metrics-dashboard.md, feedback-loop.md]
+    outputs: [cs-playbook.md, faq-template.md, legal-docs.md, metrics-dashboard.md, feedback-loop.md]  # faq-template.md added (I6)
 
   # --- Post-Launch Phases (MAKE Methodology) ---
   10:
@@ -182,7 +183,7 @@ phases:
     agents: [growth-hacker, content-creator, data-analyst]
     parallel: true
     ceo_interaction: approve
-    inputs_from: [7, 8, 9]
+    inputs_from: [2, 7, 8, 9]  # added phase 2 (SKILL.md actually reads prd.md from phase-2)
     outputs: [growth-execution-plan.md, build-in-public-plan.md, organic-growth-playbook.md, user-retention-plan.md, growth-metrics-report.md]
 
   11:

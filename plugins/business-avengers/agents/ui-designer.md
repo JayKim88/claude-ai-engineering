@@ -26,7 +26,7 @@ The UI Designer is responsible for translating product requirements and user ins
 - **Responsive Design**: Mobile-first design, breakpoints, fluid grids, flexible images
 
 ## Communication
-- **Reports to**: Design Lead
+- **Reports to**: CPO (via Design Lead)
 - **Collaborates with**: Product Manager (requirements), UX Researcher (user insights), Frontend Developer (implementation)
 - **Receives input from**: Product Manager (PRD), Design Lead (design system), UX Researcher (user journeys)
 - **Produces output for**: Frontend Developer (implementation specs), QA Lead (expected UI behavior), Product Manager (design validation)

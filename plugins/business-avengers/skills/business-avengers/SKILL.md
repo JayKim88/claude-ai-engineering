@@ -69,6 +69,17 @@ INPUT PATTERNS:
 ```python
 is_sprint = (mode == "SPRINT")
 sprint_goal = user_input if is_sprint else ""
+
+# H5: Extract project_slug for non-ORCHESTRA modes (skip Step 2)
+# For SPRINT: /business-avengers sprint "{goal}" — ask if not in command
+# For SINGLE PHASE: /business-avengers phase {phase-name} — ask if not in command
+# For RESUME: /business-avengers resume — ask if not in command
+if mode in ["SPRINT", "SINGLE_PHASE", "RESUME"]:
+    project_slug = extract_from_command(user_input) or AskUserQuestion(
+        "어떤 프로젝트를 작업할까요? (slug 입력, 예: my-app)",
+        allow_freeform=true
+    )
+    current_version = "v1.0"  # H4: default; updated from project.yaml in Step 3
 ```
 
 **Mode routing:**
@@ -103,14 +114,56 @@ if not specified:
       "아이디어 우선 (Recommended) - 아이디어가 있으면 이 모드",
       "시장 우선 - 시장 기회를 먼저 탐색",
       "MVP 빌드 - 최소 기능으로 빠르게",
-      "MAKE 모드 - 인디메이커 린 경로 (아이디어→시장→런칭→수익화→성장→자동화)",
+      "인디 메이커 모드 - 최소 단계로 빠르게 (아이디어→시장→런칭→수익화→성장→자동화) | Powered by MAKE methodology",
       "풀 라이프사이클 - 아이디어부터 매각까지 전체 13단계",
       "포스트런칭 - 이미 런칭한 서비스의 성장/자동화/매각 전략",
       "커스텀 - Phase를 직접 선택"
     ]
   )
 
-# 2.4 Initialize project
+# 2.4 Post-launch onboarding: collect existing service context (UX2)
+if workflow_mode == "post-launch":
+    """
+    [COO] 포스트런칭 모드입니다. 이미 런칭한 서비스를 성장/자동화/매각 단계로 이어갑니다.
+    기존 서비스 정보를 입력해 주시면, 에이전트들이 실제 맥락에 맞는 전략을 수립합니다.
+    """
+    AskUserQuestion("서비스 URL을 알려주세요.", allow_freeform=true)
+    service_url = last_answer
+    AskUserQuestion("서비스의 주요 기능 3가지를 간략히 설명해주세요.", allow_freeform=true)
+    service_features = last_answer
+    AskUserQuestion("현재 월 매출 (또는 수익)은 어느 정도인가요?", allow_freeform=true)
+    service_revenue = last_answer
+    AskUserQuestion("현재 활성 사용자 수 (MAU/DAU)는?", allow_freeform=true)
+    service_users = last_answer
+    AskUserQuestion("현재 사용 중인 기술 스택을 간략히 알려주세요.", allow_freeform=true)
+    service_tech = last_answer
+
+    # Generate bootstrap context documents as substitutes for Phase 0-9 outputs
+    Task(
+        subagent_type="product-manager",
+        model="sonnet",
+        description="Generate post-launch context documents",
+        prompt=f"""
+        당신은 Business Avengers의 Product Manager입니다.
+        포스트런칭 모드로 진입한 기존 서비스의 컨텍스트 문서를 생성하세요.
+
+        서비스 정보:
+        - URL: {service_url}
+        - 주요 기능: {service_features}
+        - 월 매출/수익: {service_revenue}
+        - 활성 사용자: {service_users}
+        - 기술 스택: {service_tech}
+
+        작업:
+        1. Read로 템플릿 읽기: {TEMPLATE_DIR}/idea-canvas.md
+        2. 위 정보를 바탕으로 idea-canvas를 작성하세요 (PRD 대용으로 사용됨)
+        3. Write로 저장:
+           - {PROJECT_DIR}/phase-0-ideation/idea-canvas.md
+           - 동일 내용을 {PROJECT_DIR}/phase-2-product-planning/prd.md 로도 저장 (phase 10-11이 참조)
+        """
+    )
+
+# 2.5 Initialize project
 Bash("python3 {PLUGIN_DIR}/config/init-project.py create '{project_name}' '{project_slug}' '{workflow_mode}'")
 ```
 
@@ -118,6 +171,7 @@ Bash("python3 {PLUGIN_DIR}/config/init-project.py create '{project_name}' '{proj
 ```
 # PLUGIN_DIR, TEMPLATE_DIR, KNOWLEDGE_DIR, AGENTS_DIR, CONFIG_DIR → resolved in Step 0
 PROJECT_DIR = ~/.business-avengers/projects/{project_slug}
+current_version = "v1.0"  # H4: initial version for backup filenames
 ```
 
 ---
@@ -142,28 +196,84 @@ project = result  # The JSON data from init-project.py
 # Determine which phases to run based on mode:
 if mode == ORCHESTRA:
   phases_to_run = WORKFLOW_PRESETS[workflow_mode]
+  # UX4: Inform CEO about skipped phases for non-linear presets
+  if workflow_mode == "make":
+      """
+      [CPO] 인디 메이커 모드로 시작합니다.
+      린 경로로 Phase 2(PRD), 3(디자인), 4(기술설계), 5(개발가이드), 6(QA), 9(운영)를 건너뛰고
+      Phase 0→1→7→8→10→11 순서로 진행합니다. (에러가 아닙니다)
+      PRD 미존재 시 Idea Canvas가 대용으로 사용됩니다.
+      """
+  elif workflow_mode == "post-launch":
+      """
+      [COO] 포스트런칭 모드입니다.
+      기존 서비스의 Phase 0-9 산출물 없이 Phase 10→11→12를 진행합니다.
+      온보딩 시 입력한 서비스 정보가 컨텍스트로 사용됩니다.
+      """
+  elif workflow_mode == "mvp-build":
+      """
+      [CPO] MVP 빌드 모드입니다.
+      Phase 0→2→4→5→7 순서로 진행합니다.
+      Phase 1(시장조사), 3(디자인), 6(QA), 8-12를 건너뜁니다. (에러가 아닙니다)
+      """
 elif mode == SINGLE_PHASE:
-  phases_to_run = [requested_phase_number]
+  # M8: Bounds check for phase number
+  if requested_phase_number not in range(0, 13):
+      """
+      [COO] 오류: Phase 번호는 0에서 12 사이여야 합니다.
+      요청하신 Phase: {requested_phase_number}
+      지원되는 Phase: 0(아이디어), 1(시장조사), 2(제품기획), 3(디자인),
+                      4(기술설계), 5(개발가이드), 6(QA), 7(GTM), 8(수익화),
+                      9(운영), 10(성장), 11(자동화), 12(스케일/매각)
+      """
+  else:
+      phases_to_run = [requested_phase_number]
 elif mode == SPRINT:
-  # Ask CEO which phases need updating
+  # Ask CEO which phases need updating (UX5: all 13 phases, grouped, terminology unified)
   AskUserQuestion(
-    "이번 스프린트에서 어떤 단계를 업데이트해야 할까요?",
+    "이번 스프린트에서 어떤 단계를 업데이트해야 할까요?\n"
+    "📋 기획: Phase 0(아이디어), 1(시장조사), 2(PRD)\n"
+    "🎨 개발: Phase 3(디자인), 4(기술설계), 5(개발가이드), 6(QA)\n"
+    "🚀 런칭: Phase 7(GTM), 8(수익화), 9(운영)\n"
+    "📈 성장: Phase 10(성장), 11(자동화), 12(스케일/매각)",
     options=[
-      "기획 수정 (Phase 2)",
-      "디자인 수정 (Phase 3)",
-      "기술 설계 수정 (Phase 4)",
-      "마케팅 전략 수정 (Phase 7)",
-      "성장 전략 업데이트 (Phase 10)",
-      "자동화 업데이트 (Phase 11)",
-      "전략/매각 분석 (Phase 12)",
-      "직접 선택"
+      "Phase 0 업데이트 - 아이디어 캔버스",
+      "Phase 1 업데이트 - 시장조사 (시장분석, 경쟁사, 수익모델)",
+      "Phase 2 업데이트 - PRD / 기능 우선순위",
+      "Phase 3 업데이트 - 디자인 시스템 / 와이어프레임",
+      "Phase 4 업데이트 - 기술 아키텍처 / API / DB",
+      "Phase 5 업데이트 - 개발 가이드 / 배포 전략",
+      "Phase 6 업데이트 - 테스트 계획 / QA 체크리스트",
+      "Phase 7 업데이트 - GTM 전략 / 콘텐츠 플랜",
+      "Phase 8 업데이트 - 가격 전략 / 재무 예측",
+      "Phase 9 업데이트 - CS 플레이북 / 메트릭",
+      "Phase 10 업데이트 - 성장 전략 / 유기적 성장",
+      "Phase 11 업데이트 - 자동화 감사 / 로봇 사양",
+      "Phase 12 업데이트 - 스케일 vs 매각 분석"
     ],
     multiSelect=true
   )
   phases_to_run = selected_phases
 elif mode == RESUME:
+  # I8: Load workflow from saved project data (workflow variable not defined in Step 3 otherwise)
+  workflow = WORKFLOW_PRESETS.get(project.workflow_mode, WORKFLOW_PRESETS["idea-first"])
   # Find first incomplete phase
   phases_to_run = [p for p in workflow if project.phases[p].status != "completed"]
+```
+
+**Phase Execution Loop (I10):**
+```
+# Execute each phase in phases_to_run in order.
+# For each phase N in phases_to_run, execute the corresponding Step:
+#   Phase 0  → Step 4    Phase 1  → Step 5    Phase 2  → Step 6    Phase 3  → Step 7
+#   Phase 4  → Step 8    Phase 5  → Step 9    Phase 6  → Step 10   Phase 7  → Step 11
+#   Phase 8  → Step 12   Phase 9  → Step 13   Phase 10 → Step 14   Phase 11 → Step 15
+#   Phase 12 → Step 16
+#
+# After completing all phases in phases_to_run (I11 - completion routing):
+#   If is_sprint: Go to Step 20 (Sprint Completion)
+#   If mode == ORCHESTRA: Go to Step 21 (Project Completion)
+#   Otherwise: Display summary of completed phases and return.
 ```
 
 ---
@@ -173,29 +283,85 @@ elif mode == RESUME:
 **Condition**: Only runs if Phase 0 is in phases_to_run
 
 **Lead**: CPO + Product Manager
-**CEO Interaction**: Dialogue (interactive Q&A)
+**CEO Interaction**: Dialogue (interactive Q&A or document input)
 
 ```python
 # 4.1 CPO introduces the ideation process
 # Display as CPO speaking:
 """
 [CPO] 안녕하세요, CEO님. 새로운 프로젝트를 시작하겠습니다.
-아이디어를 구체화하기 위해 몇 가지 질문을 드리겠습니다.
 """
 
-# 4.2 Interactive Q&A (5-7 questions)
-questions = [
-  "이 서비스가 해결하는 구체적인 문제는 무엇인가요?",
-  "주요 타겟 사용자는 누구인가요? (나이, 직업, 상황 등)",
-  "현재 사용자들이 이 문제를 어떻게 해결하고 있나요? (기존 대안)",
-  "기존 대안 대비 우리 서비스의 핵심 차별점은?",
-  "첫 수익은 어떻게 발생할 것으로 예상하시나요?",
-]
+# 4.2a Market-first: read Phase 1 outputs to provide market context during ideation (M7)
+market_first_context = ""
+if workflow_mode == "market-first":
+    mkt_f = Glob("{PROJECT_DIR}/phase-1-market-research/market-analysis.md")
+    comp_f = Glob("{PROJECT_DIR}/phase-1-market-research/competitive-analysis.md")
+    rev_f = Glob("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md")
+    if mkt_f or comp_f or rev_f:
+        market_first_context = (
+            "시장 조사 결과 (참고하여 아이디어를 구체화하세요):\n"
+            + (f"시장 분석:\n{Read(mkt_f[0])}\n" if mkt_f else "")
+            + (f"경쟁 분석:\n{Read(comp_f[0])}\n" if comp_f else "")
+            + (f"수익 모델 초안:\n{Read(rev_f[0])}\n" if rev_f else "")
+        )
 
-for q in questions:
-  AskUserQuestion(q, allow_freeform=true)
+# 4.2 Sprint mode: backup existing idea-canvas before overwriting
+sprint_context = ""
+if is_sprint:
+    existing = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
+    if existing:
+        Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-0-ideation idea-canvas.md {current_version}")
+        existing_canvas = Read(existing[0])
+        sprint_context = f"기존 Idea Canvas를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_canvas}"
 
-# 4.3 Product Manager synthesizes into Idea Canvas
+# 4.3 Document availability check — ask BEFORE starting Q&A
+has_doc = AskUserQuestion(
+  "[CPO] 아이디어를 미리 정리하신 문서나 메모가 있나요?",
+  options=[
+    "있음 - 파일 경로나 내용을 바로 제공하겠습니다",
+    "없음 - Q&A로 함께 정리하겠습니다"
+  ]
+)
+
+if "있음" in has_doc:
+    # 4.3a Document input flow: get file path or pasted text
+    idea_input = AskUserQuestion(
+        "[CPO] 파일 경로(.md/.txt 등) 또는 내용을 직접 붙여넣어 주세요.",
+        allow_freeform=True
+    )
+    # Smart detection: file path (contains "/" and ends with extension) vs pasted text
+    stripped = idea_input.strip()
+    is_file_path = ("/" in stripped or "\\" in stripped) and any(
+        stripped.endswith(ext) for ext in (".md", ".txt", ".pdf", ".docx")
+    )
+    if is_file_path:
+        doc_files = Glob(stripped)
+        idea_doc = Read(doc_files[0]) if doc_files else stripped  # fallback to treating as text if not found
+        if not doc_files:
+            """[CPO] 파일을 찾을 수 없어 입력 내용을 텍스트로 처리합니다."""
+    else:
+        idea_doc = stripped  # treat as pasted content
+
+    all_qa_responses = f"[CEO 제공 아이디어 문서]\n{idea_doc}"
+
+else:
+    # 4.3b Interactive Q&A flow (original behavior)
+    """[CPO] 아이디어를 구체화하기 위해 몇 가지 질문을 드리겠습니다."""
+    questions = [
+      "이 서비스가 해결하는 구체적인 문제는 무엇인가요?",
+      "주요 타겟 사용자는 누구인가요? (나이, 직업, 상황 등)",
+      "현재 사용자들이 이 문제를 어떻게 해결하고 있나요? (기존 대안)",
+      "기존 대안 대비 우리 서비스의 핵심 차별점은?",
+      "첫 수익은 어떻게 발생할 것으로 예상하시나요?",
+    ]
+
+    for q in questions:
+      AskUserQuestion(q, allow_freeform=True)
+
+    # all_qa_responses is collected from the Q&A above
+
+# 4.4 Product Manager synthesizes into Idea Canvas
 Task(
   subagent_type="product-manager",
   model="sonnet",
@@ -203,13 +369,21 @@ Task(
   prompt=f"""
   당신은 Business Avengers의 Product Manager입니다.
 
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/product-manager.md
+
   CEO와의 대화 내용:
   {all_qa_responses}
 
+  {market_first_context}
+
+  {sprint_context}
+
   작업:
-  1. Read로 템플릿 읽기: {TEMPLATE_DIR}/idea-canvas.md
-  2. CEO 답변을 분석하여 모든 플레이스홀더를 채우세요
-  3. Write로 저장: {PROJECT_DIR}/phase-0-ideation/idea-canvas.md
+  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
+  2. Read로 템플릿 읽기: {TEMPLATE_DIR}/idea-canvas.md
+  3. CEO 답변을 분석하여 모든 플레이스홀더를 채우세요
+  4. Write로 저장: {PROJECT_DIR}/phase-0-ideation/idea-canvas.md
 
   전문적이고 구체적으로 작성하세요. 모호한 표현 없이.
   """
@@ -219,7 +393,7 @@ Task(
 idea_canvas = Read("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
 # Display idea canvas content to CEO
 
-AskUserQuestion(
+gate_0 = AskUserQuestion(
   "[CPO] Idea Canvas를 검토해주세요. 어떻게 진행할까요?",
   options=[
     "승인 - 다음 단계로 진행",
@@ -228,8 +402,16 @@ AskUserQuestion(
   ]
 )
 
-# If approved: update project.yaml phase 0 status
-Bash("python3 {PLUGIN_DIR}/config/init-project.py update-phase '{project_slug}' 0 completed v1.0")
+if "승인" in gate_0:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 0 completed {current_version}")
+elif "수정 요청" in gate_0:
+    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? 구체적으로 알려주세요.", allow_freeform=true)
+    # INSTRUCTION: Re-run the Product Manager Task() from step 4.4 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # After re-run, loop back to this gate.
+elif "중단" in gate_0:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 0 cancelled {current_version}")
+    # Exit pipeline - no further phases
 ```
 
 ---
@@ -248,15 +430,25 @@ idea_canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
 idea_canvas = Read(idea_canvas_files[0]) if idea_canvas_files else ""
 
 # 5.2 Sprint mode: read existing docs for update context
-sprint_context = ""
+sprint_context_market = ""
+sprint_context_competitive = ""
+sprint_context_revenue = ""
 if is_sprint:
   existing_files = Glob("{PROJECT_DIR}/phase-1-market-research/*.md")
-  existing_market = Read("{PROJECT_DIR}/phase-1-market-research/market-analysis.md") if "market-analysis.md" in str(existing_files) else ""
-  existing_competitive = Read("{PROJECT_DIR}/phase-1-market-research/competitive-analysis.md") if "competitive-analysis.md" in str(existing_files) else ""
-  existing_revenue = Read("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md") if "revenue-model-draft.md" in str(existing_files) else ""
-  # Backup existing docs before overwriting
-  Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-1-market-research market-analysis.md {current_version}")
-  sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_market}"
+  if existing_files:
+    # Backup all 3 files before overwriting (H3)
+    Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-1-market-research market-analysis.md {current_version}")
+    Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-1-market-research competitive-analysis.md {current_version}")
+    Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-1-market-research revenue-model-draft.md {current_version}")
+    market_f = Glob("{PROJECT_DIR}/phase-1-market-research/market-analysis.md")
+    existing_market = Read(market_f[0]) if market_f else ""
+    competitive_f = Glob("{PROJECT_DIR}/phase-1-market-research/competitive-analysis.md")
+    existing_competitive = Read(competitive_f[0]) if competitive_f else ""
+    revenue_f = Glob("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md")
+    existing_revenue = Read(revenue_f[0]) if revenue_f else ""
+    sprint_context_market = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_market}"
+    sprint_context_competitive = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_competitive}"
+    sprint_context_revenue = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_revenue}"
 
 # 5.3 Launch 3 agents in PARALLEL (CRITICAL: all in single response block)
 Task(
@@ -265,6 +457,9 @@ Task(
   description="Market size analysis",
   prompt=f"""
   당신은 Business Avengers의 Business Analyst입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/business-analyst.md
 
   프로젝트 컨텍스트:
   {idea_canvas}
@@ -282,7 +477,7 @@ Task(
   3. 시장 트렌드와 성장 동력을 분석하세요
   4. 템플릿을 채워 Write로 저장: {PROJECT_DIR}/phase-1-market-research/market-analysis.md
 
-  {sprint_context if sprint else ""}
+  {sprint_context_market}
   데이터 출처를 반드시 명시하세요. 추정치에는 근거를 달아주세요.
   """
 )
@@ -293,6 +488,9 @@ Task(
   description="Competitive analysis",
   prompt=f"""
   당신은 Business Avengers의 Marketing Strategist입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/marketing-strategist.md
 
   프로젝트 컨텍스트:
   {idea_canvas}
@@ -309,7 +507,7 @@ Task(
   3. SWOT 분석과 포지셔닝 맵을 작성하세요
   4. 템플릿을 채워 Write로 저장: {PROJECT_DIR}/phase-1-market-research/competitive-analysis.md
 
-  {sprint_context if sprint else ""}
+  {sprint_context_competitive}
   실제 URL과 데이터를 포함하세요.
   """
 )
@@ -320,6 +518,9 @@ Task(
   description="Revenue model analysis",
   prompt=f"""
   당신은 Business Avengers의 Revenue Strategist입니다.
+
+  에이전트 정의 (Read로 읽으세요):
+  - {AGENTS_DIR}/revenue-strategist.md
 
   프로젝트 컨텍스트:
   {idea_canvas}
@@ -338,7 +539,7 @@ Task(
   4. 추천 모델과 근거를 제시하세요
   5. 템플릿을 채워 Write로 저장: {PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md
 
-  {sprint_context if sprint else ""}
+  {sprint_context_revenue}
   """
 )
 
@@ -358,7 +559,7 @@ revenue = Read("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md")
 상세 문서는 프로젝트 폴더에 저장되었습니다.
 """
 
-AskUserQuestion(
+gate_1 = AskUserQuestion(
   "[CFO] 시장 조사 결과를 검토해주세요.",
   options=[
     "승인 - 시장성 확인, 다음 단계로",
@@ -368,7 +569,19 @@ AskUserQuestion(
   ]
 )
 
-Bash("python3 {PLUGIN_DIR}/config/init-project.py update-phase '{project_slug}' 1 completed v1.0")
+if "승인" in gate_1:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 1 completed {current_version}")
+elif "수정 요청" in gate_1:
+    revision_feedback = AskUserQuestion("어떤 부분을 추가 조사할까요?", allow_freeform=true)
+    # INSTRUCTION: Re-run the 3 Phase 1 agents from step 5.3 above,
+    # setting sprint_context_* = f"CEO 수정 피드백: {revision_feedback}"
+    # After re-run, loop back to this gate.
+elif "피봇" in gate_1:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 1 revision {current_version}")
+    # Return to Phase 0 - re-run Ideation (Step 4)
+elif "중단" in gate_1:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 1 cancelled {current_version}")
+    # Exit pipeline
 ```
 
 ---
@@ -471,7 +684,7 @@ Task(
 prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
 personas = Read("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
 
-AskUserQuestion(
+gate_2 = AskUserQuestion(
   "[CPO] PRD와 기능 우선순위를 검토해주세요.",
   options=[
     "승인 - 다음 단계로 진행",
@@ -480,7 +693,16 @@ AskUserQuestion(
   ]
 )
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 2 completed v1.0")
+if "승인" in gate_2:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 2 completed {current_version}")
+elif "수정 요청" in gate_2:
+    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (기능 범위, 우선순위, 페르소나 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run Phase 2 agents from step 6.3 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # After re-run, loop back to this gate.
+elif "피봇" in gate_2:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 2 revision {current_version}")
+    # Return to Phase 0 - re-run Ideation (Step 4)
 ```
 
 ---
@@ -493,8 +715,14 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 2 compl
 
 ```python
 # 7.1 Read previous phase outputs
-prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
-personas = Read("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
+prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+if prd_files:
+    prd = Read(prd_files[0])
+else:
+    canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
+    prd = Read(canvas_files[0]) if canvas_files else ""
+personas_files = Glob("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
+personas = Read(personas_files[0]) if personas_files else ""
 
 # 7.2 Sprint mode: backup existing docs
 sprint_context = ""
@@ -576,7 +804,7 @@ Task(
   """)
 
 # 7.5 CEO reviews design
-AskUserQuestion(
+gate_3 = AskUserQuestion(
   "[CPO] 디자인 시스템과 와이어프레임을 검토해주세요.",
   options=[
     "승인 - 다음 단계로 진행",
@@ -584,6 +812,17 @@ AskUserQuestion(
     "피봇 - 방향 전환"
   ]
 )
+
+if "승인" in gate_3:
+    pass  # proceed to update-phase below
+elif "수정 요청" in gate_3:
+    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (디자인 시스템, 와이어프레임, UI 컴포넌트 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run Design Lead and UI Designer Tasks from step 7.3-7.4 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # After re-run, loop back to this gate.
+elif "피봇" in gate_3:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 3 revision {current_version}")
+    # Return to Phase 0
 
 Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 3 completed v1.0")
 ```
@@ -599,7 +838,12 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 3 compl
 
 ```python
 # 8.1 Read previous phase outputs
-prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+if prd_files:
+    prd = Read(prd_files[0])
+else:
+    canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
+    prd = Read(canvas_files[0]) if canvas_files else ""
 ui_specs_files = Glob("{PROJECT_DIR}/phase-3-design/ui-specifications.md")
 ui_specs = Read(ui_specs_files[0]) if ui_specs_files else ""
 
@@ -659,10 +903,17 @@ tech_arch = Read("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
 [CTO] 기술 설계가 완료되었습니다. 상세 내용은 프로젝트 폴더를 확인해주세요.
 """
 
-AskUserQuestion("[CTO] 기술 설계 보고입니다. 확인해주세요.",
+gate_4 = AskUserQuestion("[CTO] 기술 설계 보고입니다. 확인해주세요.",
   options=["확인 - 진행", "질문 있음", "수정 요청"])
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 4 completed v1.0")
+if "질문 있음" in gate_4:
+    follow_up = AskUserQuestion("어떤 내용이 궁금하신가요? 기술 설계 관련 질문을 입력해주세요.", allow_freeform=true)
+    # Display relevant section from tech_arch / api_design / database-schema based on follow_up
+elif "수정 요청" in gate_4:
+    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (아키텍처, API, DB 스키마 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run Tech Lead Task from step 8.3 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 4 completed {current_version}")
 ```
 
 ---
@@ -676,23 +927,37 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 4 compl
 
 ```python
 # 9.1 Read previous phase outputs
-tech_arch = Read("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
-api_design = Read("{PROJECT_DIR}/phase-4-tech-planning/api-design.md")
-db_schema = Read("{PROJECT_DIR}/phase-4-tech-planning/database-schema.md")
+tech_arch_files = Glob("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
+tech_arch = Read(tech_arch_files[0]) if tech_arch_files else ""
+api_design_files = Glob("{PROJECT_DIR}/phase-4-tech-planning/api-design.md")
+api_design = Read(api_design_files[0]) if api_design_files else ""
+db_schema_files = Glob("{PROJECT_DIR}/phase-4-tech-planning/database-schema.md")
+db_schema = Read(db_schema_files[0]) if db_schema_files else ""
 ui_specs_files = Glob("{PROJECT_DIR}/phase-3-design/ui-specifications.md")
 ui_specs = Read(ui_specs_files[0]) if ui_specs_files else ""
-prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+if prd_files:
+    prd = Read(prd_files[0])
+else:
+    canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
+    prd = Read(canvas_files[0]) if canvas_files else ""
 
-# 9.2 Sprint mode: backup existing docs
+# 9.2 Sprint mode: backup existing docs (I3: per-agent sprint_context with existing content)
 sprint_context = ""
+sprint_context_frontend = ""
+sprint_context_backend = ""
 if is_sprint:
   existing = Glob("{PROJECT_DIR}/phase-5-development/*.md")
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-5-development frontend-guide.md {current_version}")
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-5-development backend-guide.md {current_version}")
-    existing_frontend = Read("{PROJECT_DIR}/phase-5-development/frontend-guide.md")
-    existing_backend = Read("{PROJECT_DIR}/phase-5-development/backend-guide.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}"
+    frontend_f = Glob("{PROJECT_DIR}/phase-5-development/frontend-guide.md")
+    existing_frontend = Read(frontend_f[0]) if frontend_f else ""
+    backend_f = Glob("{PROJECT_DIR}/phase-5-development/backend-guide.md")
+    existing_backend = Read(backend_f[0]) if backend_f else ""
+    sprint_context_frontend = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 프론트엔드 가이드:\n{existing_frontend}"
+    sprint_context_backend = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 백엔드 가이드:\n{existing_backend}"
+    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}"  # devops용
 
 # 9.3 Launch 3 agents in PARALLEL (CRITICAL: all in single response block)
 Task(
@@ -716,7 +981,7 @@ Task(
   템플릿 (Read로 읽으세요):
   - {TEMPLATE_DIR}/frontend-guide.md
 
-  {sprint_context}
+  {sprint_context_frontend}
 
   작업:
   1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
@@ -752,7 +1017,7 @@ Task(
   템플릿 (Read로 읽으세요):
   - {TEMPLATE_DIR}/backend-guide.md
 
-  {sprint_context}
+  {sprint_context_backend}
 
   작업:
   1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
@@ -812,9 +1077,16 @@ Task(
 상세 내용은 프로젝트 폴더를 확인해주세요.
 """
 
-AskUserQuestion("[CTO] 개발 가이드가 완료되었습니다.", options=["확인 - 진행", "질문 있음", "수정 요청"])
+gate_5 = AskUserQuestion("[CTO] 개발 가이드가 완료되었습니다.", options=["확인 - 진행", "질문 있음", "수정 요청"])
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 5 completed v1.0")
+if "질문 있음" in gate_5:
+    follow_up = AskUserQuestion("개발 가이드 관련 질문을 입력해주세요.", allow_freeform=true)
+    # Display relevant section from frontend-guide / backend-guide / deployment-strategy based on follow_up
+elif "수정 요청" in gate_5:
+    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (프론트엔드, 백엔드, 배포 전략 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run the relevant dev agent Task(s) from step 9.3 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 5 completed {current_version}")
 ```
 
 ---
@@ -828,10 +1100,18 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 5 compl
 
 ```python
 # 10.1 Read previous phase outputs
-prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
-user_stories = Read("{PROJECT_DIR}/phase-2-product-planning/user-stories.md")
-tech_arch = Read("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
-api_design = Read("{PROJECT_DIR}/phase-4-tech-planning/api-design.md")
+prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+if prd_files:
+    prd = Read(prd_files[0])
+else:
+    canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
+    prd = Read(canvas_files[0]) if canvas_files else ""
+user_stories_files = Glob("{PROJECT_DIR}/phase-2-product-planning/user-stories.md")
+user_stories = Read(user_stories_files[0]) if user_stories_files else ""
+tech_arch_files = Glob("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
+tech_arch = Read(tech_arch_files[0]) if tech_arch_files else ""
+api_design_files = Glob("{PROJECT_DIR}/phase-4-tech-planning/api-design.md")
+api_design = Read(api_design_files[0]) if api_design_files else ""
 frontend_guide_files = Glob("{PROJECT_DIR}/phase-5-development/frontend-guide.md")
 frontend_guide = Read(frontend_guide_files[0]) if frontend_guide_files else ""
 
@@ -885,10 +1165,17 @@ Task(
   """)
 
 # 10.4 CTO reports to CEO
-AskUserQuestion("[CTO] QA 계획이 완료되었습니다. 테스트 계획서와 QA 체크리스트가 생성되었습니다.",
+gate_6 = AskUserQuestion("[CTO] QA 계획이 완료되었습니다. 테스트 계획서와 QA 체크리스트가 생성되었습니다.",
   options=["확인 - 진행", "질문 있음", "수정 요청"])
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 6 completed v1.0")
+if "질문 있음" in gate_6:
+    follow_up = AskUserQuestion("QA 계획 관련 질문을 입력해주세요.", allow_freeform=true)
+    # Display relevant section from test-plan / qa-checklist based on follow_up
+elif "수정 요청" in gate_6:
+    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (테스트 케이스, 성능 기준, E2E 시나리오 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run QA Lead Task from step 10.3 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 6 completed {current_version}")
 ```
 
 ---
@@ -904,10 +1191,17 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 6 compl
 # 11.1 Read previous phase outputs
 idea_canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
 idea_canvas = Read(idea_canvas_files[0]) if idea_canvas_files else ""
-prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
-personas = Read("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
-market_analysis = Read("{PROJECT_DIR}/phase-1-market-research/market-analysis.md")
-competitive = Read("{PROJECT_DIR}/phase-1-market-research/competitive-analysis.md")
+prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+if prd_files:
+    prd = Read(prd_files[0])
+else:
+    prd = idea_canvas  # make/mvp-build 프리셋 fallback: PRD 미존재 시 idea-canvas 사용
+personas_files = Glob("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
+personas = Read(personas_files[0]) if personas_files else ""
+market_analysis_files = Glob("{PROJECT_DIR}/phase-1-market-research/market-analysis.md")
+market_analysis = Read(market_analysis_files[0]) if market_analysis_files else ""
+competitive_files = Glob("{PROJECT_DIR}/phase-1-market-research/competitive-analysis.md")
+competitive = Read(competitive_files[0]) if competitive_files else ""
 
 # 11.2 Sprint mode: backup existing docs
 sprint_context = ""
@@ -1007,7 +1301,7 @@ Task(
   - 시장 분석: {market_analysis}
 
   Knowledge Base (Read로 읽으세요):
-  - {KNOWLEDGE_DIR}/growth-hacking.md
+  - {KNOWLEDGE_DIR}/growth-tactics.md
 
   템플릿 (Read로 읽으세요):
   - {TEMPLATE_DIR}/growth-strategy.md
@@ -1074,10 +1368,19 @@ Task(
 상세 문서는 프로젝트 폴더에 저장되었습니다.
 """
 
-AskUserQuestion("[CMO] 출시 전략을 검토해주세요.",
+gate_7 = AskUserQuestion("[CMO] 출시 전략을 검토해주세요.",
   options=["승인 - 출시 전략 확정", "수정 요청 - 피드백 반영", "예산 조정 필요", "재검토 - 방향 재설정"])
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 7 completed v1.0")
+if "승인" in gate_7:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 7 completed {current_version}")
+elif "수정 요청" in gate_7 or "예산 조정" in gate_7:
+    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (GTM 채널, 콘텐츠 전략, 예산 배분 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run the relevant Phase 7 agent Task(s) from step 11.3 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # After re-run, loop back to this gate.
+elif "재검토" in gate_7:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 7 revision {current_version}")
+    # Return to Phase 0 for full re-ideation
 ```
 
 ---
@@ -1093,10 +1396,17 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 7 compl
 # 12.1 Read previous phase outputs
 idea_canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
 idea_canvas = Read(idea_canvas_files[0]) if idea_canvas_files else ""
-prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
-market_analysis = Read("{PROJECT_DIR}/phase-1-market-research/market-analysis.md")
-competitive = Read("{PROJECT_DIR}/phase-1-market-research/competitive-analysis.md")
-revenue_draft = Read("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md")
+prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+if prd_files:
+    prd = Read(prd_files[0])
+else:
+    prd = idea_canvas  # make 프리셋 fallback: PRD 미존재 시 idea-canvas 사용
+market_analysis_files = Glob("{PROJECT_DIR}/phase-1-market-research/market-analysis.md")
+market_analysis = Read(market_analysis_files[0]) if market_analysis_files else ""
+competitive_files = Glob("{PROJECT_DIR}/phase-1-market-research/competitive-analysis.md")
+competitive = Read(competitive_files[0]) if competitive_files else ""
+revenue_draft_files = Glob("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md")
+revenue_draft = Read(revenue_draft_files[0]) if revenue_draft_files else ""
 feature_priority_files = Glob("{PROJECT_DIR}/phase-2-product-planning/feature-priority.md")
 feature_priority = Read(feature_priority_files[0]) if feature_priority_files else ""
 
@@ -1198,10 +1508,19 @@ Task(
 상세 문서는 프로젝트 폴더에 저장되었습니다.
 """
 
-AskUserQuestion("[CFO] 수익화 전략을 검토해주세요.",
+gate_8 = AskUserQuestion("[CFO] 수익화 전략을 검토해주세요.",
   options=["승인 - 가격 확정", "수정 요청 - 가격 조정 필요", "재검토 - 수익 모델 변경"])
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 8 completed v1.0")
+if "승인" in gate_8:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 8 completed {current_version}")
+elif "수정 요청" in gate_8:
+    revision_feedback = AskUserQuestion("어떤 부분을 조정할까요? (가격 tier, 수익 모델, Unit Economics 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run Phase 8 agents from step 12.3 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # After re-run, loop back to this gate.
+elif "재검토" in gate_8:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 8 revision {current_version}")
+    # Return to Phase 1 for market re-research or Phase 0 for re-ideation
 ```
 
 ---
@@ -1214,12 +1533,21 @@ Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 8 compl
 **CEO Interaction**: Delegate + Report
 
 ```python
-# 13.1 Read previous phase outputs
-prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
-personas = Read("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
+# 13.1 Read previous phase outputs (I2: added Phase 7 gtm-strategy.md per inputs_from: [2,4,7,8])
+prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+if prd_files:
+    prd = Read(prd_files[0])
+else:
+    canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
+    prd = Read(canvas_files[0]) if canvas_files else ""
+personas_files = Glob("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
+personas = Read(personas_files[0]) if personas_files else ""
 pricing_files = Glob("{PROJECT_DIR}/phase-8-monetization/pricing-strategy.md")
 pricing = Read(pricing_files[0]) if pricing_files else ""
-tech_arch = Read("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
+tech_arch_files = Glob("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
+tech_arch = Read(tech_arch_files[0]) if tech_arch_files else ""
+gtm_files = Glob("{PROJECT_DIR}/phase-7-launch-strategy/gtm-strategy.md")
+gtm = Read(gtm_files[0]) if gtm_files else ""
 
 # 13.2 Sprint mode: backup existing docs
 sprint_context = ""
@@ -1245,6 +1573,7 @@ Task(
   - PRD: {prd}
   - 페르소나: {personas}
   - 가격 전략: {pricing}
+  - GTM 전략 (출시/채널 컨텍스트): {gtm}
 
   Knowledge Base (Read로 읽으세요):
   - {KNOWLEDGE_DIR}/startup-best-practices.md
@@ -1317,7 +1646,7 @@ Task(
   - 가격 전략: {pricing}
 
   Knowledge Base (Read로 읽으세요):
-  - {KNOWLEDGE_DIR}/growth-hacking.md
+  - {KNOWLEDGE_DIR}/data-metrics-guide.md
 
   템플릿 (Read로 읽으세요):
   - {TEMPLATE_DIR}/metrics-dashboard.md
@@ -1349,10 +1678,17 @@ Task(
 상세 문서는 프로젝트 폴더에 저장되었습니다.
 """
 
-AskUserQuestion("[COO] 운영 계획이 완료되었습니다. 검토해주세요.",
+gate_9 = AskUserQuestion("[COO] 운영 계획이 완료되었습니다. 검토해주세요.",
   options=["확인 - 진행", "질문 있음", "수정 요청"])
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 9 completed v1.0")
+if "질문 있음" in gate_9:
+    follow_up = AskUserQuestion("운영 계획 관련 질문을 입력해주세요.", allow_freeform=true)
+    # Display relevant section from cs-playbook / legal-docs / metrics-dashboard based on follow_up
+elif "수정 요청" in gate_9:
+    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (CS 플레이북, 법무 문서, 메트릭 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run the relevant Phase 9 agent Task(s) from step 13.3 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 9 completed {current_version}")
 ```
 
 ---
@@ -1373,7 +1709,12 @@ pricing_files = Glob("{PROJECT_DIR}/phase-8-monetization/pricing-strategy.md")
 pricing = Read(pricing_files[0]) if pricing_files else ""
 metrics_files = Glob("{PROJECT_DIR}/phase-9-operations/metrics-dashboard.md")
 metrics = Read(metrics_files[0]) if metrics_files else ""
-prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
+if prd_files:
+    prd = Read(prd_files[0])
+else:
+    canvas_files = Glob("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
+    prd = Read(canvas_files[0]) if canvas_files else ""
 
 # 14.2 Sprint mode
 sprint_context = ""
@@ -1494,10 +1835,19 @@ Task(
 상세 문서는 프로젝트 폴더에 저장되었습니다.
 """
 
-AskUserQuestion("[CMO] 성장 전략을 검토해주세요.",
+gate_10 = AskUserQuestion("[CMO] 성장 전략을 검토해주세요.",
   options=["승인 - 성장 전략 확정", "수정 요청 - 전략 조정", "재검토 - 성장 방향 재설정"])
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 10 completed v1.0")
+if "승인" in gate_10:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 10 completed {current_version}")
+elif "수정 요청" in gate_10:
+    revision_feedback = AskUserQuestion("어떤 부분을 조정할까요? (채널 전략, BIP, 리텐션, 성장 KPI 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run Phase 10 agents from step 14.3 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # After re-run, loop back to this gate.
+elif "재검토" in gate_10:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 10 revision {current_version}")
+    # Return to Phase 7 for GTM strategy revision
 ```
 
 ---
@@ -1526,7 +1876,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-11-automation automation-audit.md {current_version}")
     existing_automation = Read("{PROJECT_DIR}/phase-11-automation/automation-audit.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 기존 자동화 감사:\n{existing_automation}\n변경사항만 반영하고, 기존 분석은 유지하세요."
+    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 자동화 감사:\n{existing_automation}\n변경사항만 반영하고, 기존 분석은 유지하세요."
 
 # 15.3 Launch agents in PARALLEL
 Task(
@@ -1611,10 +1961,20 @@ Task(
 상세 문서는 프로젝트 폴더에 저장되었습니다.
 """
 
-AskUserQuestion("[COO] 자동화 전략을 검토해주세요.",
+gate_11 = AskUserQuestion("[COO] 자동화 전략을 검토해주세요.",
   options=["승인 - 자동화 우선순위 확정", "수정 요청 - 우선순위 조정", "질문 있음"])
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 11 completed v1.0")
+if "승인" in gate_11:
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 11 completed {current_version}")
+elif "질문 있음" in gate_11:
+    follow_up = AskUserQuestion("자동화 전략 관련 질문을 입력해주세요.", allow_freeform=true)
+    # Display relevant section from automation-audit / robot-specs based on follow_up
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 11 completed {current_version}")
+elif "수정 요청" in gate_11 or "우선순위 조정" in gate_11:
+    revision_feedback = AskUserQuestion("어떤 부분을 조정할까요? (자동화 우선순위, Robot 사양, 계약직 가이드 등)", allow_freeform=true)
+    # INSTRUCTION: Re-run Phase 11 agents from step 15.3 above,
+    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}\n변경사항만 반영하고, 기존 분석은 유지하세요."
+    Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 11 completed {current_version}")
 ```
 
 ---
@@ -1638,11 +1998,33 @@ growth = Read(growth_files[0]) if growth_files else ""
 automation_files = Glob("{PROJECT_DIR}/phase-11-automation/autonomous-org-design.md")
 automation = Read(automation_files[0]) if automation_files else ""
 
-# 16.2 Strategic dialogue with CEO
+# 16.2 Sprint mode: backup all existing phase-12 docs before overwriting
+sprint_context = ""
+if is_sprint:
+    existing = Glob("{PROJECT_DIR}/phase-12-scale-exit/*.md")
+    if existing:
+        for f in ["scale-vs-exit-analysis.md", "valuation-report.md", "exit-readiness-checklist.md", "acquisition-playbook.md", "fire-plan.md"]:
+            Bash(f"python3 {{CONFIG_DIR}}/init-project.py backup '{{project_slug}}' phase-12-scale-exit {f} {{current_version}}")
+        existing_scale = Glob("{PROJECT_DIR}/phase-12-scale-exit/scale-vs-exit-analysis.md")
+        existing_scale_content = Read(existing_scale[0]) if existing_scale else ""
+        sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_scale_content}"
+
+# 16.3 Strategic dialogue with CEO
 """
 [CFO] CEO님, 전략적인 대화가 필요한 단계입니다.
 사업의 미래 방향(계속 성장 vs 매각 vs 유지)에 대해 논의하겠습니다.
 """
+
+AskUserQuestion(
+  "[CFO] 현재 사업 상태는 어떤가요? (UX8: 타이밍 판단 기준)",
+  options=[
+    "성장 중 - 매출/사용자가 계속 늘고 있다",
+    "정체 - 성장이 멈추거나 둔화되었다",
+    "번아웃 - 사업은 괜찮지만 내가 지쳤다",
+    "하락 - 매출/사용자가 줄고 있다"
+  ]
+)
+ceo_business_state = selected_option
 
 AskUserQuestion(
   "[CFO] 현재 사업의 장기 목표는 무엇인가요?",
@@ -1655,7 +2037,7 @@ AskUserQuestion(
 )
 ceo_goal = selected_option  # CEO의 장기 목표 선택 결과
 
-# 16.3 Launch 3 agents in PARALLEL
+# 16.4 Launch 3 agents in PARALLEL
 Task(
   subagent_type="revenue-strategist",
   model="sonnet",
@@ -1671,6 +2053,7 @@ Task(
   - 재무 예측: {financials}
   - 성장 계획: {growth}
   - 자율 조직 설계: {automation}
+  - CEO 현재 사업 상태: {ceo_business_state}
   - CEO 장기 목표: {ceo_goal}
 
   Knowledge Base (반드시 Read로 읽으세요 — 밸류에이션/매각 전략 참조):
@@ -1679,6 +2062,8 @@ Task(
   템플릿 (Read로 읽으세요):
   - {TEMPLATE_DIR}/scale-vs-exit-analysis.md
   - {TEMPLATE_DIR}/valuation-report.md
+
+  {sprint_context}
 
   작업:
   1. 에이전트 정의와 Knowledge Base를 Read로 읽고 숙지하세요
@@ -1704,6 +2089,7 @@ Task(
   프로젝트 컨텍스트:
   - 재무 예측: {financials}
   - 성장 계획: {growth}
+  - CEO 현재 사업 상태: {ceo_business_state}
   - CEO 장기 목표: {ceo_goal}
 
   Knowledge Base (Read로 읽으세요):
@@ -1711,6 +2097,8 @@ Task(
 
   템플릿 (Read로 읽으세요):
   - {TEMPLATE_DIR}/fire-plan.md
+
+  {sprint_context}
 
   작업:
   1. FIRE (재정적 독립) 시나리오를 분석하세요
@@ -1734,6 +2122,8 @@ Task(
   프로젝트 컨텍스트:
   - 가격 전략: {pricing}
   - 재무 예측: {financials}
+  - CEO 현재 사업 상태: {ceo_business_state}
+  - CEO 장기 목표: {ceo_goal}
 
   Knowledge Base (Read로 읽으세요):
   - {KNOWLEDGE_DIR}/exit-guide.md
@@ -1741,6 +2131,8 @@ Task(
   템플릿 (Read로 읽으세요):
   - {TEMPLATE_DIR}/exit-readiness-checklist.md
   - {TEMPLATE_DIR}/acquisition-playbook.md
+
+  {sprint_context}
 
   작업:
   1. 매각 준비 체크리스트를 작성하세요 (회계, 코드 라이선스, 법적 준비)
@@ -1765,10 +2157,14 @@ Task(
 언제든 '/business-avengers sprint' 으로 업데이트할 수 있습니다.
 """
 
-AskUserQuestion("[CFO] 전략 분석을 검토해주세요.",
+gate_12 = AskUserQuestion("[CFO] 전략 분석을 검토해주세요.",
   options=["확인 - 분석 완료", "추가 시나리오 요청", "특정 시나리오 심층 분석 요청"])
 
-Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 12 completed v1.0")
+if "추가 시나리오" in gate_12 or "심층 분석" in gate_12:
+    follow_up = AskUserQuestion("어떤 시나리오 또는 분석이 필요하신가요?", allow_freeform=true)
+    # INSTRUCTION: Re-run the relevant Phase 12 agent Task(s) from step 16.4 above,
+    # setting sprint_context = f"CEO 추가 요청: {follow_up}"
+Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 12 completed {current_version}")
 ```
 
 ---
@@ -1905,6 +2301,25 @@ Write("{PROJECT_DIR}/sprints/sprint-{N}.yaml", yaml.dump(sprint_data))
 # Update project.yaml current_sprint
 Bash("python3 ... update sprint number")
 
+# I7: Generate sprint review document using template
+sprint_review_template = Glob("{TEMPLATE_DIR}/sprint-review.md")
+if sprint_review_template:
+    Task(
+        subagent_type="data-analyst",
+        model="sonnet",
+        description="Generate sprint review",
+        prompt=f"""
+        스프린트 완료 보고서를 작성하세요.
+        템플릿 (Read로 읽으세요): {TEMPLATE_DIR}/sprint-review.md
+        스프린트 목표: {sprint_goal}
+        업데이트된 Phase: {phases_list}
+        변경 사항 요약: {changes_summary}
+        업데이트된 날짜: {current_date}
+        모든 {{PLACEHOLDER}}를 채워 Write로 저장:
+        {PROJECT_DIR}/sprints/sprint-{N}-review.md
+        """
+    )
+
 # Sprint review
 """
 [COO] 스프린트 #{N} 완료 보고:
@@ -1912,6 +2327,7 @@ Bash("python3 ... update sprint number")
 🎯 목표: {sprint_goal}
 📝 업데이트된 Phase: {phases_list}
 📊 변경 사항: {changes_summary}
+📄 스프린트 리뷰: {PROJECT_DIR}/sprints/sprint-{N}-review.md
 
 다음 스프린트를 계획하시겠습니까?
 """
