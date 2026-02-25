@@ -1,6 +1,6 @@
 ---
 name: spec-interview
-description: AI-driven requirements interview. Use when user says "interview me", "gather requirements", "help me spec this out", "ask me questions about", or wants to create detailed specifications through interactive Q&A.
+description: AI-driven requirements interview. Use when user says "interview me", "gather requirements", "help me spec this out", "ask me questions about", or wants to create detailed specifications through interactive Q&A. Note: Technical Specification generation is also available as Phase 3 of planning-interview v2.0 for users who want a unified planning + spec flow.
 version: 1.0.0
 ---
 
@@ -595,6 +595,9 @@ Generate spec: 8-page technical design
 
 - `learning-summary`: For documenting the interview process itself
 - `project-insight`: For analyzing existing codebase before planning new features
+- `planning-interview` v2.0: Unified planning flow (PRD → User Journey → **Tech Spec** → Wireframe).
+  Use spec-interview when you only need a technical spec without product planning context.
+  Use planning-interview Phase 3 when you want the spec to reference PRD personas and features.
 
 ---
 
