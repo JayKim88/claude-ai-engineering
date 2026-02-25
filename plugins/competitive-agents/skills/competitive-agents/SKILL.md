@@ -57,7 +57,7 @@ AskUserQuestion(
 
 **If "Improve existing"**: Ask for plugin name, read its current files as the mission context.
 
-Then confirm round count:
+Then confirm round count and project docs option:
 
 ```python
 AskUserQuestion(
@@ -70,10 +70,21 @@ AskUserQuestion(
                 {"label": "2 rounds", "description": "Two cycles of cross-review + improve (~5-8 min)"}
             ],
             "multiSelect": false
+        },
+        {
+            "question": "Generate project documentation alongside the implementation?",
+            "header": "Project Docs",
+            "options": [
+                {"label": "Yes — generate docs/ (Recommended)", "description": "decisions.md (ADR), dev-log.md template, spec.md (if spec was provided) in final/docs/"},
+                {"label": "No — skip docs", "description": "For quick experiments or plugin-only outputs"}
+            ],
+            "multiSelect": false
         }
     ]
 )
 ```
+
+Set `generate_docs = True` if user selected "Yes — generate docs/".
 
 ### Step 2: Build Shared Context
 
@@ -489,6 +500,80 @@ Save fused output to `tempo/competitive-agents/{mission_slug}/fused/` and copy t
 
 **If "Keep both"**: Both versions already saved. Skip to Step 12.
 
+### Step 11.5: Generate Project Docs (if generate_docs = True)
+
+Using context already in memory — no subagent needed (mission, judge-report, both implementations are already available).
+
+**Generate `final/docs/decisions.md`** — Architecture Decision Records (ADR):
+
+Extract key decisions from:
+- `judge-report.md` → "Strengths to Preserve" + "Identified best elements" sections
+- Judge's per-criterion scores → which approach was chosen per area and why
+- Mission description → constraints and goals that drove decisions
+
+ADR entry format:
+```markdown
+## ADR-NNN: [Decision Title]
+
+**날짜**: {current date}
+**상태**: 채택
+
+**결정**: [What was decided — 1-2 sentences]
+
+**이유**:
+- [Reason 1 — from judge analysis]
+- [Reason 2]
+
+**트레이드오프**:
+- [What was given up by choosing this approach]
+```
+
+Generate 3–6 ADRs covering the major architectural decisions surfaced during the competition (e.g. tech stack choices, key patterns selected, structural decisions from the fuse).
+
+**Generate `final/docs/dev-log.md`** — Empty development session log template:
+
+```markdown
+# {Project Name} - Dev Log
+
+> 구현 과정의 기술 일지. 에러 해결, 코드 스니펫, 발견 사항을 세션별로 기록한다.
+> 최신 세션이 위에 위치한다 (reverse chronological).
+
+---
+
+## 사용법
+
+\`\`\`
+## Session: YYYY-MM-DD
+
+### 작업 내용
+- 구현한 기능 / 설정 변경 요약
+
+### 코드 스니펫
+핵심 코드 조각 (왜 이렇게 했는지 코멘트 포함)
+
+### 에러 & 해결
+에러 메시지 → 원인 → 해결 방법
+
+### 발견 사항
+예상과 달랐던 점, 주의사항
+\`\`\`
+
+---
+
+<!-- 개발 시작 후 아래에 세션 추가 -->
+```
+
+**If spec file was provided in Step 1** (spec_path is set):
+- Copy the spec file content to `final/docs/spec.md`
+
+Save all generated docs:
+```python
+Write("tempo/competitive-agents/{mission_slug}/final/docs/decisions.md", ...)
+Write("tempo/competitive-agents/{mission_slug}/final/docs/dev-log.md", ...)
+# If spec was provided:
+Write("tempo/competitive-agents/{mission_slug}/final/docs/spec.md", spec_content)
+```
+
 ### Step 12: Completion Summary
 
 ```
@@ -497,14 +582,19 @@ Competitive generation complete!
 Output: tempo/competitive-agents/{mission_slug}/final/
 Judge Report: tempo/competitive-agents/{mission_slug}/judge-report.md
 
-Generated plugin: {plugin_name}
-Files: {N} files
+Generated: {plugin_name}
+Files: {N} files  (+ {M} docs files if generate_docs = True)
 Trigger phrases: {list}
+
+Project docs (if generated):
+  final/docs/decisions.md  — Architecture Decision Records ({K} ADRs)
+  final/docs/dev-log.md    — Dev session log template
+  final/docs/spec.md       — Feature spec (if spec was provided)
 
 Next steps:
 1. Review generated files
-2. Copy to plugins/ if satisfied
-3. Run `npm run link` to install
+2. Copy to plugins/ (or project repo) if satisfied
+3. Run `npm run link` to install (for plugins)
 4. Test with trigger phrases
 ```
 
@@ -543,4 +633,9 @@ tempo/competitive-agents/{mission-slug}/
 ├── agent-b/v1/, v2/ (v3/ if 2 rounds)
 ├── judge-report.md
 └── final/
+    ├── ... (implementation files)
+    └── docs/              ← if generate_docs = True
+        ├── decisions.md   ← ADR (judge report에서 자동 추출)
+        ├── dev-log.md     ← 개발 일지 템플릿
+        └── spec.md        ← spec 파일 제공 시에만 생성
 ```
