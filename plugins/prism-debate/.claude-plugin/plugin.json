@@ -1,0 +1,22 @@
+{
+  "name": "prism-debate",
+  "version": "3.0.0",
+  "description": "Multi-perspective adversarial analysis for any proposition. 3-5 agents (optimist, critic, pragmatist, + optional: alternative, pre-mortem) debate across rounds with cross-rebuttal and position tracking. Trigger: prism-debate, prism, /prism, 토론해줘, 검증해줘",
+  "author": {
+    "name": "Jay Kim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "prism-debate",
+    "adversarial",
+    "multi-round",
+    "multi-perspective",
+    "decision",
+    "verification",
+    "multi-agent",
+    "claim-labeling",
+    "pre-mortem",
+    "alternative-analysis"
+  ]
+}
