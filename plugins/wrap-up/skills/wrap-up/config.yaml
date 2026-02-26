@@ -18,3 +18,9 @@ sections:
   - decisions     # Architecture/approach decisions (omitted if none)
   - issues        # Blockers, unresolved problems (omitted if none)
   - next          # Future tasks in checkbox format (always included)
+
+# Blog log generation (wrap-to-blog integration)
+blog_log:
+  enabled: true        # Set to false to never prompt for blog log generation
+  blog_dir: "~/Documents/Projects/ai-learning/blog"
+  collection: "logs"   # src/content/{collection}/

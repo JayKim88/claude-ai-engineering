@@ -160,6 +160,44 @@ Show the user:
 
 ---
 
+### Step 6: Blog Log Generation (Optional)
+
+After confirming the wrap-up file, check `config.yaml` for `blog_log.enabled`:
+
+```pseudocode
+config = Read("config.yaml")  // from skill directory
+
+if config.blog_log.enabled == false:
+    exit  // skip silently
+
+// Prompt user
+AskUserQuestion(
+  "블로그 로그도 생성할까요?",
+  options=[
+    { label: "네", description: "오늘 작업 내용을 블로그 logs 컬렉션에 저장합니다" },
+    { label: "아니요", description: "wrap-up만 저장하고 종료합니다" }
+  ]
+)
+
+if answer == "네":
+    // Invoke wrap-to-blog skill with current session context
+    // Pass: session date, topic name, Done items, Decisions, Next items
+    invoke_skill("wrap-to-blog", {
+      session_date: current_date,        // YYYY-MM-DD
+      topic: current_topic,              // e.g., "planning-interview"
+      done: session.done_items,
+      decisions: session.decisions,
+      next: session.next_items,
+      context_summary: session.context,
+      blog_dir: config.blog_log.blog_dir,
+      collection: config.blog_log.collection
+    })
+```
+
+**Note**: This step only runs if `blog_log.enabled: true` in config.yaml. If config.yaml is missing or `blog_log` section is absent, skip silently.
+
+---
+
 ## Trigger Phrases
 
 **English:**
