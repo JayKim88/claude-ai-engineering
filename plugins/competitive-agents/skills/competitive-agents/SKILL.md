@@ -1,7 +1,6 @@
 ---
 name: competitive-agents
 description: Orchestrate competing agents to generate higher-quality plugin implementations. Use when user says "compete", "competitive agents", "dual generate", "에이전트 경쟁", "플러그인 배틀", or wants two agents to compete on a generation task.
-version: 1.0.0
 ---
 
 # Competitive Agents Skill
@@ -43,6 +42,7 @@ AskUserQuestion(
             "options": [
                 {"label": "Describe now", "description": "I'll describe the plugin I want to build"},
                 {"label": "Use a spec file", "description": "I have a spec document to reference"},
+                {"label": "Use planning-interview outputs", "description": "Import prd.md, user-journey-map.md, tech-spec.md, wireframe-spec.md as mission context"},
                 {"label": "Improve existing", "description": "Generate a better version of an existing plugin"}
             ],
             "multiSelect": false
@@ -54,6 +54,14 @@ AskUserQuestion(
 **If "Describe now"**: Collect the user's text description as the mission.
 
 **If "Use a spec file"**: Ask for path, then read the spec file.
+
+**If "Use planning-interview outputs"**: Ask for the directory path where planning-interview outputs are saved (e.g., `initial-projects/my-project/`). Read all available docs from that path:
+- `{path}/prd.md` → if exists
+- `{path}/user-journey-map.md` → if exists
+- `{path}/tech-spec.md` → if exists
+- `{path}/wireframe-spec.md` → if exists
+
+Combine their contents as the mission context. Store `planning_docs_path = path` and `planning_docs = {filename: content}` for all found files.
 
 **If "Improve existing"**: Ask for plugin name, read its current files as the mission context.
 
@@ -75,7 +83,7 @@ AskUserQuestion(
             "question": "Generate project documentation alongside the implementation?",
             "header": "Project Docs",
             "options": [
-                {"label": "Yes — generate docs/ (Recommended)", "description": "decisions.md (ADR), dev-log.md template, spec.md (if spec was provided) in final/docs/"},
+                {"label": "Yes — generate docs/ (Recommended)", "description": "decisions.md (ADR), dev-log.md template, spec.md (if spec was provided), planning-interview docs (if provided) in final/docs/"},
                 {"label": "No — skip docs", "description": "For quick experiments or plugin-only outputs"}
             ],
             "multiSelect": false
@@ -530,41 +538,15 @@ ADR entry format:
 
 Generate 3–6 ADRs covering the major architectural decisions surfaced during the competition (e.g. tech stack choices, key patterns selected, structural decisions from the fuse).
 
-**Generate `final/docs/dev-log.md`** — Empty development session log template:
-
-```markdown
-# {Project Name} - Dev Log
-
-> 구현 과정의 기술 일지. 에러 해결, 코드 스니펫, 발견 사항을 세션별로 기록한다.
-> 최신 세션이 위에 위치한다 (reverse chronological).
-
----
-
-## 사용법
-
-\`\`\`
-## Session: YYYY-MM-DD
-
-### 작업 내용
-- 구현한 기능 / 설정 변경 요약
-
-### 코드 스니펫
-핵심 코드 조각 (왜 이렇게 했는지 코멘트 포함)
-
-### 에러 & 해결
-에러 메시지 → 원인 → 해결 방법
-
-### 발견 사항
-예상과 달랐던 점, 주의사항
-\`\`\`
-
----
-
-<!-- 개발 시작 후 아래에 세션 추가 -->
-```
-
 **If spec file was provided in Step 1** (spec_path is set):
 - Copy the spec file content to `final/docs/spec.md`
+
+**If planning-interview outputs were provided in Step 1** (planning_docs_path is set):
+- Copy each found doc to `final/docs/` preserving original filenames:
+  - `prd.md` → `final/docs/prd.md`
+  - `user-journey-map.md` → `final/docs/user-journey-map.md`
+  - `tech-spec.md` → `final/docs/tech-spec.md`
+  - `wireframe-spec.md` → `final/docs/wireframe-spec.md`
 
 Save all generated docs:
 ```python
@@ -572,6 +554,9 @@ Write("tempo/competitive-agents/{mission_slug}/final/docs/decisions.md", ...)
 Write("tempo/competitive-agents/{mission_slug}/final/docs/dev-log.md", ...)
 # If spec was provided:
 Write("tempo/competitive-agents/{mission_slug}/final/docs/spec.md", spec_content)
+# If planning-interview docs were provided:
+for filename, content in planning_docs.items():
+    Write(f"tempo/competitive-agents/{mission_slug}/final/docs/{filename}", content)
 ```
 
 ### Step 12: Completion Summary
@@ -587,9 +572,13 @@ Files: {N} files  (+ {M} docs files if generate_docs = True)
 Trigger phrases: {list}
 
 Project docs (if generated):
-  final/docs/decisions.md  — Architecture Decision Records ({K} ADRs)
-  final/docs/dev-log.md    — Dev session log template
-  final/docs/spec.md       — Feature spec (if spec was provided)
+  final/docs/decisions.md        — Architecture Decision Records ({K} ADRs)
+  final/docs/dev-log.md          — Dev session log template
+  final/docs/spec.md             — Feature spec (if spec was provided)
+  final/docs/prd.md              — Product brief (if planning-interview outputs provided)
+  final/docs/user-journey-map.md — User journey map (if planning-interview outputs provided)
+  final/docs/tech-spec.md        — Technical spec (if planning-interview outputs provided)
+  final/docs/wireframe-spec.md   — Wireframe spec (if planning-interview outputs provided)
 
 Next steps:
 1. Review generated files
@@ -634,8 +623,12 @@ tempo/competitive-agents/{mission-slug}/
 ├── judge-report.md
 └── final/
     ├── ... (implementation files)
-    └── docs/              ← if generate_docs = True
-        ├── decisions.md   ← ADR (judge report에서 자동 추출)
-        ├── dev-log.md     ← 개발 일지 템플릿
-        └── spec.md        ← spec 파일 제공 시에만 생성
+    └── docs/                    ← if generate_docs = True
+        ├── decisions.md         ← ADR (judge report에서 자동 추출)
+        ├── dev-log.md           ← 개발 일지 템플릿
+        ├── spec.md              ← spec 파일 제공 시에만 생성
+        ├── prd.md               ← planning-interview 제공 시에만 복사
+        ├── user-journey-map.md  ← planning-interview 제공 시에만 복사
+        ├── tech-spec.md         ← planning-interview 제공 시에만 복사
+        └── wireframe-spec.md    ← planning-interview 제공 시에만 복사
 ```
