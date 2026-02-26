@@ -1,7 +1,40 @@
 # Competitive Agents - Wrap Up
 
 > **Project**: `/Users/jaykim/Documents/Projects/claude-ai-engineering`
-> **Scope**: `.claude/skills/competitive-agents/`
+> **Scope**: `plugins/competitive-agents/skills/competitive-agents/SKILL.md`
+
+## Session: 2026-02-26 20:40
+
+> **Context**: planning-interview outputs를 competitive-agents 입력으로 연결 + dev-log.md 제거 + frontmatter version 필드 제거
+
+### Done
+
+- feat(competitive-agents): Step 1에 "Use planning-interview outputs" 옵션 추가
+  - 선택 시 디렉토리 경로를 입력받아 `prd.md`, `user-journey-map.md`, `tech-spec.md`, `wireframe-spec.md` 읽음
+  - 4개 파일 내용을 mission context로 합산, `planning_docs_path` + `planning_docs` 변수로 저장
+- feat(competitive-agents): Step 11.5에 planning-interview docs 복사 로직 추가
+  - `planning_docs_path` 설정 시 `final/docs/`에 파일명 그대로 복사 (prd.md, user-journey-map.md, tech-spec.md, wireframe-spec.md)
+- chore(competitive-agents): Step 11.5에서 `dev-log.md` 생성 제거
+  - 빈 템플릿이라 실질적 가치 낮음 → 사용자 판단으로 제거
+- fix(competitive-agents): SKILL.md frontmatter에서 `version` 필드 제거
+  - skill 파일에서 지원되지 않는 속성 (IDE 경고 해소)
+- docs(competitive-agents): Step 12 완료 요약 및 Quick Reference 출력 트리에 planning-interview docs 항목 반영
+
+### Decisions
+
+- **planning-interview → competitive-agents 연결**: planning-interview가 prd/user-journey/tech-spec/wireframe 4개를 생성하므로, 이를 그대로 mission context로 활용하는 것이 자연스러운 워크플로우
+- **dev-log.md 제거**: 빈 템플릿은 생성 가치가 낮고, 사용자가 직접 만드는 편이 나음. decisions.md (ADR)만으로 프로젝트 히스토리 충분
+- **version 필드 제거**: Claude Code skill 파일에서 지원되지 않는 속성임을 확인 → 완전 제거
+
+### Next
+
+- [ ] competitive-agents 실행 후 Step 11.5 동작 검증 (generate_docs = Yes 선택)
+  - [ ] decisions.md ADR 품질 확인 — judge report에서 올바르게 추출되는지 테스트
+  - [ ] spec 파일 제공 시 spec.md 복사 동작 확인
+- [ ] planning-interview → competitive-agents 전체 플로우 테스트
+  - planning-interview로 4개 docs 생성 → competitive-agents "Use planning-interview outputs" 선택 → final/docs/ 확인
+
+---
 
 ## Session: 2026-02-25 17:16
 
@@ -35,4 +68,4 @@
   - [ ] dev-log.md 템플릿 형식 확인
   - [ ] spec 파일 제공 시 spec.md 복사 동작 확인
 - [ ] decisions.md ADR 포맷 표준화 (한글 기준 날짜, 상태, 결정, 이유, 트레이드오프)
-- [ ] SKILL.md 버전 업데이트 (`version: 1.0.0` → `version: 1.1.0`) — 기능 추가 반영
+- [x] SKILL.md 버전 업데이트 (`version: 1.0.0` → `version: 1.1.0`) — version 필드 자체가 지원되지 않아 제거로 대응
