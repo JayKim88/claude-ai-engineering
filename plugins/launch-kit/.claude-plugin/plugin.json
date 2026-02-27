@@ -1,0 +1,59 @@
+{
+  "name": "launch-kit",
+  "version": "1.1.0",
+  "description": "4-question interview that generates all validation content for an indie hacker's product idea: landing page copy, Indie Hackers post, Reddit r/SideProject post, email sequence (welcome + day 3 follow-up), and Founding Plan pre-sale offer. All saved to {product-slug}/launch-kit.md.",
+  "entry_point": "skills/launch-kit/SKILL.md",
+  "min_claude_version": "claude-sonnet-4-5",
+  "author": {
+    "name": "Jay Kim",
+    "url": "https://github.com/JayKim88"
+  },
+  "license": "MIT",
+  "keywords": [
+    "launch",
+    "validation",
+    "landing-page",
+    "indie-hacker",
+    "copywriting",
+    "email",
+    "presale",
+    "startup",
+    "marketing",
+    "saas",
+    "content-generation",
+    "founding-plan"
+  ],
+  "required_tools": [
+    "Read",
+    "Write",
+    "Bash"
+  ],
+  "skills": [
+    {
+      "name": "launch-kit",
+      "path": "skills/launch-kit/SKILL.md"
+    }
+  ],
+  "triggers": [
+    "launch-kit",
+    "/launch-kit",
+    "validate my idea",
+    "launch my idea",
+    "landing page copy",
+    "help me launch",
+    "아이디어 검증",
+    "랜딩페이지 만들어줘",
+    "검증 키트",
+    "런치킷",
+    "아이디어 검증해줘"
+  ],
+  "dependencies": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JayKim88/claude-ai-engineering"
+  },
+  "bugs": {
+    "url": "https://github.com/JayKim88/claude-ai-engineering/issues"
+  },
+  "homepage": "https://github.com/JayKim88/claude-ai-engineering/tree/main/plugins/launch-kit"
+}
