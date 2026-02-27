@@ -95,7 +95,7 @@ Also extract metadata for frontmatter:
 | **description** | 1-2 sentence summary under 160 characters |
 | **tags** | 3-7 lowercase kebab-case keywords from content topics |
 | **source** | Original article URL |
-| **lang** | Detect from content language (`ko` or `en`) |
+| **lang** | Always `en` (output is always in English) |
 
 **Consider user's focus** if provided (e.g., "API changes only").
 
@@ -163,16 +163,16 @@ description: "[1-2 sentence summary under 160 chars]"
 category: digests
 tags: ["ai", "topic", "subtopic"]
 source: "https://original-article-url"
-lang: ko
+lang: en
 draft: false
 ---
 
-## 요약 (Summary)
+## Summary
 
-[1-2 paragraph summary in Korean]
+[1-2 paragraph summary in English]
 [What this is about and why it matters]
 
-## 주요 개념 (Key Concepts)
+## Key Concepts
 
 ### [Concept 1]
 - **What**: [Description]
@@ -182,7 +182,7 @@ draft: false
 ### [Concept 2]
 ...
 
-## 실무 적용 방법 (Practical Applications)
+## Practical Applications
 
 ### Use Case 1: [Scenario]
 [How to apply this in real projects]
@@ -190,13 +190,13 @@ draft: false
 ### Use Case 2: [Scenario]
 ...
 
-## 주의사항 / 제한사항 (Limitations & Gotchas)
+## Limitations & Gotchas
 
 - [Warning 1]
 - [Warning 2]
 - [Tip 1]
 
-## 참고 링크 (References)
+## References
 
 - [Original article URL]
 - [Related documentation]
@@ -210,7 +210,7 @@ draft: false
 
 ---
 
-**메모 (Notes)**:
+**Notes**:
 [Personal notes or context]
 ```
 
@@ -229,28 +229,28 @@ draft: false
 Include these sections when the article contains code, API changes, or migration guides:
 
 ```markdown
-## 코드 예제 (Code Examples)
+## Code Examples
 
 ### Example 1: [What it demonstrates]
 ```language
 [Runnable code]
 ```
 
-**설명**: [What this code does]
+**Explanation**: [What this code does]
 
-## Before/After 비교
+## Before/After Comparison
 
-### Before (기존 방식)
+### Before (Old Way)
 ```language
 [Old way]
 ```
 
-### After (새로운 방식)
+### After (New Way)
 ```language
 [New way]
 ```
 
-**차이점**: [Key differences]
+**Key Differences**: [Key differences]
 ```
 
 #### Template: Strategy Extensions (add when content type is Strategic/Opinion)
@@ -258,23 +258,23 @@ Include these sections when the article contains code, API changes, or migration
 Include these sections when the article discusses frameworks, trends, or strategic analysis:
 
 ```markdown
-## 핵심 프레임워크 (Key Framework)
+## Key Framework
 
 [Visual or structured representation of the article's main framework]
 [Use tables, diagrams (text-based), or hierarchical lists]
 
-## 사례 비교 (Case Comparisons)
+## Case Comparisons
 
-| 항목 | [Case A] | [Case B] |
+| Item | [Case A] | [Case B] |
 |------|----------|----------|
 | ... | ... | ... |
 ```
 
 **Section inclusion rules:**
-- Always: 요약, 주요 개념, 실무 적용, 참고 링크
-- Technical content: + 코드 예제, Before/After
-- Strategic content: + 핵심 프레임워크, 사례 비교
-- Optional: 주의사항 (if important warnings exist), Next Steps
+- Always: Summary, Key Concepts, Practical Applications, References
+- Technical content: + Code Examples, Before/After Comparison
+- Strategic content: + Key Framework, Case Comparisons
+- Optional: Limitations & Gotchas (if important warnings exist), Next Steps
 - Do not include empty sections. If a section has no meaningful content, omit it.
 
 ---

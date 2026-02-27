@@ -49,7 +49,7 @@ Also extract metadata for frontmatter:
 | **description** | 1-2 sentence summary of key insight |
 | **tags** | 3-7 lowercase kebab-case keywords from conversation topics |
 | **source** | Primary URL referenced (if any) |
-| **lang** | Detect from conversation language (`ko` or `en`) |
+| **lang** | Always `en` (output is always in English) |
 
 ---
 
@@ -80,7 +80,7 @@ description: "[1-2 sentence summary of key insight]"
 category: learnings
 tags: ["tag1", "tag2", "tag3"]
 source: "https://..."
-lang: ko
+lang: en
 draft: false
 ---
 
@@ -241,7 +241,7 @@ sections:
   - next_steps
 
 # Language preference (auto-detect or set to 'ko'/'en')
-language: auto
+language: en
 ```
 
 ---

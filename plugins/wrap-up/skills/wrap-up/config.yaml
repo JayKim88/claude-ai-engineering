@@ -10,7 +10,7 @@ auto_commit: false
 auto_push: false
 
 # Language preference (auto-detect from conversation, or set to 'ko'/'en')
-language: auto
+language: en
 
 # Sections to include in each session entry
 sections:

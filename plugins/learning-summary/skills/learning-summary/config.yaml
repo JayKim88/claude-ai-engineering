@@ -26,7 +26,7 @@ sections:
   - next_steps          # Follow-up actions
 
 # Language preference (auto-detect based on conversation, or set to 'ko' or 'en')
-language: auto
+language: en
 
 # Categories for organizing learnings
 categories:
