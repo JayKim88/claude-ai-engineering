@@ -14,10 +14,10 @@ AI partner organization for solo entrepreneurs. 23 AI agents + You as CEO (24 ro
 - "launch a product"
 
 **Korean:**
-- "비즈니스 어벤저스"
-- "사업 시작"
-- "서비스 만들기"
-- "제품 출시"
+- "business avengers (Korean)"
+- "start a business (Korean)"
+- "build a service (Korean)"
+- "launch a product (Korean)"
 
 ## Model Selection
 
@@ -62,7 +62,7 @@ INPUT PATTERNS:
   /business-avengers status                          → STATUS mode
   /business-avengers resume                          → RESUME mode
   /business-avengers history                         → HISTORY mode
-  "비즈니스 어벤저스" + free text                      → ORCHESTRA mode (detect intent)
+  "business avengers" + free text                      → ORCHESTRA mode (detect intent)
 ```
 
 **Set mode variables:**
@@ -76,7 +76,7 @@ sprint_goal = user_input if is_sprint else ""
 # For RESUME: /business-avengers resume — ask if not in command
 if mode in ["SPRINT", "SINGLE_PHASE", "RESUME"]:
     project_slug = extract_from_command(user_input) or AskUserQuestion(
-        "어떤 프로젝트를 작업할까요? (slug 입력, 예: my-app)",
+        "Which project would you like to work on? (enter slug, e.g.: my-app)",
         allow_freeform=true
     )
     current_version = "v1.0"  # H4: default; updated from project.yaml in Step 3
@@ -98,8 +98,8 @@ if mode in ["SPRINT", "SINGLE_PHASE", "RESUME"]:
 ```python
 # 2.1 Get project name from user if not provided
 AskUserQuestion(
-  "프로젝트 이름을 정해주세요. (예: '음식 리뷰 큐레이션 앱')",
-  options=["직접 입력"],
+  "Please name your project. (e.g.: 'Food Review Curation App')",
+  options=["Enter manually"],
   allow_freeform=true
 )
 
@@ -109,33 +109,33 @@ project_slug = slugify(project_name)  # "food-review-curation"
 # 2.3 Select workflow mode
 if not specified:
   AskUserQuestion(
-    "어떤 모드로 시작할까요?",
+    "Which mode would you like to start with?",
     options=[
-      "아이디어 우선 (Recommended) - 아이디어가 있으면 이 모드",
-      "시장 우선 - 시장 기회를 먼저 탐색",
-      "MVP 빌드 - 최소 기능으로 빠르게",
-      "인디 메이커 모드 - 최소 단계로 빠르게 (아이디어→시장→런칭→수익화→성장→자동화) | Powered by MAKE methodology",
-      "풀 라이프사이클 - 아이디어부터 매각까지 전체 13단계",
-      "포스트런칭 - 이미 런칭한 서비스의 성장/자동화/매각 전략",
-      "커스텀 - Phase를 직접 선택"
+      "Idea First (Recommended) - use this mode if you already have an idea",
+      "Market First - explore market opportunities first",
+      "MVP Build - move fast with minimum viable features",
+      "Indie Maker Mode - move fast with minimum steps (Idea→Market→Launch→Monetize→Growth→Automate) | Powered by MAKE methodology",
+      "Full Lifecycle - all 13 phases from idea to acquisition",
+      "Post-Launch - growth/automation/exit strategy for an already launched service",
+      "Custom - select phases manually"
     ]
   )
 
 # 2.4 Post-launch onboarding: collect existing service context (UX2)
 if workflow_mode == "post-launch":
     """
-    [COO] 포스트런칭 모드입니다. 이미 런칭한 서비스를 성장/자동화/매각 단계로 이어갑니다.
-    기존 서비스 정보를 입력해 주시면, 에이전트들이 실제 맥락에 맞는 전략을 수립합니다.
+    [COO] You are in Post-Launch mode. We will continue with growth/automation/exit phases for your already launched service.
+    Please provide information about your existing service so agents can build strategies with accurate context.
     """
-    AskUserQuestion("서비스 URL을 알려주세요.", allow_freeform=true)
+    AskUserQuestion("Please share your service URL.", allow_freeform=true)
     service_url = last_answer
-    AskUserQuestion("서비스의 주요 기능 3가지를 간략히 설명해주세요.", allow_freeform=true)
+    AskUserQuestion("Please briefly describe the 3 main features of your service.", allow_freeform=true)
     service_features = last_answer
-    AskUserQuestion("현재 월 매출 (또는 수익)은 어느 정도인가요?", allow_freeform=true)
+    AskUserQuestion("What is your current monthly revenue (or earnings)?", allow_freeform=true)
     service_revenue = last_answer
-    AskUserQuestion("현재 활성 사용자 수 (MAU/DAU)는?", allow_freeform=true)
+    AskUserQuestion("What is your current active user count (MAU/DAU)?", allow_freeform=true)
     service_users = last_answer
-    AskUserQuestion("현재 사용 중인 기술 스택을 간략히 알려주세요.", allow_freeform=true)
+    AskUserQuestion("Please briefly describe your current tech stack.", allow_freeform=true)
     service_tech = last_answer
 
     # Generate bootstrap context documents as substitutes for Phase 0-9 outputs
@@ -144,22 +144,22 @@ if workflow_mode == "post-launch":
         model="sonnet",
         description="Generate post-launch context documents",
         prompt=f"""
-        당신은 Business Avengers의 Product Manager입니다.
-        포스트런칭 모드로 진입한 기존 서비스의 컨텍스트 문서를 생성하세요.
+        You are Business Avengers' Product Manager.
+        Generate context documents for the existing service entering Post-Launch mode.
 
-        서비스 정보:
+        Service information:
         - URL: {service_url}
-        - 주요 기능: {service_features}
-        - 월 매출/수익: {service_revenue}
-        - 활성 사용자: {service_users}
-        - 기술 스택: {service_tech}
+        - Main features: {service_features}
+        - Monthly revenue/earnings: {service_revenue}
+        - Active users: {service_users}
+        - Tech stack: {service_tech}
 
-        작업:
-        1. Read로 템플릿 읽기: {TEMPLATE_DIR}/idea-canvas.md
-        2. 위 정보를 바탕으로 idea-canvas를 작성하세요 (PRD 대용으로 사용됨)
-        3. Write로 저장:
+        Task:
+        1. Read template: {TEMPLATE_DIR}/idea-canvas.md
+        2. Write the idea-canvas based on the above information (used as a PRD substitute)
+        3. Save with Write:
            - {PROJECT_DIR}/phase-0-ideation/idea-canvas.md
-           - 동일 내용을 {PROJECT_DIR}/phase-2-product-planning/prd.md 로도 저장 (phase 10-11이 참조)
+           - Save the same content to {PROJECT_DIR}/phase-2-product-planning/prd.md as well (referenced by phases 10-11)
         """
     )
 
@@ -186,8 +186,8 @@ result = Bash("python3 {CONFIG_DIR}/init-project.py load '{project_slug}'")
 # Handle project not found
 if "not_found" in result:
   AskUserQuestion(
-    f"프로젝트 '{project_slug}'를 찾을 수 없습니다.",
-    options=["새 프로젝트 생성 → Step 2로 이동", "다른 프로젝트 이름 입력"]
+    f"Project '{project_slug}' could not be found.",
+    options=["Create new project → Go to Step 2", "Enter a different project name"]
   )
 
 # Extract project data from JSON output
@@ -199,57 +199,57 @@ if mode == ORCHESTRA:
   # UX4: Inform CEO about skipped phases for non-linear presets
   if workflow_mode == "make":
       """
-      [CPO] 인디 메이커 모드로 시작합니다.
-      린 경로로 Phase 2(PRD), 3(디자인), 4(기술설계), 5(개발가이드), 6(QA), 9(운영)를 건너뛰고
-      Phase 0→1→7→8→10→11 순서로 진행합니다. (에러가 아닙니다)
-      PRD 미존재 시 Idea Canvas가 대용으로 사용됩니다.
+      [CPO] Starting in Indie Maker mode.
+      Taking the lean path — skipping Phase 2(PRD), 3(Design), 4(Tech Planning), 5(Dev Guide), 6(QA), 9(Operations)
+      and proceeding in order: Phase 0→1→7→8→10→11. (This is not an error.)
+      If PRD does not exist, Idea Canvas will be used as a substitute.
       """
   elif workflow_mode == "post-launch":
       """
-      [COO] 포스트런칭 모드입니다.
-      기존 서비스의 Phase 0-9 산출물 없이 Phase 10→11→12를 진행합니다.
-      온보딩 시 입력한 서비스 정보가 컨텍스트로 사용됩니다.
+      [COO] You are in Post-Launch mode.
+      Proceeding through Phase 10→11→12 without Phase 0-9 outputs from the existing service.
+      Service information entered during onboarding will be used as context.
       """
   elif workflow_mode == "mvp-build":
       """
-      [CPO] MVP 빌드 모드입니다.
-      Phase 0→2→4→5→7 순서로 진행합니다.
-      Phase 1(시장조사), 3(디자인), 6(QA), 8-12를 건너뜁니다. (에러가 아닙니다)
+      [CPO] You are in MVP Build mode.
+      Proceeding in order: Phase 0→2→4→5→7.
+      Skipping Phase 1(Market Research), 3(Design), 6(QA), 8-12. (This is not an error.)
       """
 elif mode == SINGLE_PHASE:
   # M8: Bounds check for phase number
   if requested_phase_number not in range(0, 13):
       """
-      [COO] 오류: Phase 번호는 0에서 12 사이여야 합니다.
-      요청하신 Phase: {requested_phase_number}
-      지원되는 Phase: 0(아이디어), 1(시장조사), 2(제품기획), 3(디자인),
-                      4(기술설계), 5(개발가이드), 6(QA), 7(GTM), 8(수익화),
-                      9(운영), 10(성장), 11(자동화), 12(스케일/매각)
+      [COO] Error: Phase number must be between 0 and 12.
+      Requested Phase: {requested_phase_number}
+      Supported Phases: 0(Ideation), 1(Market Research), 2(Product Planning), 3(Design),
+                        4(Tech Planning), 5(Dev Guide), 6(QA), 7(GTM), 8(Monetization),
+                        9(Operations), 10(Growth), 11(Automation), 12(Scale/Exit)
       """
   else:
       phases_to_run = [requested_phase_number]
 elif mode == SPRINT:
   # Ask CEO which phases need updating (UX5: all 13 phases, grouped, terminology unified)
   AskUserQuestion(
-    "이번 스프린트에서 어떤 단계를 업데이트해야 할까요?\n"
-    "📋 기획: Phase 0(아이디어), 1(시장조사), 2(PRD)\n"
-    "🎨 개발: Phase 3(디자인), 4(기술설계), 5(개발가이드), 6(QA)\n"
-    "🚀 런칭: Phase 7(GTM), 8(수익화), 9(운영)\n"
-    "📈 성장: Phase 10(성장), 11(자동화), 12(스케일/매각)",
+    "Which phases need to be updated in this sprint?\n"
+    "📋 Planning: Phase 0(Ideation), 1(Market Research), 2(PRD)\n"
+    "🎨 Development: Phase 3(Design), 4(Tech Planning), 5(Dev Guide), 6(QA)\n"
+    "🚀 Launch: Phase 7(GTM), 8(Monetization), 9(Operations)\n"
+    "📈 Growth: Phase 10(Growth), 11(Automation), 12(Scale/Exit)",
     options=[
-      "Phase 0 업데이트 - 아이디어 캔버스",
-      "Phase 1 업데이트 - 시장조사 (시장분석, 경쟁사, 수익모델)",
-      "Phase 2 업데이트 - PRD / 기능 우선순위",
-      "Phase 3 업데이트 - 디자인 시스템 / 와이어프레임",
-      "Phase 4 업데이트 - 기술 아키텍처 / API / DB",
-      "Phase 5 업데이트 - 개발 가이드 / 배포 전략",
-      "Phase 6 업데이트 - 테스트 계획 / QA 체크리스트",
-      "Phase 7 업데이트 - GTM 전략 / 콘텐츠 플랜",
-      "Phase 8 업데이트 - 가격 전략 / 재무 예측",
-      "Phase 9 업데이트 - CS 플레이북 / 메트릭",
-      "Phase 10 업데이트 - 성장 전략 / 유기적 성장",
-      "Phase 11 업데이트 - 자동화 감사 / 로봇 사양",
-      "Phase 12 업데이트 - 스케일 vs 매각 분석"
+      "Phase 0 Update - Idea Canvas",
+      "Phase 1 Update - Market Research (Market Analysis, Competitors, Revenue Model)",
+      "Phase 2 Update - PRD / Feature Priority",
+      "Phase 3 Update - Design System / Wireframes",
+      "Phase 4 Update - Tech Architecture / API / DB",
+      "Phase 5 Update - Dev Guide / Deployment Strategy",
+      "Phase 6 Update - Test Plan / QA Checklist",
+      "Phase 7 Update - GTM Strategy / Content Plan",
+      "Phase 8 Update - Pricing Strategy / Financial Projections",
+      "Phase 9 Update - CS Playbook / Metrics",
+      "Phase 10 Update - Growth Strategy / Organic Growth",
+      "Phase 11 Update - Automation Audit / Robot Specs",
+      "Phase 12 Update - Scale vs Exit Analysis"
     ],
     multiSelect=true
   )
@@ -289,7 +289,7 @@ elif mode == RESUME:
 # 4.1 CPO introduces the ideation process
 # Display as CPO speaking:
 """
-[CPO] 안녕하세요, CEO님. 새로운 프로젝트를 시작하겠습니다.
+[CPO] Hello, CEO. Let's start a new project.
 """
 
 # 4.2a Market-first: read Phase 1 outputs to provide market context during ideation (M7)
@@ -300,10 +300,10 @@ if workflow_mode == "market-first":
     rev_f = Glob("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md")
     if mkt_f or comp_f or rev_f:
         market_first_context = (
-            "시장 조사 결과 (참고하여 아이디어를 구체화하세요):\n"
-            + (f"시장 분석:\n{Read(mkt_f[0])}\n" if mkt_f else "")
-            + (f"경쟁 분석:\n{Read(comp_f[0])}\n" if comp_f else "")
-            + (f"수익 모델 초안:\n{Read(rev_f[0])}\n" if rev_f else "")
+            "Market research results (refer to these when refining your idea):\n"
+            + (f"Market Analysis:\n{Read(mkt_f[0])}\n" if mkt_f else "")
+            + (f"Competitive Analysis:\n{Read(comp_f[0])}\n" if comp_f else "")
+            + (f"Revenue Model Draft:\n{Read(rev_f[0])}\n" if rev_f else "")
         )
 
 # 4.2 Sprint mode: backup existing idea-canvas before overwriting
@@ -313,21 +313,21 @@ if is_sprint:
     if existing:
         Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-0-ideation idea-canvas.md {current_version}")
         existing_canvas = Read(existing[0])
-        sprint_context = f"기존 Idea Canvas를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_canvas}"
+        sprint_context = f"Update the existing Idea Canvas. Change goal: {sprint_goal}\nExisting content:\n{existing_canvas}"
 
 # 4.3 Document availability check — ask BEFORE starting Q&A
 has_doc = AskUserQuestion(
-  "[CPO] 아이디어를 미리 정리하신 문서나 메모가 있나요?",
+  "[CPO] Do you have any documents or notes where you've already organized your idea?",
   options=[
-    "있음 - 파일 경로나 내용을 바로 제공하겠습니다",
-    "없음 - Q&A로 함께 정리하겠습니다"
+    "Yes - I'll provide the file path or content directly",
+    "No - let's organize it together with Q&A"
   ]
 )
 
-if "있음" in has_doc:
+if "Yes" in has_doc:
     # 4.3a Document input flow: get file path or pasted text
     idea_input = AskUserQuestion(
-        "[CPO] 파일 경로(.md/.txt 등) 또는 내용을 직접 붙여넣어 주세요.",
+        "[CPO] Please paste the file path (.md/.txt, etc.) or the content directly.",
         allow_freeform=True
     )
     # Smart detection: file path (contains "/" and ends with extension) vs pasted text
@@ -339,21 +339,21 @@ if "있음" in has_doc:
         doc_files = Glob(stripped)
         idea_doc = Read(doc_files[0]) if doc_files else stripped  # fallback to treating as text if not found
         if not doc_files:
-            """[CPO] 파일을 찾을 수 없어 입력 내용을 텍스트로 처리합니다."""
+            """[CPO] File not found — treating the input as plain text."""
     else:
         idea_doc = stripped  # treat as pasted content
 
-    all_qa_responses = f"[CEO 제공 아이디어 문서]\n{idea_doc}"
+    all_qa_responses = f"[CEO-provided idea document]\n{idea_doc}"
 
 else:
     # 4.3b Interactive Q&A flow (original behavior)
-    """[CPO] 아이디어를 구체화하기 위해 몇 가지 질문을 드리겠습니다."""
+    """[CPO] I'll ask you a few questions to help refine your idea."""
     questions = [
-      "이 서비스가 해결하는 구체적인 문제는 무엇인가요?",
-      "주요 타겟 사용자는 누구인가요? (나이, 직업, 상황 등)",
-      "현재 사용자들이 이 문제를 어떻게 해결하고 있나요? (기존 대안)",
-      "기존 대안 대비 우리 서비스의 핵심 차별점은?",
-      "첫 수익은 어떻게 발생할 것으로 예상하시나요?",
+      "What specific problem does this service solve?",
+      "Who are the main target users? (age, occupation, situation, etc.)",
+      "How are users currently solving this problem? (existing alternatives)",
+      "What is the core differentiation of our service compared to existing alternatives?",
+      "How do you expect to generate the first revenue?",
     ]
 
     for q in questions:
@@ -367,25 +367,38 @@ Task(
   model="sonnet",
   description="Create Idea Canvas",
   prompt=f"""
-  당신은 Business Avengers의 Product Manager입니다.
+  You are Business Avengers' Product Manager.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/product-manager.md
 
-  CEO와의 대화 내용:
+  Conversation with CEO:
   {all_qa_responses}
 
   {market_first_context}
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. Read로 템플릿 읽기: {TEMPLATE_DIR}/idea-canvas.md
-  3. CEO 답변을 분석하여 모든 플레이스홀더를 채우세요
-  4. Write로 저장: {PROJECT_DIR}/phase-0-ideation/idea-canvas.md
+  Knowledge Base (Read these files):
+  - {KNOWLEDGE_DIR}/extended/problem-validation-deep.md
 
-  전문적이고 구체적으로 작성하세요. 모호한 표현 없이.
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 0 section)
+
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read problem-validation-deep.md — apply Mom Test and JTBD criteria to the problem framing
+  3. Read template: {TEMPLATE_DIR}/idea-canvas.md
+  4. Apply Mom Test: problem framing must contain zero solution language — specific person + specific situation + quantified pain
+  5. Write JTBD statement: "When [X], I want [Y], so I can [Z]"
+  6. Include revenue hypothesis with basis (comparable product price, interview signal, or cost-of-current-solution)
+  7. List ≥3 core assumptions with validation methods in an Assumption Register
+  8. State "Why Now" if applicable (technology / regulatory / behavioral trigger)
+  9. Check phase-rubrics.md Phase 0 checklist, fix any unmet items
+  10. Add Quality Self-Assessment block at top of output
+  11. Save with Write: {PROJECT_DIR}/phase-0-ideation/idea-canvas.md
+
+  Write professionally and concretely. No vague expressions.
   """
 )
 
@@ -394,22 +407,22 @@ idea_canvas = Read("{PROJECT_DIR}/phase-0-ideation/idea-canvas.md")
 # Display idea canvas content to CEO
 
 gate_0 = AskUserQuestion(
-  "[CPO] Idea Canvas를 검토해주세요. 어떻게 진행할까요?",
+  "[CPO] Please review the Idea Canvas. How would you like to proceed?",
   options=[
-    "승인 - 다음 단계로 진행",
-    "수정 요청 - 피드백 반영 후 재작업",
-    "중단 - 프로젝트 보류"
+    "Approve - proceed to the next step",
+    "Request revision - rework after incorporating feedback",
+    "Stop - put the project on hold"
   ]
 )
 
-if "승인" in gate_0:
+if "Approve" in gate_0:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 0 completed {current_version}")
-elif "수정 요청" in gate_0:
-    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? 구체적으로 알려주세요.", allow_freeform=true)
+elif "Request revision" in gate_0:
+    revision_feedback = AskUserQuestion("Which parts should be revised? Please be specific.", allow_freeform=true)
     # INSTRUCTION: Re-run the Product Manager Task() from step 4.4 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
     # After re-run, loop back to this gate.
-elif "중단" in gate_0:
+elif "Stop" in gate_0:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 0 cancelled {current_version}")
     # Exit pipeline - no further phases
 ```
@@ -446,9 +459,9 @@ if is_sprint:
     existing_competitive = Read(competitive_f[0]) if competitive_f else ""
     revenue_f = Glob("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md")
     existing_revenue = Read(revenue_f[0]) if revenue_f else ""
-    sprint_context_market = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_market}"
-    sprint_context_competitive = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_competitive}"
-    sprint_context_revenue = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_revenue}"
+    sprint_context_market = f"Update the existing document. Change goal: {sprint_goal}\nExisting content:\n{existing_market}"
+    sprint_context_competitive = f"Update the existing document. Change goal: {sprint_goal}\nExisting content:\n{existing_competitive}"
+    sprint_context_revenue = f"Update the existing document. Change goal: {sprint_goal}\nExisting content:\n{existing_revenue}"
 
 # 5.3 Launch 3 agents in PARALLEL (CRITICAL: all in single response block)
 Task(
@@ -456,29 +469,41 @@ Task(
   model="sonnet",
   description="Market size analysis",
   prompt=f"""
-  당신은 Business Avengers의 Business Analyst입니다.
+  You are Business Avengers' Business Analyst.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/business-analyst.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   {idea_canvas}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/business-models.md
   - {KNOWLEDGE_DIR}/startup-best-practices.md
+  - {KNOWLEDGE_DIR}/extended/market-research-advanced.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 1 section)
+
+  Template (Read this file):
   - {TEMPLATE_DIR}/market-analysis.md
 
-  작업:
-  1. WebSearch로 실제 시장 데이터를 조사하세요
-  2. TAM/SAM/SOM을 산정하세요
-  3. 시장 트렌드와 성장 동력을 분석하세요
-  4. 템플릿을 채워 Write로 저장: {PROJECT_DIR}/phase-1-market-research/market-analysis.md
+  Task:
+  1. Read market-research-advanced.md to internalize the Why Now framework and Beachhead criteria
+  2. Use WebSearch to research real market data (Tier 1/2 sources: Gartner, Forrester, IDC, etc.)
+     - Required query: "[industry] market size [year] billion"
+     - Required query: "[industry] CAGR forecast 2024 2025 2026"
+     - Required query: "[industry] growth drivers regulatory trends [year]"
+  3. Estimate TAM/SAM/SOM (must include at least 2 external source URLs)
+  4. Write the "Why Now" section: specify the relevant technology/regulatory/behavioral changes
+  5. Define the Beachhead market: "[country], [occupation/industry], [size] — approx. X reachable customers"
+  6. Add a reverse-calculation validation for SOM Year 3: target $XM ÷ ACV $Y = Z customers needed
+  7. Check the Phase 1 checklist in phase-rubrics.md and fix any unmet items
+  8. Add a Quality Self-Assessment block at the very top of the output
+  9. Fill the template and save with Write: {PROJECT_DIR}/phase-1-market-research/market-analysis.md
 
   {sprint_context_market}
-  데이터 출처를 반드시 명시하세요. 추정치에는 근거를 달아주세요.
+  Cite a source URL for every key figure. The output is incomplete without Why Now and Beachhead.
   """
 )
 
@@ -487,28 +512,28 @@ Task(
   model="sonnet",
   description="Competitive analysis",
   prompt=f"""
-  당신은 Business Avengers의 Marketing Strategist입니다.
+  You are Business Avengers' Marketing Strategist.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/marketing-strategist.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   {idea_canvas}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/marketing-playbooks.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/competitive-analysis.md
 
-  작업:
-  1. WebSearch + WebFetch로 경쟁사 5개를 조사하세요
-  2. 각 경쟁사의 기능, 가격, 강점/약점을 분석하세요
-  3. SWOT 분석과 포지셔닝 맵을 작성하세요
-  4. 템플릿을 채워 Write로 저장: {PROJECT_DIR}/phase-1-market-research/competitive-analysis.md
+  Task:
+  1. Use WebSearch + WebFetch to research 5 competitors
+  2. Analyze each competitor's features, pricing, and strengths/weaknesses
+  3. Write a SWOT analysis and positioning map
+  4. Fill the template and save with Write: {PROJECT_DIR}/phase-1-market-research/competitive-analysis.md
 
   {sprint_context_competitive}
-  실제 URL과 데이터를 포함하세요.
+  Include real URLs and data.
   """
 )
 
@@ -517,27 +542,27 @@ Task(
   model="sonnet",
   description="Revenue model analysis",
   prompt=f"""
-  당신은 Business Avengers의 Revenue Strategist입니다.
+  You are Business Avengers' Revenue Strategist.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/revenue-strategist.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   {idea_canvas}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/business-models.md
   - {KNOWLEDGE_DIR}/pricing-strategies.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/revenue-model-draft.md
 
-  작업:
-  1. WebSearch로 유사 서비스의 가격 정책을 조사하세요
-  2. 3-5개의 수익 모델을 제안하세요
-  3. 각 모델의 예상 수익, 장단점을 분석하세요
-  4. 추천 모델과 근거를 제시하세요
-  5. 템플릿을 채워 Write로 저장: {PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md
+  Task:
+  1. Use WebSearch to research the pricing policies of similar services
+  2. Propose 3-5 revenue models
+  3. Analyze the expected revenue, pros and cons of each model
+  4. Present the recommended model with rationale
+  5. Fill the template and save with Write: {PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md
 
   {sprint_context_revenue}
   """
@@ -550,36 +575,36 @@ revenue = Read("{PROJECT_DIR}/phase-1-market-research/revenue-model-draft.md")
 
 # Display summary
 """
-[CFO] 시장 조사 결과를 보고드립니다:
+[CFO] Here is the market research report:
 
-📊 시장 분석: {market_summary}
-🏢 경쟁사 분석: {competitive_summary}
-💰 수익 모델: {revenue_summary}
+📊 Market Analysis: {market_summary}
+🏢 Competitive Analysis: {competitive_summary}
+💰 Revenue Model: {revenue_summary}
 
-상세 문서는 프로젝트 폴더에 저장되었습니다.
+Detailed documents have been saved to the project folder.
 """
 
 gate_1 = AskUserQuestion(
-  "[CFO] 시장 조사 결과를 검토해주세요.",
+  "[CFO] Please review the market research results.",
   options=[
-    "승인 - 시장성 확인, 다음 단계로",
-    "수정 요청 - 추가 조사 필요",
-    "피봇 - 방향 전환 (Phase 0으로)",
-    "중단 - 시장성 부족"
+    "Approve - market validated, proceed to next step",
+    "Request revision - additional research needed",
+    "Pivot - change direction (back to Phase 0)",
+    "Stop - insufficient market viability"
   ]
 )
 
-if "승인" in gate_1:
+if "Approve" in gate_1:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 1 completed {current_version}")
-elif "수정 요청" in gate_1:
-    revision_feedback = AskUserQuestion("어떤 부분을 추가 조사할까요?", allow_freeform=true)
+elif "Request revision" in gate_1:
+    revision_feedback = AskUserQuestion("What areas need additional research?", allow_freeform=true)
     # INSTRUCTION: Re-run the 3 Phase 1 agents from step 5.3 above,
-    # setting sprint_context_* = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context_* = f"CEO revision feedback: {revision_feedback}"
     # After re-run, loop back to this gate.
-elif "피봇" in gate_1:
+elif "Pivot" in gate_1:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 1 revision {current_version}")
     # Return to Phase 0 - re-run Ideation (Step 4)
-elif "중단" in gate_1:
+elif "Stop" in gate_1:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 1 cancelled {current_version}")
     # Exit pipeline
 ```
@@ -608,7 +633,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-2-product-planning prd.md {current_version}")
     existing_prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 PRD:\n{existing_prd}"
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting PRD:\n{existing_prd}"
 
 # 6.3 Launch 2 agents in PARALLEL
 Task(
@@ -616,34 +641,34 @@ Task(
   model="sonnet",
   description="Write PRD, user stories, feature priority",
   prompt=f"""
-  당신은 Business Avengers의 Product Manager입니다.
+  You are Business Avengers' Product Manager.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/product-manager.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - Idea Canvas: {idea_canvas}
-  - 시장 분석: {market_analysis}
-  - 경쟁 분석: {competitive}
-  - 수익 모델 초안: {revenue_draft}
+  - Market Analysis: {market_analysis}
+  - Competitive Analysis: {competitive}
+  - Revenue Model Draft: {revenue_draft}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/startup-best-practices.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read these files):
   - {TEMPLATE_DIR}/prd.md
   - {TEMPLATE_DIR}/user-stories.md
   - {TEMPLATE_DIR}/feature-priority.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. Knowledge Base를 Read로 읽어 참고하세요
-  3. 시장 분석 결과를 반영하여 PRD를 작성하세요
-  4. User Stories를 INVEST 원칙으로 작성하세요
-  5. 기능 우선순위를 MoSCoW 프레임워크로 정리하세요
-  6. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read the Knowledge Base for reference
+  3. Write the PRD incorporating market analysis findings
+  4. Write User Stories following the INVEST principle
+  5. Organize feature priority using the MoSCoW framework
+  6. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-2-product-planning/prd.md
      - {PROJECT_DIR}/phase-2-product-planning/user-stories.md
      - {PROJECT_DIR}/phase-2-product-planning/feature-priority.md
@@ -654,29 +679,29 @@ Task(
   model="sonnet",
   description="Create user personas",
   prompt=f"""
-  당신은 Business Avengers의 UX Researcher입니다.
+  You are Business Avengers' UX Researcher.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/ux-researcher.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - Idea Canvas: {idea_canvas}
-  - 시장 분석: {market_analysis}
+  - Market Analysis: {market_analysis}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/ux-principles.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/user-personas.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. WebSearch로 타겟 사용자 관련 리서치를 수행하세요
-  3. 2-3개의 상세 페르소나를 작성하세요 (이름, 나이, 직업, 목표, 고충, 시나리오)
-  4. 각 페르소나별 사용자 여정 맵을 포함하세요
-  5. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Use WebSearch to research the target users
+  3. Write 2-3 detailed personas (name, age, occupation, goals, pain points, scenarios)
+  4. Include a user journey map for each persona
+  5. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-2-product-planning/user-personas.md
   """)
 
@@ -685,22 +710,22 @@ prd = Read("{PROJECT_DIR}/phase-2-product-planning/prd.md")
 personas = Read("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
 
 gate_2 = AskUserQuestion(
-  "[CPO] PRD와 기능 우선순위를 검토해주세요.",
+  "[CPO] Please review the PRD and feature priority.",
   options=[
-    "승인 - 다음 단계로 진행",
-    "수정 요청 - 피드백 반영 후 재작업",
-    "피봇 - 방향 전환"
+    "Approve - proceed to the next step",
+    "Request revision - rework after incorporating feedback",
+    "Pivot - change direction"
   ]
 )
 
-if "승인" in gate_2:
+if "Approve" in gate_2:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 2 completed {current_version}")
-elif "수정 요청" in gate_2:
-    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (기능 범위, 우선순위, 페르소나 등)", allow_freeform=true)
+elif "Request revision" in gate_2:
+    revision_feedback = AskUserQuestion("Which parts should be revised? (feature scope, priority, personas, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run Phase 2 agents from step 6.3 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
     # After re-run, loop back to this gate.
-elif "피봇" in gate_2:
+elif "Pivot" in gate_2:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 2 revision {current_version}")
     # Return to Phase 0 - re-run Ideation (Step 4)
 ```
@@ -731,7 +756,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-3-design design-system.md {current_version}")
     existing_design = Read("{PROJECT_DIR}/phase-3-design/design-system.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 디자인 시스템:\n{existing_design}"
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting design system:\n{existing_design}"
 
 # 7.3 SEQUENTIAL: Design Lead FIRST, then UI Designer
 Task(
@@ -739,30 +764,37 @@ Task(
   model="sonnet",
   description="Create design system",
   prompt=f"""
-  당신은 Business Avengers의 Design Lead입니다.
+  You are Business Avengers' Design Lead.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/design-lead.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - 페르소나: {personas}
+  - Personas: {personas}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/ux-principles.md
+  - {KNOWLEDGE_DIR}/extended/design-advanced.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 3 section)
+
+  Template (Read this file):
   - {TEMPLATE_DIR}/design-system.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. UX 원칙 Knowledge Base를 Read로 읽어 참고하세요
-  3. 서비스 특성에 맞는 디자인 시스템을 설계하세요
-  4. 컬러 팔레트, 타이포그래피, 스페이싱, 컴포넌트 규칙을 정의하세요
-  5. 접근성(WCAG 2.1 AA) 기준을 반영하세요
-  6. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read design-advanced.md — apply Nielsen's 10 heuristics, conversion design patterns, and state design standards
+  3. Design a design system suited to the service's characteristics (all 9 required elements)
+  4. Define color tokens, typography scale (6+ levels with exact px), 8px spacing system, component states
+  5. Incorporate accessibility (WCAG 2.1 AA) — document contrast ratios for all text/background combos
+  6. Design empty states, error states, and loading states for all data-dependent screens
+  7. Check phase-rubrics.md Phase 3 checklist, fix any unmet items
+  8. Add Quality Self-Assessment block at top of output
+  9. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-3-design/design-system.md
   """)
 
@@ -774,53 +806,58 @@ Task(
   model="sonnet",
   description="Create wireframes and UI specs",
   prompt=f"""
-  당신은 Business Avengers의 UI Designer입니다.
+  You are Business Avengers' UI Designer.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/ui-designer.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - 페르소나: {personas}
-  - 디자인 시스템: {design_system}
+  - Personas: {personas}
+  - Design System: {design_system}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/ux-principles.md
+  - {KNOWLEDGE_DIR}/extended/design-advanced.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read these files):
   - {TEMPLATE_DIR}/wireframes.md
   - {TEMPLATE_DIR}/ui-specifications.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 디자인 시스템을 기반으로 핵심 화면의 와이어프레임을 작성하세요
-  3. 각 화면별 컴포넌트 명세와 인터랙션 패턴을 정의하세요
-  4. PRD의 핵심 기능이 모두 와이어프레임에 반영되었는지 확인하세요
-  5. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read design-advanced.md — apply friction audit methodology and conversion CTA standards
+  3. Create wireframes for key screens based on the design system
+  4. For each screen: verify empty state, error state, and loading state are designed
+  5. Apply above-the-fold standard for landing/marketing screens: headline + CTA + trust signal visible
+  6. Define component specs and interaction patterns for each screen
+  7. Verify all core features from PRD are reflected in wireframes
+  8. Add Quality Self-Assessment block at top of output
+  9. Fill in {{PLACEHOLDER}} in the templates and save with Write:
      - {PROJECT_DIR}/phase-3-design/wireframes.md
      - {PROJECT_DIR}/phase-3-design/ui-specifications.md
   """)
 
 # 7.5 CEO reviews design
 gate_3 = AskUserQuestion(
-  "[CPO] 디자인 시스템과 와이어프레임을 검토해주세요.",
+  "[CPO] Please review the design system and wireframes.",
   options=[
-    "승인 - 다음 단계로 진행",
-    "수정 요청 - 피드백 반영 후 재작업",
-    "피봇 - 방향 전환"
+    "Approve - proceed to the next step",
+    "Request revision - rework after incorporating feedback",
+    "Pivot - change direction"
   ]
 )
 
-if "승인" in gate_3:
+if "Approve" in gate_3:
     pass  # proceed to update-phase below
-elif "수정 요청" in gate_3:
-    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (디자인 시스템, 와이어프레임, UI 컴포넌트 등)", allow_freeform=true)
+elif "Request revision" in gate_3:
+    revision_feedback = AskUserQuestion("Which parts should be revised? (design system, wireframes, UI components, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run Design Lead and UI Designer Tasks from step 7.3-7.4 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
     # After re-run, loop back to this gate.
-elif "피봇" in gate_3:
+elif "Pivot" in gate_3:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 3 revision {current_version}")
     # Return to Phase 0
 
@@ -854,7 +891,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-4-tech-planning tech-architecture.md {current_version}")
     existing_arch = Read("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 아키텍처:\n{existing_arch}"
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting architecture:\n{existing_arch}"
 
 # 8.3 Tech Lead designs architecture
 Task(
@@ -862,19 +899,23 @@ Task(
   model="sonnet",
   description="Design technical architecture",
   prompt=f"""
-  당신은 Business Avengers의 Tech Lead입니다.
+  You are Business Avengers' Tech Lead.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/tech-lead.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - UI 스펙: {ui_specs}
+  - UI Specs: {ui_specs}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/tech-stack-guide.md
+  - {KNOWLEDGE_DIR}/extended/tech-architecture-advanced.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 4 section)
+
+  Template (Read these files):
   - {TEMPLATE_DIR}/tech-architecture.md
   - {TEMPLATE_DIR}/api-design.md
   - {TEMPLATE_DIR}/database-schema.md
@@ -882,14 +923,19 @@ Task(
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. Tech Stack Guide를 Read로 읽어 서비스 유형에 맞는 스택을 선택하세요
-  3. PRD의 기능 요구사항을 기반으로 시스템 아키텍처를 설계하세요
-  4. RESTful API를 설계하고 엔드포인트를 정의하세요
-  5. 데이터베이스 스키마를 ERD와 함께 설계하세요
-  6. 기술 스택 결정 문서에 선택 근거를 작성하세요
-  7. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read tech-architecture-advanced.md — apply boring tech principle, ADR format, and OWASP security checklist
+  3. Apply stack selection decision tree: use known tech unless switching saves >40 hours
+  4. Write ≥5 ADRs (frontend, backend, database, auth, hosting) with Context → Decision → Rationale → Alternatives
+  5. Design system architecture based on PRD functional requirements (C4 Context + Container diagrams)
+  6. Design RESTful API with consistent error format and versioning
+  7. Design database schema with indexes and constraint rationale
+  8. Address all 10 OWASP categories (status: addressed / not applicable / deferred)
+  9. Perform no-code/low-code assessment for each core feature
+  10. Check phase-rubrics.md Phase 4 checklist, fix any unmet items
+  11. Add Quality Self-Assessment block at top of each output
+  12. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md
      - {PROJECT_DIR}/phase-4-tech-planning/api-design.md
      - {PROJECT_DIR}/phase-4-tech-planning/database-schema.md
@@ -900,19 +946,19 @@ Task(
 tech_arch = Read("{PROJECT_DIR}/phase-4-tech-planning/tech-architecture.md")
 
 """
-[CTO] 기술 설계가 완료되었습니다. 상세 내용은 프로젝트 폴더를 확인해주세요.
+[CTO] Technical design is complete. Please check the project folder for details.
 """
 
-gate_4 = AskUserQuestion("[CTO] 기술 설계 보고입니다. 확인해주세요.",
-  options=["확인 - 진행", "질문 있음", "수정 요청"])
+gate_4 = AskUserQuestion("[CTO] Technical design report. Please review.",
+  options=["Confirm - proceed", "I have a question", "Request revision"])
 
-if "질문 있음" in gate_4:
-    follow_up = AskUserQuestion("어떤 내용이 궁금하신가요? 기술 설계 관련 질문을 입력해주세요.", allow_freeform=true)
+if "I have a question" in gate_4:
+    follow_up = AskUserQuestion("What would you like to know? Please enter your question about the technical design.", allow_freeform=true)
     # Display relevant section from tech_arch / api_design / database-schema based on follow_up
-elif "수정 요청" in gate_4:
-    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (아키텍처, API, DB 스키마 등)", allow_freeform=true)
+elif "Request revision" in gate_4:
+    revision_feedback = AskUserQuestion("Which parts should be revised? (architecture, API, DB schema, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run Tech Lead Task from step 8.3 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
 Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 4 completed {current_version}")
 ```
 
@@ -955,9 +1001,9 @@ if is_sprint:
     existing_frontend = Read(frontend_f[0]) if frontend_f else ""
     backend_f = Glob("{PROJECT_DIR}/phase-5-development/backend-guide.md")
     existing_backend = Read(backend_f[0]) if backend_f else ""
-    sprint_context_frontend = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 프론트엔드 가이드:\n{existing_frontend}"
-    sprint_context_backend = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 백엔드 가이드:\n{existing_backend}"
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}"  # devops용
+    sprint_context_frontend = f"Update the existing document. Change goal: {sprint_goal}\nExisting frontend guide:\n{existing_frontend}"
+    sprint_context_backend = f"Update the existing document. Change goal: {sprint_goal}\nExisting backend guide:\n{existing_backend}"
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}"  # for devops
 
 # 9.3 Launch 3 agents in PARALLEL (CRITICAL: all in single response block)
 Task(
@@ -965,33 +1011,33 @@ Task(
   model="sonnet",
   description="Frontend implementation guide",
   prompt=f"""
-  당신은 Business Avengers의 Frontend Developer입니다.
+  You are Business Avengers' Frontend Developer.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/frontend-dev.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - 기술 아키텍처: {tech_arch}
-  - UI 스펙: {ui_specs}
+  - Tech Architecture: {tech_arch}
+  - UI Specs: {ui_specs}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/tech-stack-guide.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/frontend-guide.md
 
   {sprint_context_frontend}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 기술 아키텍처에서 선택된 프론트엔드 스택을 확인하세요
-  3. 프로젝트 구조(디렉토리, 파일 구성)를 설계하세요
-  4. 핵심 컴포넌트 목록과 각 컴포넌트의 역할을 정의하세요
-  5. 상태 관리 전략, 라우팅, API 통신 패턴을 설계하세요
-  6. UI 스펙의 각 화면을 컴포넌트로 분해하세요
-  7. 성능 최적화 전략(코드 스플리팅, 레이지 로딩 등)을 포함하세요
-  8. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Confirm the frontend stack selected in the tech architecture
+  3. Design the project structure (directory and file organization)
+  4. Define the list of core components and the role of each component
+  5. Design state management strategy, routing, and API communication patterns
+  6. Break down each screen from the UI specs into components
+  7. Include performance optimization strategies (code splitting, lazy loading, etc.)
+  8. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-5-development/frontend-guide.md
   """)
 
@@ -1000,34 +1046,34 @@ Task(
   model="sonnet",
   description="Backend implementation guide",
   prompt=f"""
-  당신은 Business Avengers의 Backend Developer입니다.
+  You are Business Avengers' Backend Developer.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/backend-dev.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - 기술 아키텍처: {tech_arch}
-  - API 설계: {api_design}
-  - DB 스키마: {db_schema}
+  - Tech Architecture: {tech_arch}
+  - API Design: {api_design}
+  - DB Schema: {db_schema}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/tech-stack-guide.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/backend-guide.md
 
   {sprint_context_backend}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 기술 아키텍처에서 선택된 백엔드 스택을 확인하세요
-  3. 프로젝트 구조(디렉토리, 모듈, 레이어)를 설계하세요
-  4. API 엔드포인트별 구현 가이드를 작성하세요 (컨트롤러, 서비스, 리포지토리)
-  5. 인증/인가 구현 전략을 상세히 기술하세요
-  6. DB 마이그레이션 전략과 ORM 모델 설계를 포함하세요
-  7. 에러 핸들링, 로깅, 모니터링 패턴을 정의하세요
-  8. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Confirm the backend stack selected in the tech architecture
+  3. Design the project structure (directory, modules, layers)
+  4. Write implementation guides per API endpoint (controller, service, repository)
+  5. Describe the authentication/authorization implementation strategy in detail
+  6. Include DB migration strategy and ORM model design
+  7. Define error handling, logging, and monitoring patterns
+  8. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-5-development/backend-guide.md
   """)
 
@@ -1036,56 +1082,56 @@ Task(
   model="sonnet",
   description="Deployment strategy and implementation roadmap",
   prompt=f"""
-  당신은 Business Avengers의 DevOps Engineer입니다.
+  You are Business Avengers' DevOps Engineer.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/devops-engineer.md
 
-  프로젝트 컨텍스트:
-  - 기술 아키텍처: {tech_arch}
+  Project Context:
+  - Tech Architecture: {tech_arch}
   - PRD: {prd}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/tech-stack-guide.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read these files):
   - {TEMPLATE_DIR}/deployment-strategy.md
   - {TEMPLATE_DIR}/implementation-roadmap.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. CI/CD 파이프라인을 설계하세요 (빌드, 테스트, 배포 단계)
-  3. 인프라 아키텍처를 설계하세요 (클라우드 서비스, 서버리스 등)
-  4. 환경 구성(개발/스테이징/프로덕션)을 정의하세요
-  5. 모니터링, 알림, 로그 관리 전략을 수립하세요
-  6. 보안 설정(HTTPS, 방화벽, 시크릿 관리)을 포함하세요
-  7. 전체 구현 로드맵을 스프린트 단위로 작성하세요
-  8. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Design the CI/CD pipeline (build, test, deploy stages)
+  3. Design the infrastructure architecture (cloud services, serverless, etc.)
+  4. Define environment configuration (development/staging/production)
+  5. Establish monitoring, alerting, and log management strategy
+  6. Include security configuration (HTTPS, firewall, secret management)
+  7. Write the full implementation roadmap in sprint units
+  8. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-5-development/deployment-strategy.md
      - {PROJECT_DIR}/phase-5-development/implementation-roadmap.md
   """)
 
 # 9.4 CTO reports to CEO (delegate level - light confirmation)
 """
-[CTO] 개발 가이드가 완료되었습니다:
-- 프론트엔드 구현 가이드
-- 백엔드 구현 가이드
-- 배포 전략 & 구현 로드맵
+[CTO] Development guide is complete:
+- Frontend implementation guide
+- Backend implementation guide
+- Deployment strategy & implementation roadmap
 
-상세 내용은 프로젝트 폴더를 확인해주세요.
+Please check the project folder for details.
 """
 
-gate_5 = AskUserQuestion("[CTO] 개발 가이드가 완료되었습니다.", options=["확인 - 진행", "질문 있음", "수정 요청"])
+gate_5 = AskUserQuestion("[CTO] Development guide is complete.", options=["Confirm - proceed", "I have a question", "Request revision"])
 
-if "질문 있음" in gate_5:
-    follow_up = AskUserQuestion("개발 가이드 관련 질문을 입력해주세요.", allow_freeform=true)
+if "I have a question" in gate_5:
+    follow_up = AskUserQuestion("Please enter your question about the development guide.", allow_freeform=true)
     # Display relevant section from frontend-guide / backend-guide / deployment-strategy based on follow_up
-elif "수정 요청" in gate_5:
-    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (프론트엔드, 백엔드, 배포 전략 등)", allow_freeform=true)
+elif "Request revision" in gate_5:
+    revision_feedback = AskUserQuestion("Which parts should be revised? (frontend, backend, deployment strategy, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run the relevant dev agent Task(s) from step 9.3 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
 Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 5 completed {current_version}")
 ```
 
@@ -1122,7 +1168,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-6-qa test-plan.md {current_version}")
     existing_test = Read("{PROJECT_DIR}/phase-6-qa/test-plan.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 테스트 계획:\n{existing_test}"
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting test plan:\n{existing_test}"
 
 # 10.3 QA Lead creates test plan
 Task(
@@ -1130,51 +1176,51 @@ Task(
   model="sonnet",
   description="Create test plan and QA checklist",
   prompt=f"""
-  당신은 Business Avengers의 QA Lead입니다.
+  You are Business Avengers' QA Lead.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/qa-lead.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - 유저 스토리: {user_stories}
-  - 기술 아키텍처: {tech_arch}
-  - API 설계: {api_design}
-  - 프론트엔드 가이드: {frontend_guide}
+  - User Stories: {user_stories}
+  - Tech Architecture: {tech_arch}
+  - API Design: {api_design}
+  - Frontend Guide: {frontend_guide}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/tech-stack-guide.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read these files):
   - {TEMPLATE_DIR}/test-plan.md
   - {TEMPLATE_DIR}/qa-checklist.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. PRD와 유저 스토리를 기반으로 테스트 케이스를 도출하세요
-  3. 기능 테스트, 통합 테스트, E2E 테스트 전략을 수립하세요
-  4. API 엔드포인트별 테스트 시나리오를 작성하세요
-  5. 성능 테스트 기준(응답 시간, 동시 접속 등)을 정의하세요
-  6. 보안 테스트 체크리스트(OWASP Top 10)를 포함하세요
-  7. QA 체크리스트를 출시 전/후로 구분하여 작성하세요
-  8. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Derive test cases from the PRD and user stories
+  3. Establish functional testing, integration testing, and E2E testing strategies
+  4. Write test scenarios per API endpoint
+  5. Define performance test criteria (response time, concurrent connections, etc.)
+  6. Include a security test checklist (OWASP Top 10)
+  7. Write the QA checklist separated into pre-launch and post-launch sections
+  8. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-6-qa/test-plan.md
      - {PROJECT_DIR}/phase-6-qa/qa-checklist.md
   """)
 
 # 10.4 CTO reports to CEO
-gate_6 = AskUserQuestion("[CTO] QA 계획이 완료되었습니다. 테스트 계획서와 QA 체크리스트가 생성되었습니다.",
-  options=["확인 - 진행", "질문 있음", "수정 요청"])
+gate_6 = AskUserQuestion("[CTO] QA plan is complete. Test plan and QA checklist have been generated.",
+  options=["Confirm - proceed", "I have a question", "Request revision"])
 
-if "질문 있음" in gate_6:
-    follow_up = AskUserQuestion("QA 계획 관련 질문을 입력해주세요.", allow_freeform=true)
+if "I have a question" in gate_6:
+    follow_up = AskUserQuestion("Please enter your question about the QA plan.", allow_freeform=true)
     # Display relevant section from test-plan / qa-checklist based on follow_up
-elif "수정 요청" in gate_6:
-    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (테스트 케이스, 성능 기준, E2E 시나리오 등)", allow_freeform=true)
+elif "Request revision" in gate_6:
+    revision_feedback = AskUserQuestion("Which parts should be revised? (test cases, performance criteria, E2E scenarios, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run QA Lead Task from step 10.3 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
 Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 6 completed {current_version}")
 ```
 
@@ -1195,7 +1241,7 @@ prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
 if prd_files:
     prd = Read(prd_files[0])
 else:
-    prd = idea_canvas  # make/mvp-build 프리셋 fallback: PRD 미존재 시 idea-canvas 사용
+    prd = idea_canvas  # make/mvp-build preset fallback: use idea-canvas when PRD does not exist
 personas_files = Glob("{PROJECT_DIR}/phase-2-product-planning/user-personas.md")
 personas = Read(personas_files[0]) if personas_files else ""
 market_analysis_files = Glob("{PROJECT_DIR}/phase-1-market-research/market-analysis.md")
@@ -1210,7 +1256,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-7-launch-strategy gtm-strategy.md {current_version}")
     existing_gtm = Read("{PROJECT_DIR}/phase-7-launch-strategy/gtm-strategy.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 GTM 전략:\n{existing_gtm}"
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting GTM strategy:\n{existing_gtm}"
 
 # 11.3 Launch 4 agents in PARALLEL (CRITICAL: all in single response block)
 Task(
@@ -1218,34 +1264,43 @@ Task(
   model="sonnet",
   description="GTM strategy",
   prompt=f"""
-  당신은 Business Avengers의 Marketing Strategist입니다.
+  You are Business Avengers' Marketing Strategist.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/marketing-strategist.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - Idea Canvas: {idea_canvas}
   - PRD: {prd}
-  - 페르소나: {personas}
-  - 시장 분석: {market_analysis}
-  - 경쟁 분석: {competitive}
+  - Personas: {personas}
+  - Market Analysis: {market_analysis}
+  - Competitive Analysis: {competitive}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/marketing-playbooks.md
+  - {KNOWLEDGE_DIR}/extended/gtm-advanced.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 7 section)
+
+  Template (Read this file):
   - {TEMPLATE_DIR}/gtm-strategy.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 마케팅 플레이북 Knowledge Base를 참고하세요
-  3. 타겟 세그먼트별 GTM 전략을 수립하세요
-  4. 채널 전략(SEO, SNS, 이메일, 유료 광고)을 구체적으로 작성하세요
-  5. 출시 전/당일/후 타임라인을 작성하세요
-  6. 마케팅 예산 배분과 기대 ROI를 산정하세요
-  7. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read gtm-advanced.md — apply Beachhead, First 1000 Users, and Repeated Launch frameworks
+  3. Define ICP with specificity: role + company size + problem + buying trigger (not just "SMB")
+  4. Select max 2 primary acquisition channels for 90-day focus — justify each choice
+  5. Write First 100 Users plan: channel + specific tactic + target number (e.g., 40 from PH, 40 from Reddit, 20 from cold outreach)
+  6. Write Pre-launch warm-up plan (≥2 weeks before launch): waitlist, community contribution, hunter identification
+  7. Write the pre-launch/launch-day/post-launch timeline with launch platform rationale
+  8. Plan Repeated Launch calendar: 3 milestones with re-launch venue
+  9. Estimate marketing budget allocation and expected ROI
+  10. Check phase-rubrics.md Phase 7 checklist, fix any unmet items
+  11. Add Quality Self-Assessment block at top of output
+  12. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-7-launch-strategy/gtm-strategy.md
   """)
 
@@ -1254,33 +1309,33 @@ Task(
   model="sonnet",
   description="Content marketing plan",
   prompt=f"""
-  당신은 Business Avengers의 Content Creator입니다.
+  You are Business Avengers' Content Creator.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/content-creator.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - Idea Canvas: {idea_canvas}
   - PRD: {prd}
-  - 페르소나: {personas}
-  - 시장 분석: {market_analysis}
+  - Personas: {personas}
+  - Market Analysis: {market_analysis}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/marketing-playbooks.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/content-plan.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 페르소나별 콘텐츠 전략을 수립하세요
-  3. 채널별(블로그, SNS, 뉴스레터, 영상) 콘텐츠 캘린더를 작성하세요
-  4. 핵심 메시지와 톤앤매너를 정의하세요
-  5. SEO 키워드 전략을 포함하세요
-  6. 콘텐츠 제작 워크플로우와 품질 기준을 정의하세요
-  7. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Establish content strategy per persona
+  3. Write a content calendar per channel (blog, social media, newsletter, video)
+  4. Define core messages and tone of voice
+  5. Include SEO keyword strategy
+  6. Define the content creation workflow and quality standards
+  7. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-7-launch-strategy/content-plan.md
   """)
 
@@ -1289,34 +1344,42 @@ Task(
   model="sonnet",
   description="Growth strategy",
   prompt=f"""
-  당신은 Business Avengers의 Growth Hacker입니다.
+  You are Business Avengers' Growth Hacker.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/growth-hacker.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - Idea Canvas: {idea_canvas}
   - PRD: {prd}
-  - 페르소나: {personas}
-  - 시장 분석: {market_analysis}
+  - Personas: {personas}
+  - Market Analysis: {market_analysis}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/growth-tactics.md
+  - {KNOWLEDGE_DIR}/extended/growth-engineering.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 7 section)
+
+  Template (Read this file):
   - {TEMPLATE_DIR}/growth-strategy.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 그로스 해킹 Knowledge Base를 참고하세요
-  3. AARRR 퍼널 분석 프레임워크를 적용하세요
-  4. 핵심 성장 지표(North Star Metric)를 정의하세요
-  5. 바이럴 루프, 레퍼럴 프로그램 등 성장 레버를 설계하세요
-  6. A/B 테스트 계획을 수립하세요
-  7. 첫 1000명 사용자 획득 전략을 구체적으로 작성하세요
-  8. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read growth-engineering.md — apply NSM framework, growth loop selection, and Aha Moment identification
+  3. Define the North Star Metric (NOT revenue, NOT signups — must capture value delivery)
+  4. Identify primary growth loop type (viral / SEO content / paid / PLG) with rationale
+  5. Define Aha Moment: specific user action + target timeframe (e.g., "complete first X within 7 days")
+  6. Apply AARRR framework — address all 5 stages with specific tactics
+  7. Design viral loop if applicable: K-factor calculation, 2-sided incentive structure
+  8. Propose ≥3 ICE-scored growth experiments for first 90 days
+  9. Write strategy for acquiring first 1,000 users with channel + tactic + target breakdown
+  10. Check phase-rubrics.md Phase 7 checklist, fix any unmet items
+  11. Add Quality Self-Assessment block at top of output
+  12. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-7-launch-strategy/growth-strategy.md
   """)
 
@@ -1325,60 +1388,60 @@ Task(
   model="sonnet",
   description="PR plan and launch checklist",
   prompt=f"""
-  당신은 Business Avengers의 PR Manager입니다.
+  You are Business Avengers' PR Manager.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/pr-manager.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - Idea Canvas: {idea_canvas}
   - PRD: {prd}
-  - 시장 분석: {market_analysis}
-  - 경쟁 분석: {competitive}
+  - Market Analysis: {market_analysis}
+  - Competitive Analysis: {competitive}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/marketing-playbooks.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read these files):
   - {TEMPLATE_DIR}/pr-plan.md
   - {TEMPLATE_DIR}/launch-checklist.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. PR 전략(미디어 리스트, 보도자료, 인터뷰 등)을 수립하세요
-  3. 출시 스토리 앵글을 3-5개 개발하세요
-  4. 미디어 타겟 리스트(기자, 블로거, 인플루언서)를 작성하세요
-  5. 위기 대응 시나리오와 Q&A를 준비하세요
-  6. 출시 체크리스트를 D-30, D-7, D-1, D-Day, D+7로 구분하세요
-  7. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Establish a PR strategy (media list, press releases, interviews, etc.)
+  3. Develop 3-5 launch story angles
+  4. Write a media target list (journalists, bloggers, influencers)
+  5. Prepare crisis response scenarios and Q&A
+  6. Divide the launch checklist into D-30, D-7, D-1, D-Day, D+7
+  7. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-7-launch-strategy/pr-plan.md
      - {PROJECT_DIR}/phase-7-launch-strategy/launch-checklist.md
   """)
 
 # 11.4 CMO presents to CEO for strategic approval
 """
-[CMO] 출시 전략이 완료되었습니다:
-- GTM 전략: 채널별 마케팅 계획
-- 콘텐츠 플랜: 콘텐츠 캘린더 및 제작 계획
-- 성장 전략: AARRR 퍼널 및 그로스 해킹 전략
-- PR 플랜: 미디어 전략 및 출시 체크리스트
+[CMO] Launch strategy is complete:
+- GTM Strategy: marketing plan per channel
+- Content Plan: content calendar and production plan
+- Growth Strategy: AARRR funnel and growth hacking strategy
+- PR Plan: media strategy and launch checklist
 
-상세 문서는 프로젝트 폴더에 저장되었습니다.
+Detailed documents have been saved to the project folder.
 """
 
-gate_7 = AskUserQuestion("[CMO] 출시 전략을 검토해주세요.",
-  options=["승인 - 출시 전략 확정", "수정 요청 - 피드백 반영", "예산 조정 필요", "재검토 - 방향 재설정"])
+gate_7 = AskUserQuestion("[CMO] Please review the launch strategy.",
+  options=["Approve - confirm launch strategy", "Request revision - incorporate feedback", "Budget adjustment needed", "Re-evaluate - reset direction"])
 
-if "승인" in gate_7:
+if "Approve" in gate_7:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 7 completed {current_version}")
-elif "수정 요청" in gate_7 or "예산 조정" in gate_7:
-    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (GTM 채널, 콘텐츠 전략, 예산 배분 등)", allow_freeform=true)
+elif "Request revision" in gate_7 or "Budget adjustment" in gate_7:
+    revision_feedback = AskUserQuestion("Which parts should be revised? (GTM channels, content strategy, budget allocation, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run the relevant Phase 7 agent Task(s) from step 11.3 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
     # After re-run, loop back to this gate.
-elif "재검토" in gate_7:
+elif "Re-evaluate" in gate_7:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 7 revision {current_version}")
     # Return to Phase 0 for full re-ideation
 ```
@@ -1400,7 +1463,7 @@ prd_files = Glob("{PROJECT_DIR}/phase-2-product-planning/prd.md")
 if prd_files:
     prd = Read(prd_files[0])
 else:
-    prd = idea_canvas  # make 프리셋 fallback: PRD 미존재 시 idea-canvas 사용
+    prd = idea_canvas  # make preset fallback: use idea-canvas when PRD does not exist
 market_analysis_files = Glob("{PROJECT_DIR}/phase-1-market-research/market-analysis.md")
 market_analysis = Read(market_analysis_files[0]) if market_analysis_files else ""
 competitive_files = Glob("{PROJECT_DIR}/phase-1-market-research/competitive-analysis.md")
@@ -1417,7 +1480,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-8-monetization pricing-strategy.md {current_version}")
     existing_pricing = Read("{PROJECT_DIR}/phase-8-monetization/pricing-strategy.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 가격 전략:\n{existing_pricing}"
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting pricing strategy:\n{existing_pricing}"
 
 # 12.3 Launch 2 agents in PARALLEL
 Task(
@@ -1425,37 +1488,48 @@ Task(
   model="sonnet",
   description="Pricing strategy",
   prompt=f"""
-  당신은 Business Avengers의 Revenue Strategist입니다.
+  You are Business Avengers' Revenue Strategist.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/revenue-strategist.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - Idea Canvas: {idea_canvas}
   - PRD: {prd}
-  - 시장 분석: {market_analysis}
-  - 경쟁 분석: {competitive}
-  - 수익 모델 초안 (Phase 1): {revenue_draft}
-  - 기능 우선순위: {feature_priority}
+  - Market Analysis: {market_analysis}
+  - Competitive Analysis: {competitive}
+  - Revenue Model Draft (Phase 1): {revenue_draft}
+  - Feature Priority: {feature_priority}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/pricing-strategies.md
   - {KNOWLEDGE_DIR}/business-models.md
+  - {KNOWLEDGE_DIR}/extended/saas-metrics-bible.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 8 section)
+
+  Template (Read this file):
   - {TEMPLATE_DIR}/pricing-strategy.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 가격 전략 Knowledge Base를 Read로 읽어 참고하세요
-  3. Phase 1의 수익 모델 초안을 발전시켜 구체적인 가격 전략을 수립하세요
-  4. 경쟁사 가격 비교 분석을 포함하세요
-  5. 프리미엄/무료/프리미엄 tier별 기능 매핑을 작성하세요
-  6. 가격 민감도 분석과 최적 가격 포인트를 제시하세요
-  7. 할인/프로모션 전략을 수립하세요
-  8. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read saas-metrics-bible.md — apply Goldilocks 3-tier pricing structure and value metric selection guide
+  3. Build on the Phase 1 revenue model draft to establish a concrete pricing strategy
+  4. Design 3-tier Goldilocks pricing (Starter/Free → Pro/Core → Business/Enterprise):
+     - Tier 1: Feature-limited, upsell bait — do NOT make this tier appealing
+     - Tier 2: PRIMARY revenue tier — most visually prominent and best value
+     - Tier 3: Anchor that makes Tier 2 look reasonable by comparison
+     - Annual pricing: ~2 months free (16.7% discount); target 30–50% on annual
+  5. Include a competitive pricing comparison analysis
+  6. Write feature mapping per tier with clear upgrade triggers
+  7. Present price sensitivity analysis and optimal price points
+  8. Establish discount/promotion strategies
+  9. Check phase-rubrics.md Phase 8 checklist, fix any unmet items
+  10. Add Quality Self-Assessment block at top of output
+  11. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-8-monetization/pricing-strategy.md
   """)
 
@@ -1464,61 +1538,70 @@ Task(
   model="sonnet",
   description="Financial projections and unit economics",
   prompt=f"""
-  당신은 Business Avengers의 Business Analyst입니다.
+  You are Business Avengers' Business Analyst.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/business-analyst.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - Idea Canvas: {idea_canvas}
   - PRD: {prd}
-  - 시장 분석: {market_analysis}
-  - 수익 모델 초안: {revenue_draft}
+  - Market Analysis: {market_analysis}
+  - Revenue Model Draft: {revenue_draft}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/business-models.md
   - {KNOWLEDGE_DIR}/pricing-strategies.md
+  - {KNOWLEDGE_DIR}/extended/saas-metrics-bible.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 8 section)
+
+  Template (Read these files):
   - {TEMPLATE_DIR}/financial-projections.md
   - {TEMPLATE_DIR}/unit-economics.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 3개년 재무 예측(매출, 비용, 이익)을 작성하세요
-  3. 월별 캐시플로우 예측을 포함하세요
-  4. Unit Economics를 산정하세요 (CAC, LTV, LTV/CAC, Payback Period)
-  5. 손익분기점(BEP) 분석을 수행하세요
-  6. 시나리오 분석(낙관/기본/비관)을 포함하세요
-  7. 초기 투자 필요 금액과 자금 조달 전략을 제시하세요
-  8. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read saas-metrics-bible.md — apply LTV:CAC thresholds, Gross Margin benchmarks, and 3-scenario framework
+  3. Write 3-year financial projections (revenue, costs, profit)
+  4. Include monthly cash flow projections
+  5. Calculate Unit Economics (CAC, LTV, LTV/CAC, Payback Period) — compare each to saas-metrics-bible.md benchmarks
+  6. If LTV:CAC < 3:1 → flag business model viability to CEO explicitly in the document
+  7. If Gross Margin < 70% → include COGS breakdown + roadmap to reach 70%+
+  8. Perform break-even point (BEP) analysis — state Breakeven MRR + projected month (M+N format)
+  9. Include scenario analysis — 3 mandatory scenarios: Best (×1.5) / Base / Worst (×0.5); each with key assumption stated
+  10. Present initial investment requirements and funding strategy
+  11. Check phase-rubrics.md Phase 8 checklist, fix any unmet items
+  12. Add Quality Self-Assessment block at top of each output
+  13. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-8-monetization/financial-projections.md
      - {PROJECT_DIR}/phase-8-monetization/unit-economics.md
   """)
 
 # 12.4 CFO presents to CEO for strategic approval
 """
-[CFO] 수익화 전략이 완료되었습니다:
-- 가격 전략: tier별 가격 및 기능 매핑
-- 재무 예측: 3개년 매출/비용/이익 전망
-- Unit Economics: CAC, LTV, 손익분기점 분석
+[CFO] Monetization strategy is complete:
+- Pricing Strategy: pricing and feature mapping per tier
+- Financial Projections: 3-year revenue/cost/profit outlook
+- Unit Economics: CAC, LTV, break-even analysis
 
-상세 문서는 프로젝트 폴더에 저장되었습니다.
+Detailed documents have been saved to the project folder.
 """
 
-gate_8 = AskUserQuestion("[CFO] 수익화 전략을 검토해주세요.",
-  options=["승인 - 가격 확정", "수정 요청 - 가격 조정 필요", "재검토 - 수익 모델 변경"])
+gate_8 = AskUserQuestion("[CFO] Please review the monetization strategy.",
+  options=["Approve - confirm pricing", "Request revision - pricing adjustment needed", "Re-evaluate - change revenue model"])
 
-if "승인" in gate_8:
+if "Approve" in gate_8:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 8 completed {current_version}")
-elif "수정 요청" in gate_8:
-    revision_feedback = AskUserQuestion("어떤 부분을 조정할까요? (가격 tier, 수익 모델, Unit Economics 등)", allow_freeform=true)
+elif "Request revision" in gate_8:
+    revision_feedback = AskUserQuestion("Which parts should be adjusted? (pricing tier, revenue model, Unit Economics, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run Phase 8 agents from step 12.3 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
     # After re-run, loop back to this gate.
-elif "재검토" in gate_8:
+elif "Re-evaluate" in gate_8:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 8 revision {current_version}")
     # Return to Phase 1 for market re-research or Phase 0 for re-ideation
 ```
@@ -1556,7 +1639,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-9-operations cs-playbook.md {current_version}")
     existing_cs = Read("{PROJECT_DIR}/phase-9-operations/cs-playbook.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 CS 플레이북:\n{existing_cs}"
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting CS playbook:\n{existing_cs}"
 
 # 13.3 Launch 3 agents in PARALLEL (CRITICAL: all in single response block)
 Task(
@@ -1564,34 +1647,34 @@ Task(
   model="sonnet",
   description="CS playbook and FAQ",
   prompt=f"""
-  당신은 Business Avengers의 CS Manager입니다.
+  You are Business Avengers' CS Manager.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/cs-manager.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - 페르소나: {personas}
-  - 가격 전략: {pricing}
-  - GTM 전략 (출시/채널 컨텍스트): {gtm}
+  - Personas: {personas}
+  - Pricing Strategy: {pricing}
+  - GTM Strategy (launch/channel context): {gtm}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/startup-best-practices.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read these files):
   - {TEMPLATE_DIR}/cs-playbook.md
   - {TEMPLATE_DIR}/faq-template.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 고객 문의 유형별 대응 시나리오를 작성하세요
-  3. 에스컬레이션 프로세스를 정의하세요 (1차→2차→CEO)
-  4. 자주 묻는 질문(FAQ)을 카테고리별로 30개 이상 작성하세요
-  5. 고객 만족도 측정 방법(NPS, CSAT)을 정의하세요
-  6. 1인 기업에 맞는 효율적인 CS 운영 방안을 제시하세요
-  7. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Write response scenarios per customer inquiry type
+  3. Define the escalation process (tier 1 → tier 2 → CEO)
+  4. Write 30+ FAQ items organized by category
+  5. Define customer satisfaction measurement methods (NPS, CSAT)
+  6. Present efficient CS operation plans suitable for a solo business
+  7. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-9-operations/cs-playbook.md
      - {PROJECT_DIR}/phase-9-operations/faq-template.md
   """)
@@ -1601,32 +1684,32 @@ Task(
   model="sonnet",
   description="Legal documentation",
   prompt=f"""
-  당신은 Business Avengers의 Legal Advisor입니다.
+  You are Business Avengers' Legal Advisor.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/legal-advisor.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - 가격 전략: {pricing}
+  - Pricing Strategy: {pricing}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/legal-templates.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/legal-docs.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 법규 준수 Knowledge Base를 Read로 읽어 참고하세요
-  3. 이용약관(Terms of Service)을 작성하세요
-  4. 개인정보처리방침(Privacy Policy)을 작성하세요
-  5. 환불 정책을 작성하세요
-  6. 서비스 특성에 따른 필수 법적 고지사항을 포함하세요
-  7. 한국 법률(개인정보보호법, 전자상거래법 등) 준수 사항을 체크하세요
-  8. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Read the Legal Compliance Knowledge Base for reference
+  3. Write the Terms of Service
+  4. Write the Privacy Policy
+  5. Write the Refund Policy
+  6. Include mandatory legal notices specific to the service's characteristics
+  7. Check compliance requirements for applicable laws (privacy protection, e-commerce, etc.)
+  8. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-9-operations/legal-docs.md
   """)
 
@@ -1635,59 +1718,59 @@ Task(
   model="sonnet",
   description="Metrics dashboard and feedback loop",
   prompt=f"""
-  당신은 Business Avengers의 Data Analyst입니다.
+  You are Business Avengers' Data Analyst.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/data-analyst.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - 기술 아키텍처: {tech_arch}
-  - 가격 전략: {pricing}
+  - Tech Architecture: {tech_arch}
+  - Pricing Strategy: {pricing}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/data-metrics-guide.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read these files):
   - {TEMPLATE_DIR}/metrics-dashboard.md
   - {TEMPLATE_DIR}/feedback-loop.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의를 Read로 읽고 역할과 전문 프레임워크를 숙지하세요
-  2. 핵심 KPI를 정의하세요 (비즈니스, 제품, 기술 지표)
-  3. 대시보드 구성을 설계하세요 (실시간/일간/주간/월간)
-  4. 데이터 수집 포인트와 이벤트 트래킹 계획을 작성하세요
-  5. 분석 도구 추천 및 설정 가이드를 포함하세요
-  6. 사용자 피드백 수집→분석→반영 프로세스를 설계하세요
-  7. 데이터 기반 의사결정 프레임워크를 제시하세요
-  8. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and internalize your role and expert frameworks
+  2. Define core KPIs (business, product, technical metrics)
+  3. Design the dashboard layout (real-time/daily/weekly/monthly)
+  4. Write data collection points and event tracking plan
+  5. Include analytics tool recommendations and setup guides
+  6. Design the user feedback collection → analysis → implementation process
+  7. Present a data-driven decision-making framework
+  8. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-9-operations/metrics-dashboard.md
      - {PROJECT_DIR}/phase-9-operations/feedback-loop.md
   """)
 
 # 13.4 COO reports to CEO
 """
-[COO] 운영 계획이 완료되었습니다:
-- CS 플레이북: 고객 대응 시나리오 및 FAQ
-- 법무 문서: 이용약관, 개인정보처리방침, 환불 정책
-- 메트릭 대시보드: KPI 정의 및 데이터 수집 계획
-- 피드백 루프: 사용자 피드백 수집→반영 프로세스
+[COO] Operations plan is complete:
+- CS Playbook: customer response scenarios and FAQ
+- Legal Documents: Terms of Service, Privacy Policy, Refund Policy
+- Metrics Dashboard: KPI definitions and data collection plan
+- Feedback Loop: user feedback collection → implementation process
 
-상세 문서는 프로젝트 폴더에 저장되었습니다.
+Detailed documents have been saved to the project folder.
 """
 
-gate_9 = AskUserQuestion("[COO] 운영 계획이 완료되었습니다. 검토해주세요.",
-  options=["확인 - 진행", "질문 있음", "수정 요청"])
+gate_9 = AskUserQuestion("[COO] Operations plan is complete. Please review.",
+  options=["Confirm - proceed", "I have a question", "Request revision"])
 
-if "질문 있음" in gate_9:
-    follow_up = AskUserQuestion("운영 계획 관련 질문을 입력해주세요.", allow_freeform=true)
+if "I have a question" in gate_9:
+    follow_up = AskUserQuestion("Please enter your question about the operations plan.", allow_freeform=true)
     # Display relevant section from cs-playbook / legal-docs / metrics-dashboard based on follow_up
-elif "수정 요청" in gate_9:
-    revision_feedback = AskUserQuestion("어떤 부분을 수정할까요? (CS 플레이북, 법무 문서, 메트릭 등)", allow_freeform=true)
+elif "Request revision" in gate_9:
+    revision_feedback = AskUserQuestion("Which parts should be revised? (CS playbook, legal docs, metrics, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run the relevant Phase 9 agent Task(s) from step 13.3 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
 Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 9 completed {current_version}")
 ```
 
@@ -1723,7 +1806,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-10-growth growth-execution-plan.md {current_version}")
     existing_growth = Read("{PROJECT_DIR}/phase-10-growth/growth-execution-plan.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 성장 계획:\n{existing_growth}"
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting growth plan:\n{existing_growth}"
 
 # 14.3 Launch 3 agents in PARALLEL
 Task(
@@ -1731,33 +1814,44 @@ Task(
   model="sonnet",
   description="Growth execution plan and organic growth playbook",
   prompt=f"""
-  당신은 Business Avengers의 Growth Hacker입니다.
+  You are Business Avengers' Growth Hacker.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/growth-hacker.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - GTM 전략: {gtm}
-  - 가격 전략: {pricing}
-  - 메트릭 대시보드: {metrics}
+  - GTM Strategy: {gtm}
+  - Pricing Strategy: {pricing}
+  - Metrics Dashboard: {metrics}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/growth-tactics.md
+  - {KNOWLEDGE_DIR}/extended/growth-engineering.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 10 section)
+
+  Template (Read these files):
   - {TEMPLATE_DIR}/growth-execution-plan.md
   - {TEMPLATE_DIR}/organic-growth-playbook.md
   - {TEMPLATE_DIR}/user-retention-plan.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의와 Knowledge Base를 Read로 읽고 숙지하세요
-  2. 분기별 성장 실행 계획을 수립하세요 (MAKE 유기적 성장 우선 원칙)
-  3. SEO, API 성장, 소셜 공유, 반복 런칭 전략을 포함한 유기적 성장 플레이북 작성
-  4. 리텐션 전략(Hook Model, Win-back, 이탈 방지)을 설계하세요
-  5. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and growth-engineering.md — internalize PMF signals, growth loops, and Aha Moment framework
+  2. State PMF evidence (Sean Ellis score or retention curve result) — if no signal, recommend fixing retention before scaling
+  3. Define North Star Metric (not revenue, not signups) + 3–5 input metrics that drive it
+  4. Identify primary growth loop (viral / SEO / paid / PLG) — design loop mechanics with input → output → reinforcement
+  5. Define Aha Moment: exact action + target timeframe; include activation funnel optimization tactics
+  6. Establish a quarterly growth execution plan (MAKE organic growth-first principle)
+  7. Write organic growth playbook: SEO loop, API distribution, social sharing triggers, Repeated Launch calendar
+  8. Design retention strategy: Hook Model application, Win-back email sequence, churn prevention triggers
+  9. Propose ≥3 ICE-scored experiments for Q1 with hypothesis + metric + success threshold
+  10. Check phase-rubrics.md Phase 10 checklist, fix any unmet items
+  11. Add Quality Self-Assessment block at top of each output
+  12. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-10-growth/growth-execution-plan.md
      - {PROJECT_DIR}/phase-10-growth/organic-growth-playbook.md
      - {PROJECT_DIR}/phase-10-growth/user-retention-plan.md
@@ -1768,28 +1862,28 @@ Task(
   model="sonnet",
   description="Build in Public plan",
   prompt=f"""
-  당신은 Business Avengers의 Content Creator입니다.
+  You are Business Avengers' Content Creator.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/content-creator.md
 
-  프로젝트 컨텍스트:
+  Project Context:
   - PRD: {prd}
-  - GTM 전략: {gtm}
+  - GTM Strategy: {gtm}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/growth-tactics.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/build-in-public-plan.md
 
   {sprint_context}
 
-  작업:
-  1. Build in Public 전략을 수립하세요 (투명성, 커뮤니티 빌딩, 신뢰 구축)
-  2. 공유할 메트릭, 빈도, 채널, 톤앤매너를 정의하세요
-  3. 마일스톤별 공유 전략 (매출, 유저 수, 실패 경험 포함)
-  4. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Establish a Build in Public strategy (transparency, community building, trust building)
+  2. Define metrics to share, frequency, channels, and tone of voice
+  3. Milestone-based sharing strategy (including revenue, user count, failure experiences)
+  4. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-10-growth/build-in-public-plan.md
   """)
 
@@ -1798,54 +1892,54 @@ Task(
   model="sonnet",
   description="Growth metrics report",
   prompt=f"""
-  당신은 Business Avengers의 Data Analyst입니다.
+  You are Business Avengers' Data Analyst.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/data-analyst.md
 
-  프로젝트 컨텍스트:
-  - 메트릭 대시보드: {metrics}
-  - 가격 전략: {pricing}
+  Project Context:
+  - Metrics Dashboard: {metrics}
+  - Pricing Strategy: {pricing}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/growth-tactics.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/growth-metrics-report.md
 
   {sprint_context}
 
-  작업:
-  1. 성장 KPI 대시보드를 설계하세요 (유기적 vs 유료 트래픽 비율 포함)
-  2. 주간/월간/분기별 리포트 템플릿을 작성하세요
-  3. 성장 실험 추적 프레임워크를 포함하세요
-  4. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Design the growth KPI dashboard (including organic vs. paid traffic ratio)
+  2. Write weekly/monthly/quarterly report templates
+  3. Include a growth experiment tracking framework
+  4. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-10-growth/growth-metrics-report.md
   """)
 
 # 14.4 CMO presents to CEO
 """
-[CMO] 성장 전략이 완료되었습니다:
-- 분기별 성장 실행 계획
-- Build in Public 전략
-- 유기적 성장 플레이북 (SEO, API, 소셜, 반복 런칭)
-- 리텐션 & 이탈 방지 전략
-- 성장 KPI 대시보드
+[CMO] Growth strategy is complete:
+- Quarterly growth execution plan
+- Build in Public strategy
+- Organic growth playbook (SEO, API, social, repeat launching)
+- Retention & churn prevention strategy
+- Growth KPI dashboard
 
-상세 문서는 프로젝트 폴더에 저장되었습니다.
+Detailed documents have been saved to the project folder.
 """
 
-gate_10 = AskUserQuestion("[CMO] 성장 전략을 검토해주세요.",
-  options=["승인 - 성장 전략 확정", "수정 요청 - 전략 조정", "재검토 - 성장 방향 재설정"])
+gate_10 = AskUserQuestion("[CMO] Please review the growth strategy.",
+  options=["Approve - confirm growth strategy", "Request revision - adjust strategy", "Re-evaluate - reset growth direction"])
 
-if "승인" in gate_10:
+if "Approve" in gate_10:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 10 completed {current_version}")
-elif "수정 요청" in gate_10:
-    revision_feedback = AskUserQuestion("어떤 부분을 조정할까요? (채널 전략, BIP, 리텐션, 성장 KPI 등)", allow_freeform=true)
+elif "Request revision" in gate_10:
+    revision_feedback = AskUserQuestion("Which parts should be adjusted? (channel strategy, BIP, retention, growth KPIs, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run Phase 10 agents from step 14.3 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}"
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}"
     # After re-run, loop back to this gate.
-elif "재검토" in gate_10:
+elif "Re-evaluate" in gate_10:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 10 revision {current_version}")
     # Return to Phase 7 for GTM strategy revision
 ```
@@ -1876,7 +1970,7 @@ if is_sprint:
   if existing:
     Bash("python3 {CONFIG_DIR}/init-project.py backup '{project_slug}' phase-11-automation automation-audit.md {current_version}")
     existing_automation = Read("{PROJECT_DIR}/phase-11-automation/automation-audit.md")
-    sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 자동화 감사:\n{existing_automation}\n변경사항만 반영하고, 기존 분석은 유지하세요."
+    sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting automation audit:\n{existing_automation}\nOnly reflect the changes — preserve the existing analysis."
 
 # 15.3 Launch agents in PARALLEL
 Task(
@@ -1884,32 +1978,41 @@ Task(
   model="sonnet",
   description="Automation audit, robot specs, and monitoring",
   prompt=f"""
-  당신은 Business Avengers의 DevOps Engineer입니다.
+  You are Business Avengers' DevOps Engineer.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/devops-engineer.md
 
-  프로젝트 컨텍스트:
-  - 배포 전략: {deployment}
-  - CS 플레이북: {cs_playbook}
-  - 성장 계획: {growth_plan}
+  Project Context:
+  - Deployment Strategy: {deployment}
+  - CS Playbook: {cs_playbook}
+  - Growth Plan: {growth_plan}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/automation-guide.md
+  - {KNOWLEDGE_DIR}/extended/automation-scale.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 11 section)
+
+  Template (Read these files):
   - {TEMPLATE_DIR}/automation-audit.md
   - {TEMPLATE_DIR}/robot-specs.md
   - {TEMPLATE_DIR}/monitoring-setup.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의와 Knowledge Base를 Read로 읽고 숙지하세요
-  2. 전체 비즈니스의 반복 업무를 감사하고 자동화 기회를 식별하세요 (ROI 계산 포함)
-  3. 자동화 스크립트 사양서를 작성하세요 (cron job, webhook, Zapier/n8n)
-  4. 모니터링/알림 시스템을 설계하세요 (UptimeRobot, 3단계 알림 체계)
-  5. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and automation-scale.md — apply ROI formula, Bus Test, and 3-tier monitoring
+  2. Audit all repetitive tasks — calculate ROI for each: (time saved/week × hourly value × 52) ÷ build cost
+  3. Prioritize automations by payback period (< 8 weeks = automate)
+  4. Calculate Bus Test score (target ≥8/10) — if below, include steps to reach ≥8
+  5. Write automation specifications (cron jobs, webhooks, Zapier/n8n triggers + actions)
+  6. Every critical automation must have a failure notification path defined
+  7. Design 3-tier monitoring: uptime + error rate (Sentry) + business metrics (MRR drop, churn spike)
+  8. Check phase-rubrics.md Phase 11 checklist, fix any unmet items
+  9. Add Quality Self-Assessment block at top of each output
+  10. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-11-automation/automation-audit.md
      - {PROJECT_DIR}/phase-11-automation/robot-specs.md
      - {PROJECT_DIR}/phase-11-automation/monitoring-setup.md
@@ -1920,60 +2023,60 @@ Task(
   model="sonnet",
   description="Contractor playbook and autonomous org design",
   prompt=f"""
-  당신은 Business Avengers의 Business Analyst입니다.
+  You are Business Avengers' Business Analyst.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/business-analyst.md
 
-  프로젝트 컨텍스트:
-  - CS 플레이북: {cs_playbook}
-  - 성장 계획: {growth_plan}
+  Project Context:
+  - CS Playbook: {cs_playbook}
+  - Growth Plan: {growth_plan}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/automation-guide.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read these files):
   - {TEMPLATE_DIR}/contractor-playbook.md
   - {TEMPLATE_DIR}/autonomous-org-design.md
 
   {sprint_context}
 
-  작업:
-  1. 계약직 관리 가이드를 작성하세요 (채용, 자율성, 보상, 커뮤니케이션)
-  2. 계약직 vs 자동화 결정 매트릭스를 포함하세요
-  3. Bus Test 체크리스트를 작성하세요 (사업이 창업자 없이 돌아가는가?)
-  4. 자율 조직 설계를 작성하세요 (로봇 + 계약직 + 창업자 역할 분리)
-  5. 최소 유지보수 모델을 설계하세요
-  6. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Write a contractor management guide (hiring, autonomy, compensation, communication)
+  2. Include a contractor vs. automation decision matrix
+  3. Write a Bus Test checklist (can the business run without the founder?)
+  4. Write the autonomous organization design (robot + contractor + founder role separation)
+  5. Design the minimal maintenance model
+  6. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-11-automation/contractor-playbook.md
      - {PROJECT_DIR}/phase-11-automation/autonomous-org-design.md
   """)
 
 # 15.4 COO reports to CEO
 """
-[COO] 자동화 전략이 완료되었습니다:
-- 자동화 감사: 반복 업무 분석 및 ROI 기반 자동화 기회
-- 로봇 사양서: cron job, webhook, 워크플로우 자동화 설계
-- 계약직 관리: 채용, 운영, 평가 가이드
-- 자율 조직 설계: Bus Test 체크리스트, 최소 유지보수 모델
-- 모니터링 셋업: UptimeRobot 설정 및 알림 체계
+[COO] Automation strategy is complete:
+- Automation Audit: repetitive task analysis and ROI-based automation opportunities
+- Robot Specs: cron job, webhook, workflow automation design
+- Contractor Management: hiring, operations, evaluation guide
+- Autonomous Org Design: Bus Test checklist, minimal maintenance model
+- Monitoring Setup: UptimeRobot configuration and alert system
 
-상세 문서는 프로젝트 폴더에 저장되었습니다.
+Detailed documents have been saved to the project folder.
 """
 
-gate_11 = AskUserQuestion("[COO] 자동화 전략을 검토해주세요.",
-  options=["승인 - 자동화 우선순위 확정", "수정 요청 - 우선순위 조정", "질문 있음"])
+gate_11 = AskUserQuestion("[COO] Please review the automation strategy.",
+  options=["Approve - confirm automation priorities", "Request revision - adjust priorities", "I have a question"])
 
-if "승인" in gate_11:
+if "Approve" in gate_11:
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 11 completed {current_version}")
-elif "질문 있음" in gate_11:
-    follow_up = AskUserQuestion("자동화 전략 관련 질문을 입력해주세요.", allow_freeform=true)
+elif "I have a question" in gate_11:
+    follow_up = AskUserQuestion("Please enter your question about the automation strategy.", allow_freeform=true)
     # Display relevant section from automation-audit / robot-specs based on follow_up
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 11 completed {current_version}")
-elif "수정 요청" in gate_11 or "우선순위 조정" in gate_11:
-    revision_feedback = AskUserQuestion("어떤 부분을 조정할까요? (자동화 우선순위, Robot 사양, 계약직 가이드 등)", allow_freeform=true)
+elif "Request revision" in gate_11 or "adjust priorities" in gate_11:
+    revision_feedback = AskUserQuestion("Which parts should be adjusted? (automation priorities, robot specs, contractor guide, etc.)", allow_freeform=true)
     # INSTRUCTION: Re-run Phase 11 agents from step 15.3 above,
-    # setting sprint_context = f"CEO 수정 피드백: {revision_feedback}\n변경사항만 반영하고, 기존 분석은 유지하세요."
+    # setting sprint_context = f"CEO revision feedback: {revision_feedback}\nOnly reflect the changes — preserve the existing analysis."
     Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 11 completed {current_version}")
 ```
 
@@ -2007,35 +2110,35 @@ if is_sprint:
             Bash(f"python3 {{CONFIG_DIR}}/init-project.py backup '{{project_slug}}' phase-12-scale-exit {f} {{current_version}}")
         existing_scale = Glob("{PROJECT_DIR}/phase-12-scale-exit/scale-vs-exit-analysis.md")
         existing_scale_content = Read(existing_scale[0]) if existing_scale else ""
-        sprint_context = f"기존 문서를 업데이트하세요. 변경 목표: {sprint_goal}\n기존 내용:\n{existing_scale_content}"
+        sprint_context = f"Update the existing document. Change goal: {sprint_goal}\nExisting content:\n{existing_scale_content}"
 
 # 16.3 Strategic dialogue with CEO
 """
-[CFO] CEO님, 전략적인 대화가 필요한 단계입니다.
-사업의 미래 방향(계속 성장 vs 매각 vs 유지)에 대해 논의하겠습니다.
+[CFO] CEO, this stage requires a strategic conversation.
+Let's discuss the future direction of the business (continue growing vs. exit vs. maintain).
 """
 
 AskUserQuestion(
-  "[CFO] 현재 사업 상태는 어떤가요? (UX8: 타이밍 판단 기준)",
+  "[CFO] What is the current state of the business? (UX8: timing assessment criteria)",
   options=[
-    "성장 중 - 매출/사용자가 계속 늘고 있다",
-    "정체 - 성장이 멈추거나 둔화되었다",
-    "번아웃 - 사업은 괜찮지만 내가 지쳤다",
-    "하락 - 매출/사용자가 줄고 있다"
+    "Growing - revenue/users are continuously increasing",
+    "Stagnant - growth has stopped or slowed",
+    "Burned out - the business is fine but I'm exhausted",
+    "Declining - revenue/users are decreasing"
   ]
 )
 ceo_business_state = selected_option
 
 AskUserQuestion(
-  "[CFO] 현재 사업의 장기 목표는 무엇인가요?",
+  "[CFO] What is the long-term goal for the business?",
   options=[
-    "계속 성장 - 규모를 키우고 싶다",
-    "라이프스타일 비즈니스 - 현재 수준 유지하며 자유를 누리고 싶다",
-    "매각 검토 - 적절한 시점에 매각을 고려한다",
-    "아직 모르겠다 - 모든 시나리오를 분석해달라"
+    "Continue growing - I want to scale up",
+    "Lifestyle business - I want to maintain the current level and enjoy freedom",
+    "Considering exit - I'm open to selling at the right time",
+    "Not sure yet - please analyze all scenarios"
   ]
 )
-ceo_goal = selected_option  # CEO의 장기 목표 선택 결과
+ceo_goal = selected_option  # CEO's selected long-term goal
 
 # 16.4 Launch 3 agents in PARALLEL
 Task(
@@ -2043,35 +2146,44 @@ Task(
   model="sonnet",
   description="Scale vs exit analysis and valuation",
   prompt=f"""
-  당신은 Business Avengers의 Revenue Strategist입니다.
+  You are Business Avengers' Revenue Strategist.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/revenue-strategist.md
 
-  프로젝트 컨텍스트:
-  - 가격 전략: {pricing}
-  - 재무 예측: {financials}
-  - 성장 계획: {growth}
-  - 자율 조직 설계: {automation}
-  - CEO 현재 사업 상태: {ceo_business_state}
-  - CEO 장기 목표: {ceo_goal}
+  Project Context:
+  - Pricing Strategy: {pricing}
+  - Financial Projections: {financials}
+  - Growth Plan: {growth}
+  - Autonomous Org Design: {automation}
+  - CEO Current Business State: {ceo_business_state}
+  - CEO Long-Term Goal: {ceo_goal}
 
-  Knowledge Base (반드시 Read로 읽으세요 — 밸류에이션/매각 전략 참조):
+  Knowledge Base (must Read — refer to valuation/exit strategy):
   - {KNOWLEDGE_DIR}/exit-guide.md
+  - {KNOWLEDGE_DIR}/extended/exit-strategy.md
 
-  템플릿 (Read로 읽으세요):
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 12 section)
+
+  Template (Read these files):
   - {TEMPLATE_DIR}/scale-vs-exit-analysis.md
   - {TEMPLATE_DIR}/valuation-report.md
 
   {sprint_context}
 
-  작업:
-  1. 에이전트 정의와 Knowledge Base를 Read로 읽고 숙지하세요
-  2. 계속 성장 vs 매각 vs 유지 3가지 시나리오를 분석하세요
-  3. 밸류에이션을 산정하세요 (매출 배수, SDE, 성장률 기반)
-  4. 구매자 유형별 예상 매각가를 제시하세요
-  5. FIRE 4% 룰 시나리오 분석을 포함하세요
-  6. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Read the agent definition and exit-strategy.md — apply Acquire.com multiples, acquisition readiness checklist, and FIRE formula
+  2. Calculate current estimated valuation using benchmarked MRR multiples (Acquire.com / Quiet Light standards)
+  3. State multiple drivers and killers present in this business
+  4. Make explicit Scale vs. Sell recommendation (not "it depends") with key reasoning
+  5. If Scale: identify top 3 levers to increase acquisition multiple
+  6. If Exit: list acquisition readiness gaps and estimated time to close them
+  7. Analyze 3 scenarios: continue growing vs. exit vs. maintain (FIRE calculation for each)
+  8. Include FIRE number calculation: annual expenses × 25 = FIRE target; MRR needed at 70% margin
+  9. Check phase-rubrics.md Phase 12 checklist, fix any unmet items
+  10. Add Quality Self-Assessment block at top of each output
+  11. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-12-scale-exit/scale-vs-exit-analysis.md
      - {PROJECT_DIR}/phase-12-scale-exit/valuation-report.md
   """)
@@ -2081,31 +2193,31 @@ Task(
   model="sonnet",
   description="FIRE plan",
   prompt=f"""
-  당신은 Business Avengers의 Business Analyst입니다.
+  You are Business Avengers' Business Analyst.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/business-analyst.md
 
-  프로젝트 컨텍스트:
-  - 재무 예측: {financials}
-  - 성장 계획: {growth}
-  - CEO 현재 사업 상태: {ceo_business_state}
-  - CEO 장기 목표: {ceo_goal}
+  Project Context:
+  - Financial Projections: {financials}
+  - Growth Plan: {growth}
+  - CEO Current Business State: {ceo_business_state}
+  - CEO Long-Term Goal: {ceo_goal}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/exit-guide.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read this file):
   - {TEMPLATE_DIR}/fire-plan.md
 
   {sprint_context}
 
-  작업:
-  1. FIRE (재정적 독립) 시나리오를 분석하세요
-  2. 4% 룰 기반 필요 자산을 계산하세요
-  3. 매각 대금 투자 전략을 제시하세요
-  4. 매각 후 심리적 준비 사항을 포함하세요 (정체성 상실 경고)
-  5. 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Analyze the FIRE (Financial Independence, Retire Early) scenario
+  2. Calculate the required assets based on the 4% rule
+  3. Present an investment strategy for the sale proceeds
+  4. Include psychological preparation for post-exit (identity loss warning)
+  5. Fill in {{PLACEHOLDER}} in the template and save with Write:
      - {PROJECT_DIR}/phase-12-scale-exit/fire-plan.md
   """)
 
@@ -2114,56 +2226,56 @@ Task(
   model="sonnet",
   description="Exit readiness checklist and acquisition playbook",
   prompt=f"""
-  당신은 Business Avengers의 Legal Advisor입니다.
+  You are Business Avengers' Legal Advisor.
 
-  에이전트 정의 (Read로 읽으세요):
+  Agent Definition (Read this file):
   - {AGENTS_DIR}/legal-advisor.md
 
-  프로젝트 컨텍스트:
-  - 가격 전략: {pricing}
-  - 재무 예측: {financials}
-  - CEO 현재 사업 상태: {ceo_business_state}
-  - CEO 장기 목표: {ceo_goal}
+  Project Context:
+  - Pricing Strategy: {pricing}
+  - Financial Projections: {financials}
+  - CEO Current Business State: {ceo_business_state}
+  - CEO Long-Term Goal: {ceo_goal}
 
-  Knowledge Base (Read로 읽으세요):
+  Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/exit-guide.md
 
-  템플릿 (Read로 읽으세요):
+  Template (Read these files):
   - {TEMPLATE_DIR}/exit-readiness-checklist.md
   - {TEMPLATE_DIR}/acquisition-playbook.md
 
   {sprint_context}
 
-  작업:
-  1. 매각 준비 체크리스트를 작성하세요 (회계, 코드 라이선스, 법적 준비)
-  2. 구매자 유형별 협상 전략을 포함하세요
-  3. LOI, 실사, 계약 구조(현금 vs 주식 vs earnout)를 안내하세요
-  4. Breakup fee, 비경쟁 조항 등 핵심 계약 조건을 다루세요
-  5. 각 템플릿의 {{PLACEHOLDER}}를 채워 Write로 저장:
+  Task:
+  1. Write the exit readiness checklist (accounting, code licenses, legal preparation)
+  2. Include negotiation strategies per buyer type
+  3. Guide through LOI, due diligence, and deal structure (cash vs. stock vs. earnout)
+  4. Cover key contract terms such as breakup fee and non-compete clause
+  5. Fill in {{PLACEHOLDER}} in each template and save with Write:
      - {PROJECT_DIR}/phase-12-scale-exit/exit-readiness-checklist.md
      - {PROJECT_DIR}/phase-12-scale-exit/acquisition-playbook.md
   """)
 
 # 16.4 CFO presents to CEO for deep dialogue
 """
-[CFO] 전략 분석이 완료되었습니다:
-- 계속 성장 vs 매각 vs 유지 시나리오 비교
-- 기업 가치 평가 (밸류에이션)
-- 매각 준비 체크리스트
-- 인수 플레이북 (협상 전략, 계약 구조)
-- FIRE 시나리오 분석
+[CFO] Strategic analysis is complete:
+- Continue growing vs. exit vs. maintain scenario comparison
+- Business valuation
+- Exit readiness checklist
+- Acquisition playbook (negotiation strategy, deal structure)
+- FIRE scenario analysis
 
-이 문서들은 향후 전략적 의사결정의 기반이 됩니다.
-언제든 '/business-avengers sprint' 으로 업데이트할 수 있습니다.
+These documents will serve as the foundation for future strategic decisions.
+You can update them at any time with '/business-avengers sprint'.
 """
 
-gate_12 = AskUserQuestion("[CFO] 전략 분석을 검토해주세요.",
-  options=["확인 - 분석 완료", "추가 시나리오 요청", "특정 시나리오 심층 분석 요청"])
+gate_12 = AskUserQuestion("[CFO] Please review the strategic analysis.",
+  options=["Confirm - analysis complete", "Request additional scenarios", "Request deep-dive analysis on specific scenario"])
 
-if "추가 시나리오" in gate_12 or "심층 분석" in gate_12:
-    follow_up = AskUserQuestion("어떤 시나리오 또는 분석이 필요하신가요?", allow_freeform=true)
+if "additional scenarios" in gate_12 or "deep-dive" in gate_12:
+    follow_up = AskUserQuestion("Which scenario or analysis do you need?", allow_freeform=true)
     # INSTRUCTION: Re-run the relevant Phase 12 agent Task(s) from step 16.4 above,
-    # setting sprint_context = f"CEO 추가 요청: {follow_up}"
+    # setting sprint_context = f"CEO additional request: {follow_up}"
 Bash("python3 {CONFIG_DIR}/init-project.py update-phase '{project_slug}' 12 completed {current_version}")
 ```
 
@@ -2177,16 +2289,16 @@ project = parse_json(result)
 
 # Display formatted status
 """
-📋 프로젝트: {project.name}
-🔄 현재 스프린트: #{project.current_sprint}
-📊 진행 상황:
+📋 Project: {project.name}
+🔄 Current Sprint: #{project.current_sprint}
+📊 Progress:
 
-| Phase | 이름 | 상태 | 버전 |
-|-------|------|------|------|
-| 0 | Ideation | ✅ 완료 | v1.0 |
-| 1 | Market Research | ✅ 완료 | v1.1 |
-| 2 | Product Planning | 🔄 진행중 | v1.2 |
-| 3 | Design | ⏳ 대기 | - |
+| Phase | Name | Status | Version |
+|-------|------|--------|---------|
+| 0 | Ideation | ✅ Completed | v1.0 |
+| 1 | Market Research | ✅ Completed | v1.1 |
+| 2 | Product Planning | 🔄 In Progress | v1.2 |
+| 3 | Design | ⏳ Pending | - |
 ...
 """
 ```
@@ -2206,19 +2318,19 @@ for sprint_file in sprints_dir:
 
 # Display formatted history
 """
-📜 프로젝트 히스토리: {project.name}
+📜 Project History: {project.name}
 
 Sprint 1 (2026-02-21): Initial E2E
-  - Phase 0-8 완료
-  - CEO 결정: 타겟을 20-30대로 좁힘
+  - Phase 0-8 completed
+  - CEO decision: narrowed target to users in their 20s-30s
 
-Sprint 2 (2026-03-01): 온보딩 개선
-  - Phase 2 v1.1: PRD 온보딩 섹션 수정
-  - Phase 3 v1.1: 온보딩 와이어프레임 업데이트
+Sprint 2 (2026-03-01): Onboarding improvements
+  - Phase 2 v1.1: revised PRD onboarding section
+  - Phase 3 v1.1: updated onboarding wireframes
 
-Sprint 3 (진행중): 소셜 로그인 추가
-  - Phase 2 v1.2: 소셜 로그인 기능 추가
-  - Phase 4 v1.1: OAuth 아키텍처 추가
+Sprint 3 (in progress): Adding social login
+  - Phase 2 v1.2: added social login feature
+  - Phase 4 v1.1: added OAuth architecture
 """
 ```
 
@@ -2261,7 +2373,7 @@ agent_id = TEAM_MAP.get(agent_or_team, agent_or_team)
 # Load project context if exists
 project_context = ""
 if project_exists:
-  project_context = f"현재 프로젝트: {project.name}\n"
+  project_context = f"Current project: {project.name}\n"
   # Include relevant phase outputs based on agent's domain
 
 Task(
@@ -2269,15 +2381,15 @@ Task(
   model="sonnet",
   description=f"Direct question to {agent_id}",
   prompt=f"""
-  당신은 Business Avengers의 {agent_title}입니다.
-  CEO가 직접 질문합니다.
+  You are Business Avengers' {agent_title}.
+  The CEO is asking you directly.
 
   {project_context}
 
-  CEO 질문: {question}
+  CEO Question: {question}
 
-  전문가로서 구체적이고 실행 가능한 답변을 하세요.
-  필요하면 WebSearch로 최신 정보를 조사하세요.
+  Answer concretely and actionably as an expert.
+  If necessary, use WebSearch to research the latest information.
   """
 )
 ```
@@ -2309,35 +2421,35 @@ if sprint_review_template:
         model="sonnet",
         description="Generate sprint review",
         prompt=f"""
-        스프린트 완료 보고서를 작성하세요.
-        템플릿 (Read로 읽으세요): {TEMPLATE_DIR}/sprint-review.md
-        스프린트 목표: {sprint_goal}
-        업데이트된 Phase: {phases_list}
-        변경 사항 요약: {changes_summary}
-        업데이트된 날짜: {current_date}
-        모든 {{PLACEHOLDER}}를 채워 Write로 저장:
+        Write a sprint completion report.
+        Template (Read this file): {TEMPLATE_DIR}/sprint-review.md
+        Sprint goal: {sprint_goal}
+        Updated phases: {phases_list}
+        Changes summary: {changes_summary}
+        Updated date: {current_date}
+        Fill in all {{PLACEHOLDER}} and save with Write:
         {PROJECT_DIR}/sprints/sprint-{N}-review.md
         """
     )
 
 # Sprint review
 """
-[COO] 스프린트 #{N} 완료 보고:
+[COO] Sprint #{N} completion report:
 
-🎯 목표: {sprint_goal}
-📝 업데이트된 Phase: {phases_list}
-📊 변경 사항: {changes_summary}
-📄 스프린트 리뷰: {PROJECT_DIR}/sprints/sprint-{N}-review.md
+🎯 Goal: {sprint_goal}
+📝 Updated Phases: {phases_list}
+📊 Changes: {changes_summary}
+📄 Sprint Review: {PROJECT_DIR}/sprints/sprint-{N}-review.md
 
-다음 스프린트를 계획하시겠습니까?
+Would you like to plan the next sprint?
 """
 
 AskUserQuestion(
-  "다음 단계를 선택해주세요.",
+  "Please select the next action.",
   options=[
-    "새 스프린트 시작",
-    "현재 상태 유지",
-    "프로젝트 완료"
+    "Start a new sprint",
+    "Keep current state",
+    "Project complete"
   ]
 )
 ```
@@ -2351,29 +2463,29 @@ When all phases are completed:
 ```python
 # Generate executive summary
 """
-🎉 프로젝트 완료: {project.name}
+🎉 Project Complete: {project.name}
 
-📁 생성된 산출물:
-├── Phase 0: Idea Canvas (자기 문제 검증, 마이크로 니치 전략 포함)
-├── Phase 1: 시장 분석, 경쟁 분석, 수익 모델
-├── Phase 2: PRD, 페르소나, 유저 스토리, 기능 우선순위 (MVP 빌드 전략 포함)
-├── Phase 3: 디자인 시스템, 와이어프레임, UI 스펙
-├── Phase 4: 기술 아키텍처, API 설계, DB 스키마
-├── Phase 5: 프론트/백엔드 가이드, 배포 전략
-├── Phase 6: 테스트 계획, QA 체크리스트
-├── Phase 7: GTM 전략, 콘텐츠 플랜, 성장 전략, PR (인디메이커 런칭 플레이북 포함)
-├── Phase 8: 가격 전략, 재무 예측, Unit Economics (비즈니스 모델 실험 포함)
-├── Phase 9: CS 플레이북, 법무, 메트릭 대시보드 (셀프서비스 대시보드 포함)
-├── Phase 10: 성장 실행 계획, Build in Public, 유기적 성장, 리텐션 (MAKE)
-├── Phase 11: 자동화 감사, 로봇 사양서, 계약직 관리, 자율 조직 (MAKE)
-└── Phase 12: 성장 vs 매각 분석, 밸류에이션, 인수 플레이북, FIRE 계획 (MAKE)
+📁 Generated Deliverables:
+├── Phase 0: Idea Canvas (problem validation, micro-niche strategy included)
+├── Phase 1: Market Analysis, Competitive Analysis, Revenue Model
+├── Phase 2: PRD, Personas, User Stories, Feature Priority (MVP build strategy included)
+├── Phase 3: Design System, Wireframes, UI Specs
+├── Phase 4: Tech Architecture, API Design, DB Schema
+├── Phase 5: Frontend/Backend Guides, Deployment Strategy
+├── Phase 6: Test Plan, QA Checklist
+├── Phase 7: GTM Strategy, Content Plan, Growth Strategy, PR (indie maker launch playbook included)
+├── Phase 8: Pricing Strategy, Financial Projections, Unit Economics (business model experiments included)
+├── Phase 9: CS Playbook, Legal Docs, Metrics Dashboard (self-service dashboard included)
+├── Phase 10: Growth Execution Plan, Build in Public, Organic Growth, Retention (MAKE)
+├── Phase 11: Automation Audit, Robot Specs, Contractor Management, Autonomous Org (MAKE)
+└── Phase 12: Scale vs Exit Analysis, Valuation, Acquisition Playbook, FIRE Plan (MAKE)
 
-📂 프로젝트 폴더: {PROJECT_DIR}
+📂 Project folder: {PROJECT_DIR}
 
-💡 다음 단계:
-1. 산출물을 검토하고 CEO의 비전과 일치하는지 확인
-2. 개발 가이드(Phase 5)를 기반으로 실제 개발 시작
-3. 필요 시 '/business-avengers sprint "목표"'로 스프린트 시작
+💡 Next steps:
+1. Review deliverables and verify alignment with the CEO's vision
+2. Start actual development based on the Dev Guide (Phase 5)
+3. When needed, start a sprint with '/business-avengers sprint "goal"'
 """
 ```
 

@@ -26,6 +26,41 @@ The DevOps Engineer is responsible for building and maintaining the infrastructu
 - **Monitoring**: Prometheus, Grafana, ELK Stack, Datadog, Sentry
 - **Automation Architecture (MAKE)**: "Robots > Hiring" principle — automate repetitive tasks before hiring humans. Cron jobs, webhooks, Zapier/n8n for business process automation
 
+## Quality Standards
+
+### Phase 11 Output Requirements
+Read `quality/phase-rubrics.md` Phase 11 section + `knowledge/extended/automation-scale.md` before saving any output.
+
+**Automation ROI Gate:**
+Every automation recommendation must include ROI calculation:
+- Formula: (Time saved/week × hourly value × 52) ÷ Build cost = ROI
+- Payback period < 8 weeks = automate; else = evaluate contractor option
+
+**Bus Test Mandatory:**
+Calculate and report Bus Test score (target ≥8/10). If score < 8, automation plan must include steps to reach ≥8.
+
+**3-Tier Monitoring Mandate:**
+Monitoring setup must cover all 3 tiers:
+1. Uptime: HTTP status + response time (UptimeRobot / Betterstack)
+2. Error rate: Sentry with spike alerts
+3. Business metrics: MRR drop, churn spike, signup rate drop
+
+**Failure Path Required:**
+Every critical automation must specify its failure notification path — no silent failures allowed.
+
+**Self-Assessment Block (add at top of automation output before saving):**
+```markdown
+---
+**Automation Quality Check**
+- Depth: [1–3] — [ROI calculated per task vs. generic automation list]
+- Evidence: [1–3] — [Bus Test scored, time estimates cited]
+- Specificity: [1–3] — [specific tools named, webhook events defined]
+- Bus Test score: [X/10] — [target ≥8]
+- Monitoring tiers: [3/3 complete: yes/partial/missing]
+- Unmet criteria: [list or "none"]
+---
+```
+
 ## Communication
 - **Reports to**: CTO
 - **Collaborates with**: Tech Lead (infrastructure requirements), Backend Developer (deployment needs), Frontend Developer (frontend deployment)

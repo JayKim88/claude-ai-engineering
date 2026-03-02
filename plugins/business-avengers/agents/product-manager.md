@@ -28,6 +28,48 @@ The Product Manager is the tactical executor of product strategy, responsible fo
 - **Build with What You Know (MAKE)**: Only adopt new technology if it saves >40 hours over the project lifecycle vs known alternatives
 - **No-Code/Low-Code Assessment (MAKE)**: Before building custom, check if Typeform, Zapier, Stripe Checkout, Carrd, Airtable, Supabase, or Clerk can solve it
 
+## Quality Standards
+
+### Phase 2 Output Requirements
+Read `quality/phase-rubrics.md` Phase 2 section before saving any output.
+
+**Shape Up Appetite — MVP Scope Gate:**
+- MVP scope must fit "1 person, 6 weeks" (Fixed time, variable scope — Shape Up principle)
+- If scope exceeds this, document which features move to v1.1 and state the reason explicitly
+
+**Feature Justification Requirement:**
+Each Must Have feature must include ONE of these justifications:
+- "Without this, X% of target users would churn / not convert" (estimated)
+- "Without this, the core value proposition cannot be delivered"
+- "Without this, the product cannot be distributed / monetized"
+
+**Success Metrics — Action-Based Standard:**
+
+| Wrong | Right |
+|-------|-------|
+| "Increase user growth" | "≥60% of new users complete [specific core action] within 7 days of signup" |
+| "Improve satisfaction" | "Task completion rate for [specific flow] ≥80% at Day 30" |
+| "More engagement" | "D7 retention ≥40% (measured via [tool])" |
+
+**Mandatory Scope Boundary:**
+Every PRD must include a "What We Will NOT Build" section with ≥3 explicitly deferred items and reason for deferral.
+
+**RICE Confidence Gate:**
+Features with RICE Confidence <50% must be listed in a separate "Uncertain Priority" section and require additional validation before development starts.
+
+**Self-Assessment Block (add at top of PRD before saving):**
+```markdown
+---
+**PRD Quality Check**
+- Depth: [1–3] — [execution steps present vs. direction only]
+- Evidence: [1–3] — [user research cited, problem validated with data]
+- Specificity: [1–3] — [action-based metrics with numbers and timeframes]
+- Shape Up Appetite: [stated/missing] — [1 person, 6 weeks: fits/exceeds]
+- "Will NOT build" list: [present/missing] — [X items deferred]
+- Unmet criteria: [list or "none"]
+---
+```
+
 ## Communication
 - **Reports to**: CPO (Chief Product Officer)
 - **Collaborates with**: UX Researcher (user insights), Design Lead (feature design), Tech Lead (technical feasibility)

@@ -18,24 +18,24 @@ You are the **CEO**. Your AI team handles the rest.
 ```mermaid
 graph TD
     A(["💡 Idea"]):::inputNode
-    L1("아이디어 구체화"):::step
+    L1("Idea Refinement"):::step
     B["🔍 Market Research"]:::validateNode
     C["🔍 Product Planning"]:::validateNode
-    L2("PRD 확정"):::step
+    L2("PRD Finalized"):::step
     D["🔨 Design"]:::buildNode
     E["🔨 Tech Planning"]:::buildNode
     F["🔨 Dev Guide"]:::buildNode
     G["🔨 QA"]:::buildNode
-    L3("품질 확보"):::step
+    L3("Quality Assured"):::step
     H["🚀 GTM Strategy"]:::launchNode
     I["🚀 Pricing & Revenue"]:::launchNode
     J["🚀 Operations"]:::launchNode
-    L4("운영 체계 구축"):::step
+    L4("Operations Established"):::step
     K(["💰 Revenue"]):::revenueNode
-    L5("수익 달성"):::step
+    L5("Revenue Achieved"):::step
     M["📈 Growth"]:::growNode
     N["🤖 Automation"]:::growNode
-    L6("자율 운영 달성"):::step
+    L6("Autonomous Operations"):::step
     O["🏦 Scale & Exit"]:::exitNode
     P(["🎯 Acquisition / FIRE"]):::outputNode
 
@@ -57,7 +57,7 @@ graph TD
     classDef step fill:#f8f9fa,stroke:#dee2e6,color:#6c757d
 ```
 
-13개 Phase에서 **추상적 아이디어가 매각 가능한 자산으로** 변환됩니다. CEO는 전략적 의사결정에 집중하고, 23개 AI 에이전트가 실행을 담당합니다.
+Across 13 phases, an **abstract idea transforms into an acquirable asset**. The CEO focuses on strategic decisions while 23 AI agents handle execution.
 
 ---
 
@@ -67,11 +67,11 @@ graph TD
 graph TD
     CEO(["CEO (You)"])
 
-    CEO --> CPO["CPO<br/>제품총괄"]
-    CEO --> CTO["CTO<br/>기술총괄"]
-    CEO --> CMO["CMO<br/>마케팅총괄"]
-    CEO --> CFO["CFO<br/>재무총괄"]
-    CEO --> COO["COO<br/>운영총괄"]
+    CEO --> CPO["CPO<br/>Product"]
+    CEO --> CTO["CTO<br/>Engineering"]
+    CEO --> CMO["CMO<br/>Marketing"]
+    CEO --> CFO["CFO<br/>Finance"]
+    CEO --> COO["COO<br/>Operations"]
 
     subgraph Product["Product Team"]
         direction LR
@@ -178,24 +178,24 @@ flowchart TD
     A([User Input]) --> B{Command Type?}
 
     B -->|"new"| C{Mode?}
-    B -->|"ask {agent}"| D["Direct Agent Conversation<br/>CTO, CMO, Legal 등 직접 질문"]
-    B -->|"sprint"| E["Sprint Mode<br/>기존 프로젝트 반복 개선"]
-    B -->|"status / resume / history"| F["Project Management<br/>진행 상황 조회"]
+    B -->|"ask {agent}"| D["Direct Agent Conversation<br/>CTO, CMO, Legal, etc."]
+    B -->|"sprint"| E["Sprint Mode<br/>Iterate existing project"]
+    B -->|"status / resume / history"| F["Project Management<br/>Check progress"]
 
-    C -->|idea-first| G["Phase 0→1→2→3→4→5→6→7→8→9<br/>아이디어가 있을 때"]
-    C -->|market-first| H["Phase 1→0→2→3→4→5→6→7→8→9<br/>시장 기회를 먼저 탐색"]
-    C -->|mvp-build| I["Phase 0→2→4→5→7<br/>최소 기능 빠른 검증"]
-    C -->|make| M2["Phase 0→1→7→8→10→11<br/>린 인디메이커 경로"]
-    C -->|full-lifecycle| FL["Phase 0→12 전체<br/>아이디어부터 매각까지"]
-    C -->|post-launch| PL["Phase 10→11→12<br/>런칭 후 성장/최적화"]
-    C -->|custom| J["CEO가 Phase 직접 선택<br/>필요한 Phase만 조합"]
+    C -->|idea-first| G["Phase 0→1→2→3→4→5→6→7→8→9<br/>Start from idea"]
+    C -->|market-first| H["Phase 1→0→2→3→4→5→6→7→8→9<br/>Explore market opportunity first"]
+    C -->|mvp-build| I["Phase 0→2→4→5→7<br/>Fast MVP validation"]
+    C -->|make| M2["Phase 0→1→7→8→10→11<br/>Lean indie maker path"]
+    C -->|full-lifecycle| FL["Phase 0→12 complete<br/>Idea to acquisition"]
+    C -->|post-launch| PL["Phase 10→11→12<br/>Post-launch growth & optimization"]
+    C -->|custom| J["CEO selects phases manually<br/>Mix and match as needed"]
 
     G & H & I & M2 & FL & PL & J --> K["Phase Execution Pipeline"]
-    E --> L["Sprint Planning<br/>변경할 Phase 선택"] --> K
+    E --> L["Sprint Planning<br/>Select phases to update"] --> K
 
-    D --> M(["Agent Response<br/>전문 분야 답변"])
-    F --> N(["Project Status<br/>현재 진행 상황"])
-    K --> O(["Project Complete<br/>50+ 문서 산출물"])
+    D --> M(["Agent Response<br/>Domain expert answer"])
+    F --> N(["Project Status<br/>Current progress"])
+    K --> O(["Project Complete<br/>50+ document outputs"])
 
     style A fill:#f0f4ff,stroke:#4a6cf7
     style D fill:#e6fff0,stroke:#27ae60
@@ -238,17 +238,17 @@ flowchart TD
     DONE(["Project Complete<br/>50+ Documents"])
 
     P0 --> G0
-    G0 -->|"승인"| P1
+    G0 -->|"approve"| P1
     P1 --> G1
-    G1 -->|"승인"| P2
-    G1 -->|"피봇"| P0
-    G1 -->|"중단"| STOP(["중단"])
+    G1 -->|"approve"| P2
+    G1 -->|"pivot"| P0
+    G1 -->|"stop"| STOP(["Stopped"])
     P2 --> G2
-    G2 -->|"승인"| P3
-    G2 -->|"수정"| P2
+    G2 -->|"approve"| P3
+    G2 -->|"revise"| P2
     P3 --> G3
-    G3 -->|"승인"| P4
-    G3 -->|"수정"| P3
+    G3 -->|"approve"| P4
+    G3 -->|"revise"| P3
     P4 --> G4
     G4 --> P5
     P5 --> G5
@@ -256,21 +256,21 @@ flowchart TD
     P6 --> G6
     G6 --> P7
     P7 --> G7
-    G7 -->|"승인"| P8
-    G7 -->|"수정"| P7
+    G7 -->|"approve"| P8
+    G7 -->|"revise"| P7
     P8 --> G8
-    G8 -->|"승인"| P9
-    G8 -->|"수정"| P8
+    G8 -->|"approve"| P9
+    G8 -->|"revise"| P8
     P9 --> G9
     G9 --> P10
     P10 --> G10
-    G10 -->|"승인"| P11
-    G10 -->|"수정"| P10
+    G10 -->|"approve"| P11
+    G10 -->|"revise"| P10
     P11 --> G11
-    G11 -->|"승인"| P12
-    G11 -->|"수정"| P11
+    G11 -->|"approve"| P12
+    G11 -->|"revise"| P11
     P12 --> G12
-    G12 -->|"완료"| DONE
+    G12 -->|"done"| DONE
 
     style P0 fill:#f0f4ff,stroke:#4a6cf7
     style P1 fill:#fff8e6,stroke:#f5a623
@@ -289,14 +289,14 @@ flowchart TD
     style STOP fill:#999,color:#fff,stroke:#666
 ```
 
-**`∥` = 병렬 실행** (같은 Phase 내 에이전트가 동시에 작업)
+**`∥` = Parallel execution** (agents in the same phase run simultaneously)
 
-**CEO 개입 수준:**
-- **Dialogue**: CEO와 에이전트가 Q&A로 함께 작업
-- **Approve**: 산출물 리뷰 후 승인/수정/피봇/중단 선택
-- **Delegate**: C-Level이 자율 판단, CEO에게 결과 보고
-- **Confirm**: CEO가 결과 확인 후 자동 진행
-- **Deep Dialogue**: CEO와 전략적 대화 (장기 목표, 매각 의사 등 심층 논의)
+**CEO involvement levels:**
+- **Dialogue**: CEO and agent work together in Q&A
+- **Approve**: Review output, then choose: approve / revise / pivot / stop
+- **Delegate**: C-Level decides autonomously and reports result to CEO
+- **Confirm**: CEO checks result, auto-proceeds to next phase
+- **Deep Dialogue**: Strategic conversation with CEO (long-term goals, exit intentions, etc.)
 
 ---
 
@@ -401,7 +401,7 @@ graph LR
     style P12 fill:#f0e6ff,stroke:#a855f7
 ```
 
-각 Phase의 산출물이 다음 Phase의 **입력**으로 흘러갑니다. 에이전트는 직접 통신하지 않고, **구조화된 문서**를 통해 협업합니다 (MetaGPT 패턴).
+Each phase's outputs flow as **inputs** into the next phase. Agents do not communicate directly — they collaborate through **structured documents** (MetaGPT pattern).
 
 ---
 
@@ -409,23 +409,23 @@ graph LR
 
 ```mermaid
 flowchart TD
-    A([Sprint 시작]) --> B["Sprint Planning<br/>CEO: 이번 스프린트 목표 설정"]
-    B --> C["Phase 선택<br/>변경이 필요한 Phase 선택"]
-    C --> D["기존 문서 백업<br/>history/ 폴더에 버전 저장"]
-    D --> E["에이전트 실행<br/>기존 문서 Read → 변경사항 반영"]
-    E --> F["산출물 업데이트<br/>prd.md v1.0 → v1.1"]
-    F --> G["Changelog 기록<br/>변경 이력 추적"]
-    G --> H{{"CEO Review<br/>결과 확인"}}
+    A([Sprint Start]) --> B["Sprint Planning<br/>CEO: set sprint goal"]
+    B --> C["Select Phases<br/>Choose phases to update"]
+    C --> D["Backup Existing Docs<br/>Save version to history/"]
+    D --> E["Run Agents<br/>Read existing doc → apply changes"]
+    E --> F["Update Outputs<br/>prd.md v1.0 → v1.1"]
+    F --> G["Record Changelog<br/>Track change history"]
+    G --> H{{"CEO Review<br/>Check results"}}
 
-    H -->|"승인"| I{"다음 Phase<br/>있음?"}
-    H -->|"수정"| E
+    H -->|"approve"| I{"More phases?"}
+    H -->|"revise"| E
 
-    I -->|"있음"| C
-    I -->|"없음"| J["Sprint Complete<br/>project.yaml 업데이트"]
+    I -->|"yes"| C
+    I -->|"no"| J["Sprint Complete<br/>Update project.yaml"]
 
-    J --> K{{"다음 Sprint?"}}
-    K -->|"계속"| A
-    K -->|"완료"| L(["Project Updated"])
+    J --> K{{"Next Sprint?"}}
+    K -->|"continue"| A
+    K -->|"done"| L(["Project Updated"])
 
     style A fill:#f0f4ff,stroke:#4a6cf7
     style J fill:#e6fff0,stroke:#27ae60
@@ -434,11 +434,11 @@ flowchart TD
 
 ```
 phase-2-product-planning/
-├── prd.md                          # 항상 최신 버전
+├── prd.md                          # always the latest version
 ├── history/
-│   ├── prd-v1.0-2026-02-21.md     # Sprint 1: 최초
-│   └── prd-v1.1-2026-03-01.md     # Sprint 2: 온보딩 개선
-└── changelog.md                    # 변경 이력
+│   ├── prd-v1.0-2026-02-21.md     # Sprint 1: initial
+│   └── prd-v1.1-2026-03-01.md     # Sprint 2: onboarding improvement
+└── changelog.md                    # change history
 ```
 
 ---

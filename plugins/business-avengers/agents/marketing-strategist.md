@@ -26,6 +26,44 @@ The Marketing Strategist conducts comprehensive market research, analyzes compet
 - **Market Research**: TAM-SAM-SOM sizing, customer segmentation, market trends analysis
 - **Repeated Launch Strategy (MAKE)**: Every significant update is a launch opportunity — re-launch on PH, HN, Reddit, press for each major milestone. Plan launch calendar around product milestones
 
+## Quality Standards
+
+### Phase 7 Output Requirements
+Read `quality/phase-rubrics.md` Phase 7 section + `knowledge/extended/gtm-advanced.md` before saving any output.
+
+**ICP Specificity Gate:**
+Target audience must NOT be generic. Required format:
+- Good: "Bootstrapped SaaS founders ($1K–$10K MRR) building developer tools in the US/EU"
+- Bad: "B2B SaaS companies", "SMBs", "tech companies"
+
+**First 100 Users — Concrete Plan Required:**
+Must specify: Channel + Tactic + Target Number + Timeline
+- Good: "100 signups: 40 from Product Hunt launch (Day 0), 40 from Reddit r/SaaS posts (Weeks 1–4), 20 from cold outreach (ongoing)"
+- Bad: "Use social media and SEO to acquire first users"
+
+**Channel Focus Standard:**
+Max 2 primary channels for first 90 days. Spreading across 5+ channels = failure mode for early-stage.
+
+**Launch Platform Rationale Required:**
+If recommending PH / HN / Reddit / influencer — state WHY this channel fits this product and audience.
+
+**Pre-Launch Warm-Up Mandate:**
+GTM plan must include ≥2 weeks of pre-launch community warm-up or waitlist building before any public launch.
+
+**Self-Assessment Block (add at top of GTM strategy before saving):**
+```markdown
+---
+**GTM Quality Check**
+- Depth: [1–3] — [specific tactics vs. generic channels]
+- Evidence: [1–3] — [channel benchmarks cited, competitor launch data referenced]
+- Specificity: [1–3] — [concrete numbers: X signups from Y channel in Z days]
+- ICP specificity: [specific/vague] — [role/size/problem/geography defined]
+- First 100 users plan: [concrete/generic]
+- Channel count (90-day focus): [X channels — should be ≤2 primary]
+- Unmet criteria: [list or "none"]
+---
+```
+
 ## Communication
 - **Reports to**: CMO (Chief Marketing Officer)
 - **Collaborates with**: Business Analyst (market data), Content Creator (content strategy), Growth Hacker (growth experiments)

@@ -3,6 +3,53 @@
 > **Project**: `/Users/jaykim/Documents/Projects/claude-ai-engineering`
 > **Scope**: `plugins/business-avengers/`
 
+## Session: 2026-03-02 23:54
+
+> **Context**: Sprint 2–4 완료 — 8개 extended KB 파일 생성 + 9개 에이전트 Quality Standards 추가 + SKILL.md 8개 Step 강화
+
+### Done
+- feat(knowledge/extended): Sprint 2 — Phase 0 + Phase 8 에이전트 강화
+  - `agents/product-manager.md` — Shape Up Appetite 기준, Feature justification, "Will NOT Build" 필수, RICE Confidence 게이트, Self-Assessment 블록 추가
+  - `agents/cfo.md` — Unit Economics 기준표(LTV:CAC >3:1, GM ≥70%), 3-Scenario 필수, Goldilocks 3-tier, Burn Multiple Red Flag 추가
+  - `SKILL.md` Step 4 (Phase 0) — `problem-validation-deep.md` + `phase-rubrics.md` 참조 추가, 4→11 Steps 확장 (Mom Test / JTBD / Assumption Register / Why Now)
+  - `SKILL.md` Step 12 (Phase 8) — `saas-metrics-bible.md` + `phase-rubrics.md` 참조 추가, Goldilocks/annual pricing steps 추가
+- feat(knowledge/extended): Sprint 3 — Phase 7 + Phase 10 에이전트 강화
+  - `knowledge/extended/gtm-advanced.md` 신규 생성 — Geoffrey Moore Chasm 전략, First 1,000 Users Playbook, Product Hunt/Indie Hacker 런치 플레이북, D-30→D+7 타임라인
+  - `knowledge/extended/growth-engineering.md` 신규 생성 — Sean Ellis PMF 40% 테스트, NSM 선정 기준, Andrew Chen 4 Growth Loop, ICE/RICE/BRASS 우선순위, Activation Engineering
+  - `agents/marketing-strategist.md` — ICP 구체성 게이트, First 100 Users 경로, 채널 집중 기준, Pre-launch warm-up 필수 추가
+  - `agents/growth-hacker.md` — PMF signal 선행, NSM Non-Negotiable, Growth Loop 정의, Aha Moment, ICE ≥6 실험 의무화 추가
+  - `SKILL.md` Step 11 (Phase 7) — `gtm-advanced.md` 참조, 7→12 Steps 확장 (ICP/First100/Pre-launch/Repeated Launch)
+  - `SKILL.md` Step 14 (Phase 10) — `growth-engineering.md` 참조, PMF/NSM/Loop/ICE steps 추가
+- feat(knowledge/extended): Sprint 4 — Phase 3 + Phase 4 + Phase 11 + Phase 12 에이전트 강화
+  - `knowledge/extended/design-advanced.md` 신규 생성 — Nielsen 10 Heuristics, Conversion Design, Empty/Error/Loading States, Friction Audit, Mobile-first 기준
+  - `knowledge/extended/tech-architecture-advanced.md` 신규 생성 — Boring Technology 40h 룰, MVA monolith 진화 경로, AWS Well-Architected 5 Pillars, OWASP Top 10, ADR 형식
+  - `knowledge/extended/automation-scale.md` 신규 생성 — Automation ROI 공식, Bus Test 10문항, 3-Tier Stack, 3-Tier Monitoring, Autonomous Org 구조
+  - `knowledge/extended/exit-strategy.md` 신규 생성 — Acquire.com 멀티플 테이블, 멀티플 드라이버/킬러, FIRE 계산 공식, DD 체크리스트, Scale vs. Sell 프레임워크
+  - `agents/design-lead.md` — Design System 9-element gate, Nielsen 필수 5개, CTA hierarchy 1개 primary 룰 추가
+  - `agents/tech-lead.md` — Boring Tech 40h 기준, ADR 5개 필수, OWASP Top 10 의무, 10× sizing 룰, No-code assessment 필수 추가
+  - `agents/devops-engineer.md` — Automation ROI gate (payback <8주), Bus Test 필수(≥8/10), 3-Tier Monitoring 의무, Failure path 필수 추가
+  - `agents/revenue-strategist.md` — Acquire.com 벤치마크 필수, Scale vs. Sell 명시적 결정, Multiple 개선 로드맵, FIRE 계산 추가
+  - `SKILL.md` Step 7 (Phase 3) — `design-advanced.md` 참조, design-lead/ui-designer 양쪽 6→9 Steps 확장
+  - `SKILL.md` Step 8 (Phase 4) — `tech-architecture-advanced.md` 참조, 7→12 Steps 확장 (ADR/OWASP/No-code assessment)
+  - `SKILL.md` Step 15 (Phase 11) — `automation-scale.md` 참조, ROI/Bus Test/3-Tier steps 추가
+  - `SKILL.md` Step 16 (Phase 12) — `exit-strategy.md` 참조, 6→11 Steps 확장 (benchmarked valuation/FIRE/Scale vs. Sell)
+
+### Decisions
+- KB 언어: 모든 extended KB 파일 영어로 작성 (토큰 1.5–2× 절감, 에이전트 지시사항과 동일 언어)
+- Self-Assessment 블록 표준화: 모든 에이전트에 동일한 형식의 Quality Check 블록 삽입 (Depth/Evidence/Specificity 3차원 + 미충족 기준 명시)
+- Quality Standards 위치: `## Expert Frameworks`와 `## Communication` 사이에 삽입 (기존 구조 최소 침범)
+- 아직 강화하지 않은 Step(2, 6, 9, 10, 13)은 다음 Sprint에서 처리
+
+### Next
+- [ ] E2E 테스트: 실제 아이디어 1개로 전체 파이프라인 실행 후 품질 비교 (고도화 전/후 Phase별 Self-Assessment 점수 확인)
+- [ ] Phase 2 (PRD) `SKILL.md` Step 6 강화 — `product-manager.md` Extended KB 참조 + quality check 지시 추가
+- [ ] Phase 5 (Dev Guide) `SKILL.md` Step 9 강화 — frontend-dev + backend-dev + devops-engineer tasks
+- [ ] Phase 6 (QA) `SKILL.md` Step 10 강화 — qa-lead task, Test Pyramid + Core Web Vitals 기준 추가
+- [ ] Phase 9 (Operations) `SKILL.md` Step 13 강화 — cs-manager + data-analyst tasks, North Star Metric + AARRR 기준 추가
+- [ ] 나머지 에이전트 Quality Standards 추가 — ui-designer, ux-researcher, coo, cto, cmo, cpo, frontend-dev, backend-dev, qa-lead, cs-manager 등
+
+---
+
 ## Session: 2026-02-25 14:51
 
 > **Context**: v2.1 감사 37건 잔여 항목 완료 + Phase 0 아이디어 문서 입력 기능 추가

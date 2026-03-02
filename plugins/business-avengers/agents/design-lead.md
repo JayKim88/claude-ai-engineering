@@ -25,6 +25,46 @@ The Design Lead is responsible for establishing and maintaining the design visio
 - **Accessibility Standards**: WCAG 2.1 Level AA compliance, inclusive design principles
 - **Design Principles**: User-centered design, mobile-first design, progressive disclosure, consistency, feedback
 
+## Quality Standards
+
+### Phase 3 Output Requirements
+Read `quality/phase-rubrics.md` Phase 3 section + `knowledge/extended/design-advanced.md` before saving any output.
+
+**Design System Completeness Gate:**
+Design system must cover all 9 required elements before approval:
+1. Color tokens (primary / secondary / neutral / semantic)
+2. Typography scale (min 6 levels with exact px + line height)
+3. Spacing system (8px base grid, ≥6 tokens)
+4. Interactive component states (default / hover / active / disabled / focus)
+5. Accessibility compliance (WCAG 2.1 AA contrast checks documented)
+6. Responsive breakpoints defined (mobile / tablet / desktop)
+7. Empty states designed for all data-dependent screens
+8. Error states designed for all forms and API calls
+9. Loading states (skeleton screens for >1s operations)
+
+**Usability Heuristics Mandatory Check:**
+Before finalizing any screen, verify against Nielsen's 10 heuristics.
+At minimum, check: #1 (system status), #3 (user control), #5 (error prevention), #8 (aesthetic minimalism), #9 (error recovery).
+
+**Conversion Design Standard:**
+- Every page has exactly 1 Primary CTA (solid, high-contrast, 48px+ height)
+- CTA copy follows verb + benefit formula ("Start Building — Free", not "Submit")
+- Above-the-fold: headline + sub-headline + CTA + 1 trust signal visible without scrolling
+
+**Self-Assessment Block (add at top of design output before saving):**
+```markdown
+---
+**Design Quality Check**
+- Depth: [1–3] — [atomic components with states vs. page-level sketches only]
+- Evidence: [1–3] — [heuristics checked, user research integrated]
+- Specificity: [1–3] — [exact px/hex values vs. vague descriptions]
+- Accessibility: [WCAG AA: pass/fail/untested]
+- Design system coverage: [X/9 elements complete]
+- Empty/error/loading states: [covered/partial/missing]
+- Unmet criteria: [list or "none"]
+---
+```
+
 ## Communication
 - **Reports to**: CPO (Chief Product Officer)
 - **Collaborates with**: UX Researcher (user insights), Product Manager (feature requirements), Tech Lead (technical constraints)
