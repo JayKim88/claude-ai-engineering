@@ -22,6 +22,25 @@
 
 ---
 
+## Jobs to Be Done (JTBD)
+
+<!-- The core "hiring" statement: in what situation does someone hire this product, and to do what job? -->
+
+**Core JTBD Statement:**
+> **When** {{JTBD_SITUATION}},
+> **I want to** {{JTBD_MOTIVATION}},
+> **so I can** {{JTBD_OUTCOME}}.
+
+**Functional Job** (practical task to accomplish): {{FUNCTIONAL_JOB}}
+**Emotional Job** (how they want to feel): {{EMOTIONAL_JOB}}
+**Social Job** (how they want to be perceived): {{SOCIAL_JOB}}
+
+**Switching Trigger:**
+{{SWITCHING_TRIGGER}}
+<!-- What specific frustration or life event pushes someone from their current solution to try yours? -->
+
+---
+
 ## Solution Hypothesis
 
 <!-- Your proposed solution. Focus on the core innovation, not features. -->
@@ -121,6 +140,22 @@
 **If Technology/Trend/Copy-first, reframe:**
 {{REFRAME_TO_PROBLEM}}
 <!-- Force yourself to articulate the PROBLEM, not the solution -->
+
+---
+
+## Why Now
+
+<!-- Why is this the right moment to build this? What changed in the last 1-3 years? -->
+
+**The Timing Trigger:**
+{{WHY_NOW_TRIGGER}}
+<!-- Choose one or more: Technology shift / Behavioral shift / Regulatory shift / Cost shift -->
+
+**What this enables that wasn't possible before:**
+{{WHY_NOW_ENABLEMENT}}
+
+**Window of opportunity:** {{OPPORTUNITY_WINDOW}}
+<!-- Is this a temporary window (act fast) or a durable shift (timing flexible)? -->
 
 ---
 

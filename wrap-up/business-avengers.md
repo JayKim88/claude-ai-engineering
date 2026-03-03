@@ -3,6 +3,61 @@
 > **Project**: `/Users/jaykim/Documents/Projects/claude-ai-engineering`
 > **Scope**: `plugins/business-avengers/`
 
+## Session: 2026-03-03 23:44
+
+> **Context**: Per-phase fine-tuning kick-off — Phase 0 ideation Q&A redesign + JTBD/Why Now additions, Phase 2 PM knowledge doc creation
+
+### Done
+- feat(SKILL.md Step 4): Phase 0 Q&A redesigned from 5 transactional questions → 7 exploratory questions
+  - Added story-based problem discovery ("walk me through the last time you faced this")
+  - Added Why Now question ("what changed recently that makes this the right moment?")
+  - Added Switching Trigger question ("what would push someone from their current solution?")
+  - Added closing open question for anything missed
+  - CPO now introduces the conversation with "discovery mode" framing
+- feat(agents/product-manager.md): Added Phase 0 expert frameworks section
+  - Mom Test application rules (past-tense behavioral framing, false positive filters)
+  - JTBD writing standard with 3 job types (Functional / Emotional / Social)
+  - Why Now evaluation (Technology / Behavioral / Regulatory / Cost shift taxonomy)
+  - Competitive Moat Test (structural vs. copyable differentiation)
+  - Own Problem Validation guidance
+- feat(templates/idea-canvas.md): Added JTBD section and Why Now section
+  - JTBD: Core statement format + 3 job type fields + Switching Trigger field
+  - Why Now: Timing Trigger + Enablement + Opportunity Window fields
+- feat(quality/phase-rubrics.md): Expanded Phase 0 mandatory checklist and rubric
+  - Checklist: JTBD format check + Why Now presence check added
+  - Rubric: expanded from 4 → 6 criteria (added JTBD quality + Why Now)
+- feat(SKILL.md Step 4 PM task): Strengthened PM task instructions
+  - JTBD 3-type fill requirement (Functional/Emotional/Social + Switching Trigger)
+  - Why Now explicit requirement (or flag as timing risk)
+  - Differentiation 6-month moat test
+  - "Every placeholder must be filled" rule added
+- feat(knowledge/extended/prd-methods-advanced.md): New knowledge doc created
+  - Inspired (Marty Cagan): 4 product risks, Opportunity Assessment 10 questions
+  - Shape Up (Ryan Singer): Appetite sizing, Pitch format, Shaping, Hill Charts
+  - User Story Mapping (Jeff Patton): Backbone, Walking Skeleton, Release slices
+  - Continuous Discovery (Teresa Torres): Opportunity Solution Tree, Assumption Testing
+  - PRD quality standards: outcome metrics, "Will NOT Build" format, RICE Confidence Gate
+  - JTBD-based persona format (behavior > demographics)
+- feat(SKILL.md Step 6 PM task): Phase 2 PM task strengthened (from previous Next)
+  - Added prd-methods-advanced.md to knowledge base references
+  - Added phase-rubrics.md reference
+  - Expanded from 6 → 18 detailed steps covering Shape Up, 4 product risks, Story Map, RICE gate
+
+### Decisions
+- Phase 0 Q&A: transactional 5-question form → conversational 7-question exploration (Mom Test principle)
+- Agent architecture: agent def = role + framework overview (thin) / knowledge doc = deep content with examples (Option B preferred)
+- prd-methods-advanced.md: integrated Shape Up + Inspired + Story Mapping into single reference doc vs. separate files
+
+### Next
+- [ ] Test Phase 0 with updated Q&A: verify JTBD/Why Now sections are properly filled in idea-canvas output
+- [ ] Phase 1 (Market Research) fine-tuning — business-analyst, marketing-strategist, revenue-strategist agents
+- [ ] Phase 5 (Dev Guide) SKILL.md Step 9 strengthening — frontend-dev + backend-dev + devops-engineer
+- [ ] Phase 6 (QA) SKILL.md Step 10 strengthening — qa-lead task, Test Pyramid + Core Web Vitals
+- [ ] Phase 9 (Operations) SKILL.md Step 13 strengthening — cs-manager + data-analyst tasks
+- [ ] Remaining agent Quality Standards — ui-designer, ux-researcher, coo, cto, cmo, cpo, frontend-dev, backend-dev, qa-lead, cs-manager
+
+---
+
 ## Session: 2026-03-02 23:54
 
 > **Context**: Sprint 2–4 완료 — 8개 extended KB 파일 생성 + 9개 에이전트 Quality Standards 추가 + SKILL.md 8개 Step 강화
@@ -42,7 +97,7 @@
 
 ### Next
 - [ ] E2E 테스트: 실제 아이디어 1개로 전체 파이프라인 실행 후 품질 비교 (고도화 전/후 Phase별 Self-Assessment 점수 확인)
-- [ ] Phase 2 (PRD) `SKILL.md` Step 6 강화 — `product-manager.md` Extended KB 참조 + quality check 지시 추가
+- [x] Phase 2 (PRD) `SKILL.md` Step 6 강화 — `product-manager.md` Extended KB 참조 + quality check 지시 추가 (from previous Next)
 - [ ] Phase 5 (Dev Guide) `SKILL.md` Step 9 강화 — frontend-dev + backend-dev + devops-engineer tasks
 - [ ] Phase 6 (QA) `SKILL.md` Step 10 강화 — qa-lead task, Test Pyramid + Core Web Vitals 기준 추가
 - [ ] Phase 9 (Operations) `SKILL.md` Step 13 강화 — cs-manager + data-analyst tasks, North Star Metric + AARRR 기준 추가

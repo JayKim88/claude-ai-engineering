@@ -42,6 +42,16 @@
 
 □ Are 2+ core assumptions explicitly listed?
   (Naming assumptions before validation clarifies future pivot decisions)
+
+□ Is a JTBD statement written in "When [X] / I want [Y] / So I can [Z]" format?
+  - BAD: "Users want a faster invoicing tool"
+  - GOOD: "When I finish a project and need to get paid quickly,
+           I want to send a professional invoice in under 5 minutes,
+           so I can maintain cash flow without looking disorganized to clients"
+
+□ Is a "Why Now" or switching trigger present?
+  - What changed recently (technology / behavior / regulation / cost) that makes this timely?
+  - If no "Why Now" exists, it must be explicitly flagged as a timing risk
 ```
 
 ### Rubric (Phase 0)
@@ -52,6 +62,8 @@
 | **Differentiation** | "We do it better" | Specific feature advantage | Structural reason competitors cannot replicate |
 | **Revenue hypothesis** | None | "Subscription" mentioned | "$X/month, basis: comparable service Y at $Z" |
 | **Assumptions stated** | None | < 2 | 2+ with proposed validation method |
+| **JTBD quality** | Missing or generic ("users want X") | Functional job stated only | Situation + motivation + outcome, all specific; switching trigger identified |
+| **Why Now** | None | General trend mentioned ("AI is growing") | Named technology/behavior/regulatory shift with specific enabling change |
 
 ---
 

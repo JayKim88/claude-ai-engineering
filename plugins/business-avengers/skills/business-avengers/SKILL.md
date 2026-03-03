@@ -346,18 +346,58 @@ if "Yes" in has_doc:
     all_qa_responses = f"[CEO-provided idea document]\n{idea_doc}"
 
 else:
-    # 4.3b Interactive Q&A flow (original behavior)
-    """[CPO] I'll ask you a few questions to help refine your idea."""
+    # 4.3b Interactive Q&A flow — conversational ideation dialogue
+    """
+    [CPO] Let's explore your idea together. Don't worry about being precise —
+    we're in discovery mode. Answer freely and we'll shape it together.
+    """
     questions = [
-      "What specific problem does this service solve?",
-      "Who are the main target users? (age, occupation, situation, etc.)",
-      "How are users currently solving this problem? (existing alternatives)",
-      "What is the core differentiation of our service compared to existing alternatives?",
-      "How do you expect to generate the first revenue?",
+        # 1. Problem Discovery — past-tense, story-based (Mom Test principle)
+        "Tell me about a concrete moment when you — or someone you know closely — "
+        "ran into this problem. What exactly happened? Walk me through the situation.",
+
+        # 2. Existing Solutions — map the full landscape of workarounds
+        "How do people currently deal with this? List every option you know: "
+        "tools, services, manual workarounds, or just living with it. "
+        "For each option, what's the main frustration or limitation?",
+
+        # 3. Target Person — sharpen the one specific person who hurts most
+        "Picture the ONE person who has this problem most severely right now. "
+        "Who are they? What are they doing, and when does this problem hit them hardest?",
+
+        # 4. Why Now — the timing question (Zero to One / 'secret' framing)
+        "Why hasn't a great solution to this existed before? "
+        "What changed recently — in technology, behavior, regulation, or the market — "
+        "that makes this the right moment to build it?",
+
+        # 5. Differentiation + Moat
+        "What would your solution offer that's fundamentally different from what's out there? "
+        "And why couldn't an existing player or well-funded competitor copy it within 6 months?",
+
+        # 6. Switching Trigger — JTBD framing (what pushes someone to switch?)
+        "Think of someone currently using the best existing alternative. "
+        "What specific frustration or life event would push them to look for something better — "
+        "and give your product a real try?",
+
+        # 7. Revenue Signal — WTP evidence
+        "How do you see this making money? "
+        "And do you have any signal that people would actually pay — "
+        "e.g., complaints about current costs, a price someone mentioned, or industry benchmarks?",
     ]
 
     for q in questions:
-      AskUserQuestion(q, allow_freeform=True)
+        AskUserQuestion(q, allow_freeform=True)
+
+    # CPO synthesizes and opens space for anything missed
+    """
+    [CPO] Thanks — I have a good picture of the idea. Before I build the Idea Canvas,
+    is there anything else important to add? Personal motivation, past experiments,
+    key constraints, or context that shaped this idea?
+    """
+    AskUserQuestion(
+        "[CPO] Anything else to add before I build the Idea Canvas?",
+        allow_freeform=True
+    )
 
     # all_qa_responses is collected from the Q&A above
 
@@ -386,19 +426,25 @@ Task(
   - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 0 section)
 
   Task:
-  1. Read the agent definition and internalize your role and expert frameworks
+  1. Read the agent definition — internalize Phase 0 role (problem validation specialist, not feature writer)
   2. Read problem-validation-deep.md — apply Mom Test and JTBD criteria to the problem framing
-  3. Read template: {TEMPLATE_DIR}/idea-canvas.md
+  3. Read template: {TEMPLATE_DIR}/idea-canvas.md — fill ALL sections including JTBD and Why Now
   4. Apply Mom Test: problem framing must contain zero solution language — specific person + specific situation + quantified pain
-  5. Write JTBD statement: "When [X], I want [Y], so I can [Z]"
-  6. Include revenue hypothesis with basis (comparable product price, interview signal, or cost-of-current-solution)
-  7. List ≥3 core assumptions with validation methods in an Assumption Register
-  8. State "Why Now" if applicable (technology / regulatory / behavioral trigger)
-  9. Check phase-rubrics.md Phase 0 checklist, fix any unmet items
-  10. Add Quality Self-Assessment block at top of output
-  11. Save with Write: {PROJECT_DIR}/phase-0-ideation/idea-canvas.md
+  5. Write JTBD statement in the template's JTBD section:
+     - Core statement: "When [X], I want [Y], so I can [Z]" — must be specific, not generic
+     - Identify the Switching Trigger: what frustration or life event pushes someone from their current solution?
+     - Fill all three job types: Functional / Emotional / Social
+  6. Fill the "Why Now" section:
+     - Name the specific technology / behavioral / regulatory / cost shift that makes this timely
+     - If no clear "Why Now" exists, state this explicitly as a timing risk
+  7. Include revenue hypothesis with basis (comparable product price, interview signal, or cost-of-current-solution)
+  8. List ≥3 core assumptions with validation methods in an Assumption Register
+  9. Test differentiation: would competitors need 6+ months to replicate? If not, flag it
+  10. Check phase-rubrics.md Phase 0 checklist — fix any unmet items before saving
+  11. Add Quality Self-Assessment block at top of output
+  12. Save with Write: {PROJECT_DIR}/phase-0-ideation/idea-canvas.md
 
-  Write professionally and concretely. No vague expressions.
+  Write professionally and concretely. No vague expressions. Every placeholder must be filled.
   """
 )
 
@@ -654,6 +700,10 @@ Task(
 
   Knowledge Base (Read these files):
   - {KNOWLEDGE_DIR}/startup-best-practices.md
+  - {KNOWLEDGE_DIR}/extended/prd-methods-advanced.md
+
+  Quality Rubric (Read this file):
+  - {PLUGIN_DIR}/quality/phase-rubrics.md  (refer to Phase 2 section)
 
   Template (Read these files):
   - {TEMPLATE_DIR}/prd.md
@@ -663,15 +713,35 @@ Task(
   {sprint_context}
 
   Task:
-  1. Read the agent definition and internalize your role and expert frameworks
-  2. Read the Knowledge Base for reference
-  3. Write the PRD incorporating market analysis findings
-  4. Write User Stories following the INVEST principle
-  5. Organize feature priority using the MoSCoW framework
-  6. Fill in {{PLACEHOLDER}} in each template and save with Write:
-     - {PROJECT_DIR}/phase-2-product-planning/prd.md
-     - {PROJECT_DIR}/phase-2-product-planning/user-stories.md
-     - {PROJECT_DIR}/phase-2-product-planning/feature-priority.md
+  1. Read the agent definition — apply Phase 2 role (PRD & Backlog) frameworks
+  2. Read prd-methods-advanced.md thoroughly — apply Shape Up, Inspired, Story Mapping standards
+  3. Read templates — fill ALL placeholders, no empty fields
+
+  PRD (prd.md):
+  4. Write problem statement in "specific person + specific situation + quantified pain" format
+  5. Define success metrics as action-based outcomes (not output metrics like "launch X")
+  6. Apply Shape Up appetite: MVP must fit 1 person × 6 weeks — if not, cut to v1.1
+  7. For each Must-Have feature, add ONE business justification (churn/value-prop/distribution/monetization blocker)
+  8. Address four product risks per Must-Have: Value / Usability / Feasibility / Viability
+  9. Write "What We Will NOT Build" section with ≥3 explicitly deferred items and rationale
+
+  User Stories (user-stories.md):
+  10. Write stories as: "As [specific persona], I want [action], so that [outcome]"
+  11. Add Given-When-Then acceptance criteria for each Must-Have story
+  12. Build Story Map: organize stories by backbone activities → identify walking skeleton
+
+  Feature Priority (feature-priority.md):
+  13. Apply MoSCoW classification
+  14. Apply RICE scoring for Must-Have features only
+  15. Move features with RICE Confidence <50% to "Uncertain Priority" section
+
+  Final checks:
+  16. Check phase-rubrics.md Phase 2 checklist — fix any unmet items
+  17. Add Quality Self-Assessment block at top of PRD
+  18. Save with Write:
+      - {PROJECT_DIR}/phase-2-product-planning/prd.md
+      - {PROJECT_DIR}/phase-2-product-planning/user-stories.md
+      - {PROJECT_DIR}/phase-2-product-planning/feature-priority.md
   """)
 
 Task(

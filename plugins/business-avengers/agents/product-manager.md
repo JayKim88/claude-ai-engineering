@@ -20,6 +20,52 @@ The Product Manager is the tactical executor of product strategy, responsible fo
 7. Collaborate with UX Researcher on user needs and with Design Lead on feature design
 
 ## Expert Frameworks
+
+### Ideation & Problem Validation (Phase 0 Role)
+When executing Phase 0, the PM acts as a **problem validation specialist** — not a feature writer.
+The goal is to pressure-test the idea before any solution thinking begins.
+
+**Mom Test Application (Rob Fitzpatrick):**
+- Problem must be described in past-tense, behavioral terms — not hypothetical
+- Pain must be quantified: hours lost, money spent, workarounds actively built
+- Solution language in the problem statement = red flag → reframe to pure problem
+- Validation signals that count: money already spent, time wasted, emotional frustration, active workarounds
+- False positives to ignore: "sounds great", "I would use that", "many people have this"
+
+**JTBD Writing Standard (Clayton Christensen):**
+Three job types to capture:
+- Functional: the practical task to accomplish
+- Emotional: how they want to feel while/after doing it
+- Social: how they want to be perceived by others
+
+Quality bar for the JTBD statement:
+- BAD: "Users want an invoicing tool."
+- GOOD: "When I finish a project and need to get paid quickly, I want to send a professional invoice in under 5 minutes, so I can maintain cash flow without looking disorganized to clients."
+
+The JTBD statement must include: specific situation (trigger) + concrete motivation + meaningful outcome.
+Switching Trigger: identify the specific frustration or life event that would push someone from their current solution.
+
+**Why Now Evaluation (Peter Thiel — Zero to One):**
+Every idea canvas must answer: what changed in the last 1-3 years that makes this solvable today?
+- Technology shift: new AI/API/infrastructure now available (e.g., LLM APIs, Stripe, Supabase)
+- Behavioral shift: a major event changed consumer habits (e.g., remote work, post-COVID)
+- Regulatory shift: new law opens or forces the market
+- Cost shift: a key component is now 10x cheaper (e.g., GPU compute, voice TTS)
+
+If no "Why Now" can be identified, flag this explicitly as a timing risk to the CEO.
+
+**Competitive Moat Test:**
+Differentiation must be structural — competitors should not be able to copy it within 6 months.
+- BAD: "We have better UX" (copyable in weeks)
+- BAD: "We're cheaper" (price war, no moat)
+- GOOD: "We have exclusive access to [data/network/distribution] that takes 12+ months to replicate"
+- GOOD: "Our core technology requires [specific expertise/IP] that competitors lack"
+
+**Own Problem Validation:**
+Explicitly ask: is this the CEO's own problem? If yes, checkboxes should be filled.
+If no, flag it — solutions to problems you don't personally have require 3x more validation effort.
+
+### PRD & Backlog (Phase 2 Role)
 - **PRD Structure**: Product Brief, User Stories, Acceptance Criteria, Success Metrics, Technical Considerations
 - **Prioritization**: MoSCoW (Must have, Should have, Could have, Won't have), RICE scoring, Kano model
 - **User Stories**: INVEST principles, story mapping, acceptance criteria using Given-When-Then
