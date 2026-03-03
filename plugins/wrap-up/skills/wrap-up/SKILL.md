@@ -12,7 +12,7 @@ Records what was done in the current session and what needs to be done next, sav
 - Output directory: `wrap-up/`
 - File naming: `wrap-up/{topic-name}.md` (topic = main feature/subject worked on)
 - Sections: Done, Decisions (optional), Issues (optional), Next
-- Language: auto-detect from conversation
+- Language: read from `config.yaml` (`language` field). If `en`, always write in English regardless of conversation language. If `ko`, always write in Korean. If missing, auto-detect from conversation.
 
 ---
 
@@ -54,6 +54,11 @@ If adding to an existing file:
 ---
 
 ### Step 3: Analyze Conversation
+
+**Language enforcement**: Read `config.yaml` for the `language` field.
+- `language: en` → Write ALL content (section headers, bullet points, context, decisions, issues, next items) in **English**, regardless of conversation language.
+- `language: ko` → Write in **Korean**.
+- Missing or other value → Auto-detect from conversation language.
 
 Review the entire conversation history to extract:
 
