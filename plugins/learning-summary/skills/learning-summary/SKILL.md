@@ -1,7 +1,6 @@
 ---
 name: learning-summary
 description: Summarize and document key learnings from the conversation. Use when user says "summarize", "document", "what did I learn", or wants to capture insights.
-version: 2.0.0
 ---
 
 # Learning Summary
@@ -65,6 +64,56 @@ Create descriptive filename based on main topic:
 - `2026-01-17-claude-code-marketplace-guide.md`
 - `2026-01-17-python-async-programming.md`
 - `2026-01-17-docker-compose-networking.md`
+
+---
+
+### Step 3.5: Check for Existing Files
+
+After generating the filename, scan the output directory for conflicts:
+
+**Check 1 — Exact filename match**:
+```
+Glob: {output_dir}/{filename}
+```
+If the exact file exists → it's the same topic on the same day.
+
+**Check 2 — Same-date files** (even if topic differs):
+```
+Glob: {output_dir}/{YYYY-MM-DD}-*.md
+```
+Collect all files with today's date prefix.
+
+**If any existing files are found**, ask the user:
+
+```
+AskUserQuestion(
+  question: "오늘 날짜의 학습 파일이 이미 있습니다. 어떻게 할까요?",
+  options: [
+    {
+      label: "이어서 추가 (Append)",
+      description: "기존 파일 맨 아래에 새 섹션으로 추가합니다."
+    },
+    {
+      label: "새 파일 생성 (New File)",
+      description: "별도 파일로 독립 저장합니다. (파일명 충돌 시 -2 접미사 추가)"
+    }
+  ]
+)
+```
+
+Show existing filenames in the question for context (e.g., `Found: 2026-03-03-python-async.md`).
+
+**If user selects Append**:
+- Read the existing file with the Read tool
+- In Step 5, use Edit (not Write) to append a `---` separator + new content block at the end
+- Update the frontmatter `tags` to merge old + new tags (deduplicated)
+- Skip frontmatter rewrite if it would break existing structure — append only to body
+
+**If user selects New File**:
+- If exact filename conflict → append `-2` suffix (e.g., `2026-03-03-topic-2.md`)
+- Proceed normally with Write in Step 5
+
+**If no existing files found**: Skip this step entirely, proceed to Step 4.
 
 ---
 
@@ -205,6 +254,7 @@ Show the user:
 | Git not initialized | `Warning: Not a git repository. Skipping auto-commit.` |
 | Write permission denied | `Error: Cannot write to {path}. Check permissions: ls -la {dir}` |
 | Empty conversation | `Warning: Not enough content to summarize. Continue the conversation first.` |
+| Append fails (malformed file) | Fall back to new file with `-2` suffix; warn user |
 | Invalid YAML config | `Warning: Invalid config.yaml. Using defaults.` |
 | Git commit fails | `Warning: Git commit failed. Document saved but not committed.` |
 
